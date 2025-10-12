@@ -1,0 +1,662 @@
+{
+    "Weapon": [
+        {
+            "name": "Club",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 1,
+            "properties": [
+                "Light",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Dagger",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 2,
+            "properties": [
+                "Finesse",
+                "Light",
+                "Thrown",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Greatclub",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 2,
+            "properties": [
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Handaxe",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": [
+                "Light",
+                "Thrown",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Javelin",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": [
+                "Thrown",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Light hammer",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 2,
+            "properties": [
+                "Light",
+                "Thrown",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Mace",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": [
+                "Monk"
+            ]
+        },
+        {
+            "name": "Quarterstaff",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 2,
+            "properties": [
+                "Versatile",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Sickle",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 1,
+            "properties": [
+                "Light",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Spear",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 1,
+            "properties": [
+                "Thrown",
+                "Versatile",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Crossbow, light",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 80,
+            "range_long": 320,
+            "cost": 25,
+            "properties": [
+                "Ammunition",
+                "Loading",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Dart",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 20,
+            "range_long": 60,
+            "cost": 5,
+            "properties": [
+                "Finesse",
+                "Thrown"
+            ]
+        },
+        {
+            "name": "Shortbow",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 80,
+            "range_long": 320,
+            "cost": 25,
+            "properties": [
+                "Ammunition",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Sling",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 30,
+            "range_long": 120,
+            "cost": 1,
+            "properties": [
+                "Ammunition"
+            ]
+        },
+        {
+            "name": "Battleaxe",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 10,
+            "properties": [
+                "Versatile"
+            ]
+        },
+        {
+            "name": "Flail",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 10,
+            "properties": []
+        },
+        {
+            "name": "Glaive",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d10",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 20,
+            "properties": [
+                "Heavy",
+                "Reach",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Greataxe",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d12",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 30,
+            "properties": [
+                "Heavy",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Greatsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "2d6",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 50,
+            "properties": [
+                "Heavy",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Halberd",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d10",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 20,
+            "properties": [
+                "Heavy",
+                "Reach",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Lance",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d12",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 10,
+            "properties": [
+                "Reach",
+                "Special"
+            ]
+        },
+        {
+            "name": "Longsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 15,
+            "properties": [
+                "Versatile"
+            ]
+        },
+        {
+            "name": "Maul",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "2d6",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 10,
+            "properties": [
+                "Heavy",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Morningstar",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 15,
+            "properties": []
+        },
+        {
+            "name": "Pike",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d10",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": [
+                "Heavy",
+                "Reach",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Rapier",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 25,
+            "properties": [
+                "Finesse"
+            ]
+        },
+        {
+            "name": "Scimitar",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 25,
+            "properties": [
+                "Finesse",
+                "Light"
+            ]
+        },
+        {
+            "name": "Shortsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 10,
+            "properties": [
+                "Finesse",
+                "Light",
+                "Monk"
+            ]
+        },
+        {
+            "name": "Trident",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": [
+                "Thrown",
+                "Versatile"
+            ]
+        },
+        {
+            "name": "War pick",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 5,
+            "properties": []
+        },
+        {
+            "name": "Warhammer",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Bludgeoning",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 15,
+            "properties": [
+                "Versatile"
+            ]
+        },
+        {
+            "name": "Whip",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee",
+            "damage_dice": "1d4",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": null,
+            "cost": 2,
+            "properties": [
+                "Finesse",
+                "Reach"
+            ]
+        },
+        {
+            "name": "Blowgun",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d1",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 25,
+            "range_long": 100,
+            "cost": 10,
+            "properties": [
+                "Ammunition",
+                "Loading"
+            ]
+        },
+        {
+            "name": "Crossbow, hand",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d6",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 30,
+            "range_long": 120,
+            "cost": 75,
+            "properties": [
+                "Ammunition",
+                "Light",
+                "Loading"
+            ]
+        },
+        {
+            "name": "Crossbow, heavy",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d10",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 100,
+            "range_long": 400,
+            "cost": 50,
+            "properties": [
+                "Ammunition",
+                "Light",
+                "Loading",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Longbow",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d8",
+            "damage_bonus": 0,
+            "damage_type": "Piercing",
+            "range_normal": 150,
+            "range_long": 600,
+            "cost": 50,
+            "properties": [
+                "Ammunition",
+                "Heavy",
+                "Two-Handed"
+            ]
+        },
+        {
+            "name": "Net",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged",
+            "damage_dice": "1d0",
+            "damage_bonus": 0,
+            "damage_type": "Slashing",
+            "range_normal": 5,
+            "range_long": 15,
+            "cost": 1,
+            "properties": [
+                "Thrown",
+                "Special"
+            ]
+        }
+    ],
+    "Shield": [
+        {
+            "name": "Shield",
+            "base": 2,
+            "cost": 10
+        }
+    ],
+    "Armor": [
+        {
+            "name": "Padded Armor",
+            "category": "Light",
+            "base": 11,
+            "dex_bonus": true,
+            "max_bonus": null,
+            "cost": 5
+        },
+        {
+            "name": "Leather Armor",
+            "category": "Light",
+            "base": 11,
+            "dex_bonus": true,
+            "max_bonus": null,
+            "cost": 10
+        },
+        {
+            "name": "Studded Leather Armor",
+            "category": "Light",
+            "base": 12,
+            "dex_bonus": true,
+            "max_bonus": null,
+            "cost": 45
+        },
+        {
+            "name": "Hide Armor",
+            "category": "Medium",
+            "base": 12,
+            "dex_bonus": true,
+            "max_bonus": 2,
+            "cost": 10
+        },
+        {
+            "name": "Chain Shirt Armor",
+            "category": "Medium",
+            "base": 13,
+            "dex_bonus": true,
+            "max_bonus": 2,
+            "cost": 50
+        },
+        {
+            "name": "Scale Mail Armor",
+            "category": "Medium",
+            "base": 14,
+            "dex_bonus": true,
+            "max_bonus": 2,
+            "cost": 50
+        },
+        {
+            "name": "Breastplate Armor",
+            "category": "Medium",
+            "base": 14,
+            "dex_bonus": true,
+            "max_bonus": 2,
+            "cost": 400
+        },
+        {
+            "name": "Half Plate Armor",
+            "category": "Medium",
+            "base": 15,
+            "dex_bonus": true,
+            "max_bonus": 2,
+            "cost": 750
+        },
+        {
+            "name": "Ring Mail Armor",
+            "category": "Heavy",
+            "base": 14,
+            "dex_bonus": false,
+            "max_bonus": null,
+            "cost": 30
+        },
+        {
+            "name": "Chain Mail Armor",
+            "category": "Heavy",
+            "base": 16,
+            "dex_bonus": false,
+            "max_bonus": null,
+            "cost": 75
+        },
+        {
+            "name": "Splint Armor",
+            "category": "Heavy",
+            "base": 17,
+            "dex_bonus": false,
+            "max_bonus": null,
+            "cost": 200
+        },
+        {
+            "name": "Plate Armor",
+            "category": "Heavy",
+            "base": 18,
+            "dex_bonus": false,
+            "max_bonus": null,
+            "cost": 1500
+        }
+    ]
+}

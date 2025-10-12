@@ -1,0 +1,2 @@
+[console_scripts]
+dndassist = dndassist.__main__:main

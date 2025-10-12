@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dndassist"
+version = "0.0.0"
+
+[project.scripts]
+dndassist = "dndassist.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["./src"]
+
+[tool.setuptools.package-data]
+myModule = ["*.yaml", "*.json"]
