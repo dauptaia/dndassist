@@ -1,0 +1,36 @@
+name: "Forest Glade"
+ascii_map:
+  - "WWWWWWWWWWWW"
+  - "W  o   s  MW"
+  - "W       l  W"
+  - "WWWWWWWWWWWW"
+actors:
+  M1:
+    facing: NW
+    name: Monster 1
+    pos:
+    - 4
+    - 1
+    symbol: M
+  Player0:
+    facing: SE
+    name: Aelar
+    pos:
+    - 1
+    - 1
+    symbol: '@'
+  Player1:
+    facing: SE
+    name: Liana
+    pos:
+    - 1
+    - 2
+    symbol: '@'
+loots:
+  l1:
+    index: 1
+    name: Loot 1
+    pos:
+    - 8
+    - 1
+    symbol: l

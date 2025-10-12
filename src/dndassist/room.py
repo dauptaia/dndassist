@@ -6,6 +6,8 @@ import math
 import numpy
 from collections import defaultdict
 
+from dndassist.themes.themes import Theme
+
 # constants (tweakable)
 UNIT_M = 1.5                        # 1 tile/unit = 1.5 meters (matches your band example)
 MAX_UNITS = 50                      # max scanning distance in units
@@ -97,78 +99,14 @@ class Loot:
 class RoomMap:
     name: str
     tiles: Dict[Tuple[int, int], Tile]
+    theme: Theme
     width: int
     height: int
     elevation: Optional[Dict[Tuple[int, int], int]] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
 
-    # -------------------------------------------
-    @classmethod
-    def from_ascii(cls, name: str, ascii_map: str):
-        lines =  textwrap.dedent(ascii_map).strip().splitlines()
-        height = len(lines)
-        width = max(len(line) for line in lines)
-        tiles = {}
-        actors = {}
-        loots = {}
-        loot_counter, npc_counter, player_counter = 1, 1,1
-
-        for y, line in enumerate(lines):
-            for x, char in enumerate(line.ljust(width)):
-                if char == "M":
-                    key = f"M{npc_counter}"
-                    actors[key] = Actor(name=f"Monster {npc_counter}", symbol="M", index=npc_counter, pos=(x, y), facing="NW")
-                    npc_counter += 1
-                    tiles[(x, y)] = Tile(" ", True, False, "Floor")
-                elif char == "@":
-                    key = f"l{player_counter}"
-                    loots[key] = Actor(name=f"Player {player_counter}", symbol="@", index=player_counter, pos=(x, y), facing="SE")
-                    player_counter += 1
-                    tiles[(x, y)] = Tile(" ", True, False, "Floor")
-                elif char == "l":
-                    key = f"l{loot_counter}"
-                    loots[key] = Loot(name=f"Loot {loot_counter}", symbol="l", index=loot_counter, pos=(x, y))
-                    loot_counter += 1
-                    tiles[(x, y)] = Tile(" ", True, False, "Floor")
-                else:
-                    tiles[(x, y)] = cls.symbol_to_tile(char)
-        return cls(name, tiles, width, height, actors=actors, loots=loots)
-
-
-    def tiles_to_ascii(self):
-        """express tiles into ascii"""
-        map_ = numpy.full((self.width, self.height)," ")
-        
-        for (x, y), tile in self.tiles.items():
-            map_[x,y] = tile.symbol
-        
-        ascii_map=""
-        for y in range(self.height):
-            for x in range(self.width):
-                ascii_map+=map_[x,y]
-            ascii_map+="\n"
-        print(ascii_map)
-        return ascii_map
-            
-
-    # -------------------------------------------
-    @staticmethod
-    def symbol_to_tile(symbol: str) -> Tile:
-        mapping = {
-            "W": Tile("W", False, True, "Wall"),
-            "O": Tile("O", False, True, "Tall obstacle"),
-            "o": Tile("o", True, True, "Low obstacle", {"agility_dc": "check"}),
-            "X": Tile("X", False, False, "Void"),
-            "V": Tile("V", True, False, "Window"),
-            "v": Tile("v", False, False, "Crack"),
-            "G": Tile("G", True, False, "Gate"),
-            "s": Tile("s", True, False, "Secret"),
-            ".": Tile(".", True, False, "Special terrain"),
-            " ": Tile(" ", True, False, "Floor"),
-        }
-        return mapping.get(symbol, Tile(symbol, True, False, "Unknown"))
-
+   
     # -------------------------------------------
     # def add_player(self, index:int, name: str, pos: Tuple[int, int], facing: str = "N"):
     #     self.actors["Player"+str(index)] = Actor(name, "@", index, pos, facing=facing)
@@ -443,20 +381,104 @@ class RoomMap:
     # -------------------------------------------
     # SAVE / LOAD
     # -------------------------------------------
-    def save(self, path: str):
+
+    @classmethod
+    def load(cls, yaml_path: str, theme: Theme):
+        """Load a room map and apply a theme to it."""
+        with open(yaml_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        name = data.get("name", "Unnamed Room")
+        actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
+        loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
+        print(theme)
+        tile_specs = theme.tiles
+        tiles, width, height = from_ascii_map(data["ascii_map"],tile_specs)
+
+        return cls(
+            name=name,
+            width=width,
+            height=height,
+            tiles=tiles,
+            theme=theme,
+            actors=actors,
+            loots=loots,
+        )
+
+
+    # def save(self, path: str):
+    #     data = {
+    #         "name": self.name,
+    #         "ascii_map": self.render_ascii(),
+    #         "actors": {k: a.to_dict() for k, a in self.actors.items()},
+    #         "loots": {k: l.to_dict() for k, l in self.loots.items()},
+    #     }
+    #     with open(path, "w") as f: yaml.safe_dump(data, f)
+
+    def save(self, yaml_path: str):
+        """Save the room definition (excluding theme)."""
         data = {
             "name": self.name,
             "ascii_map": self.render_ascii(),
-            "actors": {k: a.to_dict() for k, a in self.actors.items()},
-            "loots": {k: l.to_dict() for k, l in self.loots.items()},
+            "actors": self.npcs,
+            "loots": self.loots,
         }
-        with open(path, "w") as f: yaml.safe_dump(data, f)
-       
-    @classmethod
-    def load(cls, path: str):
-        with open(path) as f:
-            data = yaml.safe_load(f) 
-        rebooted_room = RoomMap.from_ascii(data["name"], data["ascii_map"])
-        actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
-        loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
-        return cls(data["name"], rebooted_room.tiles, rebooted_room.width, rebooted_room.height, actors=actors, loots=loots)
+        with open(yaml_path, "w", encoding="utf-8") as f:
+            yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
+
+    # def get_tile_spec(self, x: int, y: int):
+    #     """Return the TileSpec from the theme for the map position."""
+    #     if y < 0 or y >= len(self.ascii_map):
+    #         return None
+    #     line = self.ascii_map[y]
+    #     if x < 0 or x >= len(line):
+    #         return None
+    #     char = line[x]
+    #     return self.theme.tiles.get(char)
+    
+
+
+def from_ascii_map(ascii_map: str, tile_specs:dict):
+
+    if isinstance(ascii_map,list):
+        ascii_map="\n".join(ascii_map)
+    lines =  textwrap.dedent(ascii_map).strip().splitlines()
+    height = len(lines)
+    width = max(len(line) for line in lines)
+    tiles = {}
+    for y, line in enumerate(lines):
+        for x, char in enumerate(line.ljust(width)):
+            tiles[(x, y)] = symbol_to_tile(char,tile_specs)
+    return tiles, width, height
+
+def symbol_to_tile(symbol: str, tile_specs:dict) -> Tile:
+
+    tile_spec = tile_specs.get(symbol)
+
+    if tile_spec is None:
+        print(f"Warning, symbol {symbol} not found in theme. Interpreted as ground")
+        tile_spec = tile_specs.get(" ")
+    
+    
+    return Tile(
+        symbol=symbol,
+        traversable=tile_spec.traversable,
+        blocks_view=tile_spec.blocks_view,
+        description=tile_spec.short_description,
+    )
+
+
+    # )
+    # mapping = {
+    #     "W": Tile("W", False, True, "Wall"),
+    #     "O": Tile("O", False, True, "Tall obstacle"),
+    #     "o": Tile("o", True, True, "Low obstacle", {"agility_dc": "check"}),
+    #     "X": Tile("X", False, False, "Void"),
+    #     "V": Tile("V", True, False, "Window"),
+    #     "v": Tile("v", False, False, "Crack"),
+    #     "G": Tile("G", True, False, "Gate"),
+    #     "s": Tile("s", True, False, "Secret"),
+    #     ".": Tile(".", True, False, "Special terrain"),
+    #     " ": Tile(" ", True, False, "Floor"),
+    # }
+    # return mapping.get(symbol, Tile(symbol, True, False, "Unknown"))
