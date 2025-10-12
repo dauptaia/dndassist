@@ -1,6 +1,6 @@
 from dndassist.room import RoomMap
 from dndassist.themes.themes import Theme
-
+from dndassist.isometric_renderer import IsometricRenderer
 # ascii_map = """
 # WWWWWWWWWW|
 # W  OM   lW|
@@ -15,8 +15,12 @@ with open("bridge.map", "r") as fin:
     ascii_map = fin.read()
 print(ascii_map)
 room = RoomMap.load("forest_glade.yaml", forest_theme)
-room.add_actor("Aelar", pos=(2, 2), symbol="@", facing="SE")
-room.add_actor("Liana", pos=(3, 2), symbol="&", facing="SE")
+#room.add_actor("Aelar", pos=(2, 2), symbol="@", facing="SE")
+#room.add_actor("Liana", pos=(3, 2), symbol="&", facing="SE")
+
+
+renderer = IsometricRenderer(room)
+renderer.run()
 
 print(room.actors)
 print(room.render_ascii())

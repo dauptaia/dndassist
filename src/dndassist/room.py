@@ -60,6 +60,7 @@ class Tile:
 class Actor:
     name: str
     symbol: str
+    sprite: str
     pos: Tuple[int, int]
     facing: str = "N"
 
@@ -82,9 +83,10 @@ class Actor:
 class Loot:
     name: str
     symbol: str
+    sprite: str
     index:int
     pos: Tuple[int, int]
-
+    
     def to_dict(self): return asdict(self)
     @classmethod
     def from_dict(cls, d): 
@@ -98,6 +100,7 @@ class Loot:
 @dataclass
 class RoomMap:
     name: str
+    ascii_map: str
     tiles: Dict[Tuple[int, int], Tile]
     theme: Theme
     width: int
@@ -397,6 +400,7 @@ class RoomMap:
 
         return cls(
             name=name,
+            ascii_map=data["ascii_map"],
             width=width,
             height=height,
             tiles=tiles,

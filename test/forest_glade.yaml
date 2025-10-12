@@ -1,8 +1,12 @@
 name: "Forest Glade"
 ascii_map:
   - "WWWWWWWWWWWW"
-  - "W  o   s  MW"
-  - "W       l  W"
+  - "W          W"
+  - "W  o       W"
+  - "W          W"
+  - "W          W"
+  - "W     OOO  W"
+  - "W    OOOOO W"
   - "WWWWWWWWWWWW"
 actors:
   M1:
@@ -10,22 +14,26 @@ actors:
     name: Monster 1
     pos:
     - 4
-    - 1
+    - 2
     symbol: M
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"
   Player0:
     facing: SE
     name: Aelar
     pos:
-    - 1
-    - 1
+    - 2
+    - 2
     symbol: '@'
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_012.png"
+
   Player1:
     facing: SE
     name: Liana
     pos:
-    - 1
     - 2
+    - 3
     symbol: '@'
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_006.png"
 loots:
   l1:
     index: 1
@@ -34,3 +42,4 @@ loots:
     - 8
     - 1
     symbol: l
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_loot/sprite_010.png"

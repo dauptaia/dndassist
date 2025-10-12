@@ -13,9 +13,9 @@ tiles:
     move_difficulty: 1
     lighting: 1.0
     color: "#4CAF50"
-    sprite: "sprites/forest/grass.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_007.png"
 
-  "W":  # obstacle
+  "O":  # obstacle
     name: "tree"
     short_description: "a tall tree"
     long_description: "A massive oak tree with a trunk too wide to encircle."
@@ -24,7 +24,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: "#2E5A2E"
-    sprite: "sprites/forest/tree.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_004.png"
 
   "o":  # obstacle (low)
     name: "bush"
@@ -36,4 +36,16 @@ tiles:
     lighting: 0.8
     enter_condition: "acrobatics_check"
     color: "#3E7E3E"
-    sprite: "sprites/forest/bush.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_018.png"
+
+  "W":  # Wall
+    name: "wall"
+    short_description: "a wall"
+    long_description: "A massive wall"
+    traversable: false
+    blocks_view: true
+    move_difficulty: 999
+    lighting: 0.6
+    color: "#2E5A2E"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_012.png"
+
