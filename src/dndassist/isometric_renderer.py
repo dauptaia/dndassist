@@ -57,7 +57,7 @@ class IsometricRenderer:
 
     ORIENTATIONS = ["NE", "NW", "SW", "SE"]  # cycling order for left/right rotate
 
-    def __init__(self, room: RoomMap, tile_w: int = 130, tile_h: int = 76, screen_size=(1600, 1000)):
+    def __init__(self, room: RoomMap, tile_w: int = 130, tile_h: int = 76, screen_size=(1200, 600)):
         self.room = room
         self.theme = room.theme
         self.tile_w = tile_w
@@ -167,19 +167,21 @@ class IsometricRenderer:
             SE: flip Y? (we'll implement symmetrical transforms)
         We'll implement transforms that produce visually correct rotation/mirror for isometric projection below.
         """
-        w = len(self.room.ascii_map[0])
-        h = len(self.room.ascii_map)
+        #w = len(self.room.ascii_map[0])
+        #h = len(self.room.ascii_map)
+        w = self.room.width
+        h = self.room.height
         if self.orientation == "NE":
             return x, y
         elif self.orientation == "NW":
             # mirror horizontally (x -> w-1-x)
-            return (w - 1 - x), y
+            return  y,(w - 1 - x)
         elif self.orientation == "SW":
             # rotate 180 degrees (x->w-1-x, y->h-1-y)
             return (w - 1 - x), (h - 1 - y)
         elif self.orientation == "SE":
             # mirror vertically (y -> h-1-y)
-            return x, (h - 1 - y)
+            return (h - 1 - y),x
         else:
             return x, y
 
@@ -192,9 +194,15 @@ class IsometricRenderer:
         sx = (tx - ty) * (self.tile_w // 2)
         sy = (tx + ty) * (self.tile_h // 2)
         # offset to center map on screen
-        map_px_width = (len(self.room.ascii_map[0]) + len(self.room.ascii_map)) * (self.tile_w // 2)
+        w = self.room.width
+        h = self.room.height
+        
+        map_px_width = (w + h - 1) * (self.tile_w // 2)
+        map_px_height = (w + h - 1) * (self.tile_h // 2)
+        print(self.screen_w , map_px_width,400)
         offset_x = (self.screen_w - map_px_width) // 2 + self.tile_w
-        offset_y = 80  # top padding
+        offset_y = (self.screen_h - map_px_height) // 2 - self.tile_h
+        #offset_y = 80  # top padding
         return int(sx + offset_x), int(sy + offset_y)
 
     # ---------- draw utilities ----------
@@ -243,7 +251,7 @@ class IsometricRenderer:
                     # position sprite bottom-center on isometric tile
                     w, h = surf.get_size()
                     blit_x = sx - w//2
-                    blit_y = sy - h + (self.tile_h//4)  # slight vertical offset
+                    blit_y = sy - h + (self.tile_h)  # slight vertical offset
                     self.screen.blit(surf, (blit_x, blit_y))
                     tileinfo["blit_rect"] = pygame.Rect(blit_x, blit_y, w, h)
                     continue
@@ -308,14 +316,14 @@ class IsometricRenderer:
                 spec = self.theme.tiles.get("M") if "M" in self.theme.tiles else None
                 short = actor.name
                 longdesc = spec.long_description if spec else "A creature."
-                return {"title": short, "body": f"{actor.name}\nFacing: {actor.facing}\n{longdesc}"}
+                return {"title": short, "body": f"{actor.name}\nFacing: {actor.facing}\n{longdesc}\n{actor.pos}"}
 
         for lid, loot in self.loots.items():
             r = getattr(loot, "_screen_rect", None)
             if r and r.collidepoint(mx, my):
                 spec = self.theme.tiles.get("l") if "l" in self.theme.tiles else None
                 longdesc = spec.long_description if spec else "An item."
-                return {"title": loot.name, "body": f"{loot.name}\n{longdesc}"}
+                return {"title": loot.name, "body": f"{loot.name}\n{longdesc}\n{loot.pos}"}
 
         # tiles hitboxes
         for t in reversed(self.tile_hitboxes):  # topmost first
@@ -325,9 +333,9 @@ class IsometricRenderer:
                 ch = self.room.ascii_map[y][x]
                 spec = self.theme.tiles.get(ch)
                 if spec:
-                    return {"title": spec.name, "body": spec.long_description}
+                    return {"title": spec.name, "body": f"{spec.long_description}\n{x}-{y}"}
                 else:
-                    return {"title": f"Tile '{ch}'", "body": "Unknown tile"}
+                    return {"title": f"Tile '{ch}'", "body": f"Unknown tile\n{x}-{y}"}
         return None
 
     # ---------- public controls ----------

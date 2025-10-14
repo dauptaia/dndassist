@@ -1,19 +1,24 @@
 name: "Forest Glade"
+
 ascii_map:
-  - "WWWWWWWWWWWW"
-  - "W          W"
-  - "W  o       W"
-  - "W          W"
-  - "W          W"
-  - "W     OOO  W"
-  - "W    OOOOO W"
-  - "WWWWWWWWWWWW"
+  - "XOOXOOOOOOXX"
+  - "XOOOOOOOOOOX"
+  - "   oO    O  "
+  - "o    O      "
+  - "XXXXXX..XXXX"
+  - "XXXXXX..XXXX"
+  - "XXXXXX..XXXX"
+  - "XXXXXX..XXXX"
+  - "W           "
+  - "X          X"
+  - "X         XX"
+  - "XXWWWWWWWWXX"
 actors:
   M1:
     facing: NW
     name: Monster 1
     pos:
-    - 4
+    - 1
     - 2
     symbol: M
     sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"

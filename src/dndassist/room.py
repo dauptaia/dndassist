@@ -60,10 +60,10 @@ class Tile:
 class Actor:
     name: str
     symbol: str
-    sprite: str
     pos: Tuple[int, int]
     facing: str = "N"
-
+    sprite: str= None
+    
     def turn(self, direction: str):
         self.facing = direction.upper()
 

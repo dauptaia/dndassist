@@ -16,7 +16,7 @@ with open("bridge.map", "r") as fin:
 print(ascii_map)
 room = RoomMap.load("forest_glade.yaml", forest_theme)
 #room.add_actor("Aelar", pos=(2, 2), symbol="@", facing="SE")
-#room.add_actor("Liana", pos=(3, 2), symbol="&", facing="SE")
+room.add_actor("Liana", pos=(3, 2), symbol="&", facing="SE")
 
 
 renderer = IsometricRenderer(room)

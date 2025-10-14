@@ -24,7 +24,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: "#2E5A2E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_004.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_tree.png"
 
   "o":  # obstacle (low)
     name: "bush"
@@ -36,7 +36,7 @@ tiles:
     lighting: 0.8
     enter_condition: "acrobatics_check"
     color: "#3E7E3E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_018.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_bush.png"
 
   "W":  # Wall
     name: "wall"
@@ -47,5 +47,26 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: "#2E5A2E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_012.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_wall.png"
 
+  "X":  # Void
+    name: "void"
+    short_description: "a ravine"
+    long_description: "A deep ravine"
+    traversable: false
+    blocks_view: false
+    move_difficulty: 999
+    lighting: 0.6
+    color: null
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_void.png"
+
+  ".":  # Bridge
+    name: "bridge"
+    short_description: "a bridge"
+    long_description: "A wooden bridge"
+    traversable: true
+    blocks_view: false
+    move_difficulty: 1
+    lighting: 0.6
+    color: null
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain2/sprite_004.png"
