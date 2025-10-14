@@ -63,6 +63,9 @@ class IsometricRenderer:
         self.tile_w = tile_w
         self.tile_h = tile_h
         self.screen_w, self.screen_h = screen_size
+        self.cam_x = 0
+        self.cam_y = 0
+        self.zoom = 1.0
         pygame.init()
         self.screen = pygame.display.set_mode((self.screen_w, self.screen_h))
         pygame.display.set_caption(f"Isometric Renderer - {room.name} ({self.theme.name})")
@@ -191,18 +194,16 @@ class IsometricRenderer:
         """
         tx, ty = self._transform_coord_for_orientation(x, y)
         # basic isometric projection
-        sx = (tx - ty) * (self.tile_w // 2)
-        sy = (tx + ty) * (self.tile_h // 2)
+        sx = (tx - ty) * (self.tile_w // 2) * self.zoom
+        sy = (tx + ty) * (self.tile_h // 2) * self.zoom
         # offset to center map on screen
-        w = self.room.width
-        h = self.room.height
+       # w = self.room.width
+        #h = self.room.height
         
-        map_px_width = (w + h - 1) * (self.tile_w // 2)
-        map_px_height = (w + h - 1) * (self.tile_h // 2)
-        print(self.screen_w , map_px_width,400)
-        offset_x = (self.screen_w - map_px_width) // 2 + self.tile_w
-        offset_y = (self.screen_h - map_px_height) // 2 - self.tile_h
-        #offset_y = 80  # top padding
+        #map_px_width = (w + h - 1) * (self.tile_w // 2)
+
+        offset_x = (self.screen_w ) / 2  + self.cam_x
+        offset_y = 80 + self.cam_y
         return int(sx + offset_x), int(sy + offset_y)
 
     # ---------- draw utilities ----------
@@ -216,6 +217,16 @@ class IsometricRenderer:
         ]
         pygame.draw.polygon(surf, color, points)
 
+    def _draw_rect(self, surf, cx, cy, w, h, color):
+        # draw a filled isometric square centered at (cx, cy)
+        points = [
+            (cx, cy + h),   # top
+            (cx, cy ),   # right
+            (cx + w, cy),   # right
+            (cx + w, cy + h),   # right
+               # left
+        ]
+        pygame.draw.polygon(surf, color, points)
     # ---------- main render pass ----------
     def _build_hitboxes_and_draw_order(self):
         """Create a list of tile cells with screen coords and bounding rects for hit detection and ordering."""
@@ -239,6 +250,9 @@ class IsometricRenderer:
         # build hitboxes & draw order
         self._build_hitboxes_and_draw_order()
 
+        w_std = int(self.tile_w * self.zoom)
+        h_std = int(self.tile_h * self.zoom)
+
         # draw tiles in order
         for tileinfo in self.tile_hitboxes:
             x, y = tileinfo["coord"]
@@ -249,15 +263,21 @@ class IsometricRenderer:
                 surf = self._load_sprite(spec.sprite)
                 if surf:
                     # position sprite bottom-center on isometric tile
-                    w, h = surf.get_size()
-                    blit_x = sx - w//2
-                    blit_y = sy - h + (self.tile_h)  # slight vertical offset
+                    w_exact, h_exact = surf.get_size()
+                    w_exact *= self.zoom
+                    h_exact *= self.zoom
+                    blit_x = sx - w_std//2
+                    blit_y = sy + (h_std-h_exact) #+ (self.tile_h)  # slight vertical offset
+                    if self.zoom != 1.0:
+                        surf = pygame.transform.scale_by(surf, self.zoom)
+
                     self.screen.blit(surf, (blit_x, blit_y))
-                    tileinfo["blit_rect"] = pygame.Rect(blit_x, blit_y, w, h)
+                    tileinfo["blit_rect"] = pygame.Rect(blit_x- w_std//2, blit_y-h_std//2, w_std//2, h_std//2)
+
                     continue
             # fallback: colored diamond
             color = self._hex_to_color(spec.color) if spec and spec.color else pygame.Color("#666666")
-            self._draw_diamond(self.screen, sx, sy, self.tile_w, self.tile_h, color)
+            self._draw_diamond(self.screen, sx, sy, w_std, h_std, color)
             tileinfo["blit_rect"] = tileinfo["rect"]
 
         # draw loots and actors after tiles
@@ -277,11 +297,15 @@ class IsometricRenderer:
 
         for etype, obj, sx, sy, sprite in entity_draw_list:
             if sprite:
-                w, h = sprite.get_size()
-                blit_x = sx - w//2
-                blit_y = sy - h + (self.tile_h//4)
+                w_exact, h_exact = sprite.get_size()
+                w_exact *= self.zoom
+                h_exact *= self.zoom
+                blit_x = sx - w_std//2
+                blit_y = sy + (h_std- h_exact) - h_std
+                #if self.zoom != 1.0:
+                sprite = pygame.transform.scale_by(sprite, self.zoom)
                 self.screen.blit(sprite, (blit_x, blit_y))
-                obj._screen_rect = pygame.Rect(blit_x, blit_y, w, h)
+                obj._screen_rect = pygame.Rect(blit_x+0*w_std//2, blit_y+1*h_std//2, w_std//2, h_exact//2)
             else:
                 # draw placeholder circle
                 color = pygame.Color("#FFD700") if etype == "loot" else pygame.Color("#00BFFF")
@@ -350,6 +374,7 @@ class IsometricRenderer:
     # ---------- main loop ----------
     def run(self):
         running = True
+        zoom_step=1.1
         while running:
             self.clock.tick(30)
             for ev in pygame.event.get():
@@ -358,10 +383,29 @@ class IsometricRenderer:
                 elif ev.type == pygame.KEYDOWN:
                     if ev.key == pygame.K_ESCAPE:
                         running = False
-                    elif ev.key == pygame.K_LEFT:
+                    elif ev.key == pygame.K_w:
                         self.rotate_left()
-                    elif ev.key == pygame.K_RIGHT:
+                    elif ev.key == pygame.K_x:
                         self.rotate_right()
+                    elif ev.key == pygame.K_UP: 
+                        self.cam_y += 50
+                    elif ev.key == pygame.K_DOWN: 
+                        self.cam_y -= 50
+                    elif ev.key == pygame.K_LEFT: 
+                        self.cam_x += 50
+                    elif ev.key == pygame.K_RIGHT: 
+                        self.cam_x -= 50
+                    elif ev.key == pygame.K_a:
+                        self.zoom *= 1./zoom_step
+                        self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
+                        print(self.zoom)
+                    elif ev.key == pygame.K_z:
+                        self.zoom *= zoom_step 
+                        self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
+                        print(self.zoom)
+                    # elif ev.type == pygame.MOUSEWHEEL:
+                    #     self.zoom *= zoom_step if ev.y > 0 else 1./zoom_step
+                    #     self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
             self.render_frame()
         pygame.quit()
 

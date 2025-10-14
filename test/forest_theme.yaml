@@ -58,7 +58,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: null
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_void.png"
+    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_void2.png"
 
   ".":  # Bridge
     name: "bridge"
