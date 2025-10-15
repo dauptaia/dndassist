@@ -13,32 +13,32 @@ ascii_map:
   - "X          X"
   - "X         XX"
   - "XXWWWWWWWWXX"
-actors:
-  Grunt:
-    facing: SE
-    name: Grunt
-    pos:
-    - 1
-    - 2
-    symbol: M
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"
-  Aelar:
-    facing: SE
-    name: Aelar
-    pos:
-    - 2
-    - 2
-    symbol: '@'
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_012.png"
+actors: {}
+  # Grunt:
+  #   facing: SE
+  #   name: Grunt
+  #   pos:
+  #   - 1
+  #   - 2
+  #   symbol: M
+  #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"
+  # Aelar:
+  #   facing: SE
+  #   name: Aelar
+  #   pos:
+  #   - 2
+  #   - 2
+  #   symbol: '@'
+  #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_012.png"
 
-  Liana:
-    facing: SE
-    name: Liana
-    pos:
-    - 2
-    - 3
-    symbol: '@'
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_006.png"
+  # Liana:
+  #   facing: SE
+  #   name: Liana
+  #   pos:
+  #   - 2
+  #   - 3
+  #   symbol: '@'
+  #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_006.png"
 loots:
   l1:
     index: 1

@@ -7,7 +7,7 @@ import numpy
 from collections import defaultdict
 
 from dndassist.themes.themes import Theme
-
+from dndassist.character import Character
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
 MAX_UNITS = 50  # max scanning distance in units
@@ -75,6 +75,7 @@ class Actor:
     pos: Tuple[int, int]
     facing: str = "N"
     sprite: str = None
+    character: Character = None
 
     def turn(self, direction: str):
         self.facing = direction.upper()
@@ -133,7 +134,7 @@ class RoomMap:
     #     self.actors["Player"+str(index)] = Actor(name, "@", index, pos, facing=facing)
 
     # to refine
-    def add_actor(self, name: str, pos: Tuple[int, int], symbol="M", facing: str = "N"):
+    def add_actor(self, name: str, pos: Tuple[int, int], symbol="M", facing: str = "N", character:Character=None):
         """add an actor in the room.
 
         Actors are identified by their unique names, handled outside the room concept.
@@ -143,7 +144,7 @@ class RoomMap:
         if name in self.actors:
             print(f"Actor {name} is already in the room")
         else:
-            self.actors[name] = Actor(name, symbol, pos, facing=facing)
+            self.actors[name] = Actor(name, symbol, pos, facing=facing, character=character)
 
     def del_actor(self, name: str):
         """remove an actor in the room"""
@@ -221,7 +222,7 @@ class RoomMap:
                 del self.loots[key]
 
     # -------------------------------------------
-    def render_ascii(self, mode="symbol") -> str:
+    def render_ascii(self, mode="symbol", spaced:bool=False) -> str:
         if mode == "symbol":
             grid = [
                 [
@@ -250,8 +251,11 @@ class RoomMap:
         for actor in self.actors.values():
             x, y = actor.pos
             grid[y][x] = actor.symbol
-        return "\n".join("".join(row) for row in grid)
-
+        if spaced:
+            return "\n".join(" ".join(row) for row in grid)
+        else:
+            return "\n".join("".join(row) for row in grid)
+        
     # -------------------------------------------
     def describe_view_los(self, actor_name: str) -> str:
         """

@@ -1,0 +1,40 @@
+name: Selra the Umbral Adept
+race: Human
+char_class: Warlock
+level: 3
+alignment: Lawful Evil
+attributes:
+  strength: 8
+  dexterity: 13
+  constitution: 12
+  intelligence: 14
+  wisdom: 11
+  charisma: 17
+max_hp: 22
+max_speed: 30
+proficiency_bonus: 2
+equipment:
+  - Arcane Focus
+  - Dagger
+  - Dark Robes
+  - Shadow Tome
+spells:
+  - Eldritch Blast
+  - Hex
+  - Armor of Agathys
+  - Charm Person
+equipped:
+  armor: Dark Robes
+  main_hand: Arcane Focus
+  off_hand: Dagger
+weapon_mastery:
+  simple: proficient
+  martial: none
+xp: 820
+notes: Serves a shadowy patron; prefers to manipulate and curse from afar.
+faction: cult_of_shadows
+available_actions:
+  - cast_spell
+  - move
+  - talk
+  - rest

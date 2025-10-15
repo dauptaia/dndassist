@@ -1,0 +1,37 @@
+name: Garruk Stonefang
+race: Half-Orc
+char_class: Barbarian
+level: 3
+alignment: Neutral Evil
+attributes:
+  strength: 17
+  dexterity: 12
+  constitution: 15
+  intelligence: 8
+  wisdom: 11
+  charisma: 9
+max_hp: 36
+max_speed: 30
+proficiency_bonus: 2
+equipment:
+  - Greataxe
+  - Javelin
+  - Hide Armor
+  - Totem Necklace
+spells: []
+equipped:
+  armor: Hide Armor
+  main_hand: Greataxe
+  off_hand: Javelin
+weapon_mastery:
+  simple: proficient
+  martial: proficient
+xp: 800
+notes: A savage mercenary who revels in close combat and bloodshed.
+faction: bandits
+available_actions:
+  - attack
+  - dash
+  - roar
+  - move
+  - rest
