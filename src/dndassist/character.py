@@ -15,8 +15,22 @@ class Character:
     race: str
     char_class: str
     level: int = 1
-    alignment: Optional[str] = None
+    xp: int = 0
+    gold: int = 0
+    description: str = "no particular trait"
+    alignment: Optional[str] = None 
+    notes: Optional[str] = None
 
+    # ---game Engine----
+    faction: str = "neutral" # to simplfy firends and foes
+    available_actions: List[str]=field(default_factory=list)#lambda: ["attack", "move", "dash", "rest"])
+    
+
+    max_cargo: int = 30 # max weight to carry in Kgs
+    max_hp: int = 10
+    max_speed: int = 30 # max distance in one round (6 seconds) , in meters
+    proficiency_bonus: int = 2
+    
     # --- Attributes ---
     attributes: Dict[str, int] = field(default_factory=lambda: {
         "strength": 10,
@@ -27,17 +41,17 @@ class Character:
         "charisma": 10
     })
 
-    # --- Combat Stats ---
-    max_hp: int = 10
-    current_hp: int = 10
-    temp_hp: int = 0
-    armor_class: int = 10
-    speed: int = 30
-    proficiency_bonus: int = 2
-    initiative: Optional[int] = None
-    hit_dice: str = "1d10"
-    conditions: List[str] = field(default_factory=list)
 
+    # --Current state ---
+    current_state: Dict[str, int] = field(default_factory=lambda: {
+        "current_hp": 10,
+        "objectives": ["stand watch"],
+        "conditions": [],
+        "action": "idle",
+        "aggro": None
+    })
+
+   
     # --- Equipment / Magic ---
     equipment: List[str] = field(default_factory=list)
     spells: List[str] = field(default_factory=list)
@@ -51,9 +65,7 @@ class Character:
         "martial": "none"
     })
 
-    # --- Progression / Notes ---
-    xp: int = 0
-    notes: Optional[str] = None
+    
 
     # ---------- YAML I/O ----------
     def save(self, path: str):
@@ -69,6 +81,9 @@ class Character:
         with open(path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         return cls(**data)
+
+    def push_objective(self, new_obj: str):
+        self.current_state["objectives"].insert(0, new_obj)
 
     def attr_mod(self, attr)-> int:
         """Return attribute modifier"""

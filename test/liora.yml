@@ -11,14 +11,8 @@ attributes:
   wisdom: 15
   charisma: 10
 max_hp: 24
-current_hp: 18
-temp_hp: 0
-armor_class: 15
-speed: 35
+max_speed: 35
 proficiency_bonus: 2
-initiative: null
-hit_dice: 1d10
-conditions: []
 equipment:
   - Longbow
   - Leather Armor
