@@ -14,15 +14,15 @@ ascii_map:
   - "X         XX"
   - "XXWWWWWWWWXX"
 actors:
-  M1:
-    facing: NW
-    name: Monster 1
+  Grunt:
+    facing: SE
+    name: Grunt
     pos:
     - 1
     - 2
     symbol: M
     sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"
-  Player0:
+  Aelar:
     facing: SE
     name: Aelar
     pos:
@@ -31,7 +31,7 @@ actors:
     symbol: '@'
     sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_012.png"
 
-  Player1:
+  Liana:
     facing: SE
     name: Liana
     pos:
