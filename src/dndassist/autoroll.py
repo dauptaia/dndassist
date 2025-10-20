@@ -3,20 +3,26 @@ from typing import Tuple
 from random import randint
 
 
-def rolldice(dice:str, autoroll=False, advantage:int=0)-> Tuple[ int, float] :
-
-    mod = 0
-    modstr=""
+def scan_dice(dice:str)-> Tuple[int, int, int]:
+    """return the scan of a dice
+    
+    1D20+4 => 1, 20, 4"""
     dice_ = dice
+    mod = 0
     if "+" in dice:
-        modstr = " without modifier"
         mod=int(dice.split("+")[-1])
         dice_ = dice.split("+")[0]
-    
-    
     nb= int(dice_.split("d")[0])
     faces= int(dice_.split("d")[1])
-    
+    return nb, faces, mod
+
+def max_dice(dice:str)->int:
+    nb, faces, mod = scan_dice(dice)
+    return nb*faces+mod
+
+def rolldice(dice:str, autoroll=False, advantage:int=0)-> Tuple[ int, float] :
+
+    nb, faces, mod = scan_dice(dice)
     min_ = nb 
     max_ = nb*faces
 
@@ -33,7 +39,7 @@ def rolldice(dice:str, autoroll=False, advantage:int=0)-> Tuple[ int, float] :
     else:
         done=False
         while not done: 
-            result = int(input(f"Enter dice {dice} result {modstr}:"))+mod
+            result = int(input(f"Enter dice {dice} result:"))+mod
             if result>= min_ and result<= max_:
                 done=True    
 

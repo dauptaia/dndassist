@@ -7,7 +7,7 @@ gold: 0
 description: no particular trait
 alignment: Chaotic Good
 notes: Prefers ranged combat.
-faction: neutral
+faction: player
 available_actions: []
 max_cargo: 30
 max_hp: 24

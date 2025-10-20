@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, Tuple, List, Optional
 import textwrap, math, yaml, json
-
+import heapq
 import math
 import numpy
 from collections import defaultdict
@@ -41,10 +41,6 @@ def _angle_to_vector(angle_deg: float):
     return dx, dy
 
 
-def _unit_to_m(u: float) -> int:
-    """Convert map units to meters (rounded integer)."""
-    return int(round(u * UNIT_M))
-
 
 # -----------------------------------------------------------
 #  BASIC TILE
@@ -53,8 +49,9 @@ def _unit_to_m(u: float) -> int:
 class Tile:
     symbol: str
     traversable: bool
+    difficulty: 1
     blocks_view: bool
-    description: str
+    description: str = ""
     metadata: Dict[str, str] = field(default_factory=dict)
 
     def to_dict(self):
@@ -76,13 +73,20 @@ class Actor:
     facing: str = "N"
     sprite: str = None
     character: Character = None
-
+    """THis class is the simplified version of an actor, sufficient for RoomMap handling.
+    
+    through attribute character, you get the complete DND Character of the NPC/player
+    """
     def turn(self, direction: str):
         self.facing = direction.upper()
 
     def move(self, dx: int, dy: int):
         x, y = self.pos
         self.pos = (x + dx, y + dy)
+
+    def __repr__(self):
+        out = f"{self.name} ({self.symbol}), pos: {self.pos}, facing {self.facing}"
+        return out
 
     def to_dict(self):
         return asdict(self)
@@ -102,6 +106,11 @@ class Loot:
     sprite: str
     index: int
     pos: Tuple[int, int]
+
+    def __repr__(self):
+        out = f"{self.name} ({self.symbol}), pos: {self.pos}"
+        return out
+
 
     def to_dict(self):
         return asdict(self)
@@ -125,6 +134,7 @@ class RoomMap:
     theme: Theme
     width: int
     height: int
+    unit_m: float = 1.5
     elevation: Optional[Dict[Tuple[int, int], int]] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
@@ -134,6 +144,13 @@ class RoomMap:
     #     self.actors["Player"+str(index)] = Actor(name, "@", index, pos, facing=facing)
 
     # to refine
+
+
+    def unit_to_m(self, u: float) -> int:
+        """Convert map units to meters (rounded integer)."""
+        return int(round(u * self.unit_m))
+
+
     def add_actor(self, name: str, pos: Tuple[int, int], symbol="M", facing: str = "N", character:Character=None):
         """add an actor in the room.
 
@@ -198,7 +215,7 @@ class RoomMap:
             dir += "E"
         if dy < 0:
             dir += "W"
-        dist = _unit_to_m(math.hypot(dx, dy))
+        dist = self.unit_to_m(math.hypot(dx, dy))
 
         nx, ny = actor.pos[0] + dx, actor.pos[1] + dy
         tile = self.tiles.get((nx, ny))
@@ -263,6 +280,8 @@ class RoomMap:
         Groups visible items into (close, mid, far) x (left, front, right).
         Returns a multi-line text describing what's visible.
         """
+        if actor_name not in self.actors:
+            return f"No actor named {actor_name}."
         items_by_zone, _, _ = compute_los(
             actor_name, self.actors, self.loots, self.tiles, self.width, self.height
         )
@@ -273,25 +292,110 @@ class RoomMap:
 
         return "\n".join(report_lines)
 
-    def visible_actors(self, actor_name: str) -> str:
-        """
-        True LoS description using multiple rays per sector.
-        Returns a list of visible actors
-        """
-        _, _visible_actors, _ = compute_los(
-            actor_name, self.actors, self.loots, self.tiles, self.width, self.height
-        )
-        return _visible_actors
 
-    def visible_loots(self, actor_name: str) -> str:
+    def visible_actors_n_loots(self, actor_name: str) -> Tuple[List[Tuple[str,int]],List[Tuple[str,int]]]:
         """
         True LoS description using multiple rays per sector.
-        Returns a list of visible loots
+        Returns a list of (visible actors distance in m)
         """
-        _, _, _visible_loot = compute_los(
+        _, _visible_actors, _visible_loots = compute_los(
             actor_name, self.actors, self.loots, self.tiles, self.width, self.height
         )
-        return _visible_loot
+
+        _visible_actors = [(actor, self.unit_to_m(dist)) for actor, dist in _visible_actors]
+        _visible_loots = [(loot, self.unit_to_m(dist)) for loot, dist in _visible_loots]
+        
+        print("??", _visible_actors)
+        print("!!", _visible_loots)
+        return _visible_actors,_visible_loots
+
+    def _neighbors(self, x: int, y: int) -> List[Tuple[int, int, float]]:
+        """Return all valid 8-directional neighbors with cost multiplier."""
+        deltas = [
+            (-1,  0, 1.0), (1,  0, 1.0),
+            (0, -1, 1.0), (0,  1, 1.0),
+            (-1, -1, math.sqrt(2)), (1, -1, math.sqrt(2)),
+            (-1,  1, math.sqrt(2)), (1,  1, math.sqrt(2))
+        ]
+        neighbors = []
+        for dx, dy, mult in deltas:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < self.width and 0 <= ny < self.height:
+                neighbors.append((nx, ny, mult))
+        return neighbors
+
+    def _heuristic(self, a: Tuple[int, int], b: Tuple[int, int]) -> float:
+        """Euclidean distance heuristic for A*."""
+        (x1, y1), (x2, y2) = a, b
+        return math.hypot(x2 - x1, y2 - y1)
+
+
+    def move_to(
+        self, 
+        x0: int, 
+        y0: int, 
+        x: int, 
+        y: int, 
+        max_distance: Optional[float] = None
+    ) -> Tuple[List[Tuple[int, int]], List[int]]:
+        """
+        Find shortest path from (x0, y0) to (x, y) using A* algorithm.
+        Accounts for tile difficulty, diagonal movement, and movement limit.
+        
+        If `max_distance` is provided, the path stops when movement allowance is exceeded.
+        Returns (path, list_of_difficulties).
+        """
+        start, goal = (x0, y0), (x, y)
+
+        frontier = [(0, start)]  # priority queue (f_score, position)
+        came_from: Dict[Tuple[int, int], Optional[Tuple[int, int]]] = {start: None}
+        g_score: Dict[Tuple[int, int], float] = {start: 0.0}
+
+        best_reached = start  # last reachable position if max_distance stops us
+
+        while frontier:
+            _, current = heapq.heappop(frontier)
+
+            # If max distance exceeded, stop at the farthest reachable tile
+            if max_distance is not None and g_score[current] > max_distance:
+                break
+
+            # If we reached the goal before exceeding distance, stop
+            if current == goal:
+                best_reached = goal
+                break
+
+            for nx, ny, mult in self._neighbors(*current):
+                tile = self.tiles[ny][nx]
+                if tile.difficulty >= 999:  # impassable
+                    continue
+
+                tentative_g = g_score[current] + tile.difficulty * mult
+                if max_distance is not None and tentative_g > max_distance:
+                    continue  # skip unreachable within move allowance
+
+                if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
+                    g_score[(nx, ny)] = tentative_g
+                    f_score = tentative_g + self._heuristic((nx, ny), goal)
+                    heapq.heappush(frontier, (f_score, (nx, ny)))
+                    came_from[(nx, ny)] = current
+                    best_reached = (nx, ny)
+
+        # --- Reconstruct path ---
+        if best_reached not in came_from:
+            return [], []  # No path found
+
+        path, diffs = [], []
+        node = best_reached
+        while node:
+            path.append(node)
+            diffs.append(self.tiles[node[1]][node[0]].difficulty)
+            node = came_from[node]
+        path.reverse()
+        diffs.reverse()
+
+        return path, diffs
+
 
     # -------------------------------------------
     # SAVE / LOAD
@@ -373,10 +477,108 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
 
     return Tile(
         symbol=symbol,
+        difficulty=tile_spec.move_difficulty,
         traversable=tile_spec.traversable,
         blocks_view=tile_spec.blocks_view,
         description=tile_spec.short_description,
     )
+
+
+
+# def visible_actors(
+#     actor_name: str,
+#     actors: Dict[str, Actor],
+#     loots: Dict[str, Loot],
+#     tiles: Dict[Tuple[int, int], Tile],
+#     width: int,
+#     height: int,
+# ) -> Tuple[
+#     List[list[List[Tuple[str, str]]]],
+#     List[Tuple[str, int]],
+#     List[Tuple[str, int]],
+# ]:
+    
+
+#     actor = actors[actor_name]
+#     px, py = actor.pos
+#     facing = actor.facing.upper()
+    
+#     f_angle = FACING_ANGLE[facing]
+
+#     # sector angle ranges relative to facing
+#     # front: -30..+30 ; left: -90..-30 ; right: +30..+90 (deg)
+#     sector_ranges = {"front": (-20, 20), "left": (-60, -20), "right": (20, 60)}
+
+#     # We'll gather nearest distance (in units) for each unique object name under each sector.
+#     # data structure: items_by_zone[band][sector] -> dict name -> nearest_distance_units
+    
+#     # Build list of ray angles to cast (for all three sectors)
+#     rays = []
+#     for sector_name, (a_min, a_max) in sector_ranges.items():
+#         # cast rays from a_min to a_max inclusive with step RAY_STEP_DEG
+#         a = a_min
+#         while a <= a_max:
+#             rays.append((sector_name, (f_angle + a) % 360))
+#             a += RAY_STEP_DEG
+
+#     # For actors and loots, build quick lookup by pos
+#     pos_to_actors = {
+#         a.pos: (k, a) for k, a in actors.items()
+#     }  # key includes Player too
+#     pos_to_loots = {l.pos: (k, l) for k, l in loots.items()}
+
+#     visible_actors = []
+#     visible_loots = []
+
+#     # Cast each ray
+#     for sector_name, ray_angle in rays:
+#         dx_unit, dy_unit = _angle_to_vector(ray_angle)  # per-unit vector in map units
+#         s = RAY_STEP_UNIT
+#         blocked = False
+#         visited_tiles = set()
+#         while s <= MAX_UNITS and not blocked:
+#             tx = px + dx_unit * s
+#             ty = py + dy_unit * s
+#             ix = int(round(tx))
+#             iy = int(round(ty))
+#             tile_coord = (ix, iy)
+
+#             # skip if same tile already processed along this ray
+#             if tile_coord in visited_tiles:
+#                 s += RAY_STEP_UNIT
+#                 continue
+#             visited_tiles.add(tile_coord)
+
+#             # out of bounds ?
+#             if ix < 0 or iy < 0 or ix >= width or iy >= height:
+#                 break
+
+#             tile = tiles.get(tile_coord)
+#             # check for actors (exclude the observer)
+#             if tile_coord in pos_to_actors:
+#                 akey, ak = pos_to_actors[tile_coord]
+#                 if akey != actor_name:
+#                     dist_units = math.hypot((ak.pos[0] - px), (ak.pos[1] - py))
+#                     pair = (akey, dist_units)
+#                     if pair not in visible_actors:
+#                         visible_actors.append(pair)
+#             # check for loots
+#             if tile_coord in pos_to_loots:
+#                 lkey, lo = pos_to_loots[tile_coord]
+#                 dist_units = math.hypot((lo.pos[0] - px), (lo.pos[1] - py))
+#                 pair = (lkey, dist_units)
+#                 if pair not in visible_loots:
+#                     visible_loots.append(pair)
+
+#             # if tile blocks view, terminate this ray
+#             if tile and tile.blocks_view:
+#                 blocked = True
+#                 break
+
+#             s += RAY_STEP_UNIT
+#     return visible_actors, visible_loots
+
+
 
 
 def compute_los(
@@ -391,15 +593,12 @@ def compute_los(
     List[Tuple[str, int]],
     List[Tuple[str, int]],
 ]:
-    if actor_name not in actors:
-        return f"No actor named {actor_name}."
+    
 
     actor = actors[actor_name]
     px, py = actor.pos
     facing = actor.facing.upper()
-    if facing not in FACING_ANGLE:
-        return f"Unknown facing '{actor.facing}'."
-
+    
     f_angle = FACING_ANGLE[facing]
 
     # sector angle ranges relative to facing
@@ -490,7 +689,7 @@ def compute_los(
                 lkey, lo = pos_to_loots[tile_coord]
                 dist_units = math.hypot((lo.pos[0] - px), (lo.pos[1] - py))
                 register(sector_name, dist_units, (lo.name.lower(), "loot"))
-                if (lkey, dist_units) not in visible_actors:
+                if (lkey, dist_units) not in visible_loots:
                     visible_loots.append((lkey, dist_units))
 
             # check tile itself (non-floor items)

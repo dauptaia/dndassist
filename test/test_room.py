@@ -19,8 +19,8 @@ room = RoomMap.load("forest_glade.yaml", forest_theme)
 #room.add_actor("Liana2", pos=(3, 2), symbol="&", facing="SE")
 
 
-# renderer = IsometricRenderer(room)
-# renderer.run()
+renderer = IsometricRenderer(room)
+renderer.run()
 
 print(room.actors)
 print(room.render_ascii(spaced=True))

@@ -325,7 +325,7 @@ class IsometricRenderer:
 
     def _draw_overlay(self):
         font = pygame.font.SysFont(None, 18)
-        txt = f"Orientation: {self.orientation}  |  Rotate: LEFT/RIGHT  |  Tiles: {len(self.room.ascii_map[0])}x{len(self.room.ascii_map)}"
+        txt = f"Orientation: {self.orientation}  |  Pan: LEFT/RIGHT/UP/DOWN | Zoom: a/z | Rotate:  w/x |  Tiles: {len(self.room.ascii_map[0])}x{len(self.room.ascii_map)}"
         surf = font.render(txt, True, pygame.Color("white"))
         self.screen.blit(surf, (8, self.screen_h - 24))
 

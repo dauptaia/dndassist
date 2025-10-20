@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 import yaml
 import os
 from math import floor
@@ -7,7 +7,7 @@ from textwrap import indent
 from colorama import Fore, Style, init
 
 
-from dndassist.equipment import weapon_catg
+from dndassist.equipment import weapon_catg, Weapon
 @dataclass
 class Character:
     # --- Identity ---
@@ -89,6 +89,23 @@ class Character:
         """Return attribute modifier"""
         return floor((self.attributes[attr]-10)/2)
 
+    def available_ranges(self)->List[Tuple[str, int, str]]:
+        """ return all weapon ranges available, from the longest to the shortest
+        as a list of weapon_name, range, and damage_dice"""
+        found_ranges=[]
+        for item in self.equipment:
+            if weapon_catg(item) is not None:
+                weapon=Weapon.from_name(item)
+                range_ = weapon.range_normal
+                damage_ = weapon.damage_dice
+                if weapon.range_long is not None:
+                    range_=weapon.range_long
+                found_ranges.append((item,range_,damage_) )
+        
+        sorted_ranges = sorted(found_ranges,key=lambda x:x[1], reverse=True)
+        return sorted_ranges
+
+
     def equipped_armor(self)-> str:
         return self.equipped["armor"]
 
@@ -104,7 +121,6 @@ class Character:
             return 0
         if self.weapon_mastery[cat] == "proficient":
             return self.proficiency_bonus
-        
         return 0
 
      # ---------- Pretty terminal display ----------

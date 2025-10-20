@@ -81,6 +81,7 @@ class Weapon:
 
     # ------------------ GAME LOGIC ------------------
 
+
     def attributes(self) -> List[str]:
         """Return which ability (e.g. Strength, Dexterity) is used to attack with this weapon."""
         props = [p.lower() for p in self.properties or []]

@@ -40,9 +40,9 @@ actors: {}
   #   symbol: '@'
   #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_006.png"
 loots:
-  l1:
+  sword:
     index: 1
-    name: Loot 1
+    name: Sword
     pos:
     - 8
     - 1
