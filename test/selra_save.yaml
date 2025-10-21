@@ -42,7 +42,7 @@ spells:
 - Armor of Agathys
 - Charm Person
 equipped:
-  armor: Dark Robes
+  armor: null
   main_hand: Arcane Focus
   off_hand: Dagger
 weapon_mastery:

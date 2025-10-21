@@ -5,9 +5,13 @@ import os
 from math import floor
 from textwrap import indent
 from colorama import Fore, Style, init
+import random
 
-
+from dndassist.autoroll import rolldice
 from dndassist.equipment import weapon_catg, Weapon
+from dndassist.storyprint import print_r,print_c_red,print_c_orange
+
+
 @dataclass
 class Character:
     # --- Identity ---
@@ -18,54 +22,52 @@ class Character:
     xp: int = 0
     gold: int = 0
     description: str = "no particular trait"
-    alignment: Optional[str] = None 
+    alignment: Optional[str] = None
     notes: Optional[str] = None
 
     # ---game Engine----
-    faction: str = "neutral" # to simplfy firends and foes
-    available_actions: List[str]=field(default_factory=list)#lambda: ["attack", "move", "dash", "rest"])
-    
+    faction: str = "neutral"  # to simplfy firends and foes
+    available_actions: List[str] = field(
+        default_factory=list
+    )  # lambda: ["attack", "move", "dash", "rest"])
 
-    max_cargo: int = 30 # max weight to carry in Kgs
+    max_cargo: int = 30  # max weight to carry in Kgs
     max_hp: int = 10
-    max_speed: int = 30 # max distance in one round (6 seconds) , in meters
+    max_speed: int = 30  # max distance in one round (6 seconds) , in meters
     proficiency_bonus: int = 2
-    
-    # --- Attributes ---
-    attributes: Dict[str, int] = field(default_factory=lambda: {
-        "strength": 10,
-        "dexterity": 10,
-        "constitution": 10,
-        "intelligence": 10,
-        "wisdom": 10,
-        "charisma": 10
-    })
 
+    # --- Attributes ---
+    attributes: Dict[str, int] = field(
+        default_factory=lambda: {
+            "strength": 10,
+            "dexterity": 10,
+            "constitution": 10,
+            "intelligence": 10,
+            "wisdom": 10,
+            "charisma": 10,
+        }
+    )
 
     # --Current state ---
-    current_state: Dict[str, int] = field(default_factory=lambda: {
-        "current_hp": 10,
-        "objectives": ["stand watch"],
-        "conditions": [],
-        "action": "idle",
-        "aggro": None
-    })
+    current_state: Dict[str, int] = field(
+        default_factory=lambda: {
+            "current_hp": 10,
+            "objectives": ["stand watch"],
+            "conditions": [],
+            "action": "idle",
+            "aggro": None,
+        }
+    )
 
-   
     # --- Equipment / Magic ---
     equipment: List[str] = field(default_factory=list)
     spells: List[str] = field(default_factory=list)
-    equipped: Dict[str, Optional[str]] = field(default_factory=lambda: {
-        "armor": None,
-        "main_hand": None,
-        "off_hand": None
-    })
-    weapon_mastery: Dict[str, str] = field(default_factory=lambda: {
-        "simple": "proficient",
-        "martial": "none"
-    })
-
-    
+    equipped: Dict[str, Optional[str]] = field(
+        default_factory=lambda: {"armor": None, "main_hand": None, "off_hand": None}
+    )
+    weapon_mastery: Dict[str, str] = field(
+        default_factory=lambda: {"simple": "proficient", "martial": "none"}
+    )
 
     # ---------- YAML I/O ----------
     def save(self, path: str):
@@ -85,37 +87,36 @@ class Character:
     def push_objective(self, new_obj: str):
         self.current_state["objectives"].insert(0, new_obj)
 
-    def attr_mod(self, attr)-> int:
+    def attr_mod(self, attr) -> int:
         """Return attribute modifier"""
-        return floor((self.attributes[attr]-10)/2)
+        return floor((self.attributes[attr] - 10) / 2)
 
-    def available_ranges(self)->List[Tuple[str, int, str]]:
-        """ return all weapon ranges available, from the longest to the shortest
+    def available_ranges(self) -> List[Tuple[str, int, str]]:
+        """return all weapon ranges available, from the longest to the shortest
         as a list of weapon_name, range, and damage_dice"""
-        found_ranges=[]
+        found_ranges = []
         for item in self.equipment:
             if weapon_catg(item) is not None:
-                weapon=Weapon.from_name(item)
+                weapon = Weapon.from_name(item)
                 range_ = weapon.range_normal
                 damage_ = weapon.damage_dice
                 if weapon.range_long is not None:
-                    range_=weapon.range_long
-                found_ranges.append((item,range_,damage_) )
-        
-        sorted_ranges = sorted(found_ranges,key=lambda x:x[1], reverse=True)
+                    range_ = weapon.range_long
+                found_ranges.append((item, range_, damage_))
+
+        sorted_ranges = sorted(found_ranges, key=lambda x: x[1], reverse=True)
         return sorted_ranges
 
-
-    def equipped_armor(self)-> str:
+    def equipped_armor(self) -> str:
         return self.equipped["armor"]
 
-    def equipped_shield(self)-> str:
+    def equipped_shield(self) -> str:
         return None
 
-    def defense_bonus(self)-> int:
+    def defense_bonus(self) -> int:
         return 0
 
-    def attack_bonus(self,weapon_name)-> int:
+    def attack_bonus(self, weapon_name) -> int:
         cat = weapon_catg(weapon_name)
         if cat is None:
             return 0
@@ -123,11 +124,70 @@ class Character:
             return self.proficiency_bonus
         return 0
 
-     # ---------- Pretty terminal display ----------
+    def get_damage(self, damage: int) -> bool:
+        """Apply damage to character
+
+        Return a boolean about death : True if dead"""
+
+        print_r(
+            f"Character __{self.name}__, at {self.current_state['current_hp']} HP, takes {damage} HP."
+        )
+        self.current_state["current_hp"] -= damage
+
+        # Insta-kill
+        if self.current_state["current_hp"] <= self.max_hp:
+            self.current_state["conditions"].append("dead")
+            print_c_red(f"Character __{self.name}__ is dead...")
+            return True
+
+        # For NPC
+        if self.faction != "player":
+            if self.current_state["current_hp"] > 0:
+                return False
+            else:
+                print_c_red(f"Character __{self.name}__ is dead...")
+                return True
+        # For players
+        # .  - HP positive ? exit...
+        if self.current_state["current_hp"] > 0:
+            return False
+        else:
+            self.current_state["current_hp"] = 0
+            print_c_orange(f"Character __{self.name}__ is in the hands of fate...")
+            success = 0
+            fails = 0
+            while 1:
+                fate = rolldice("1d20")
+                if fate == 20:
+                    success = 3
+                elif fate >= 10:
+                    success += 1
+                else:
+                    fails += 1
+
+                print_r(f"    failuress {fails} , successes {success}")
+                if success == 3:
+                    self.current_state["current_hp"] = 1
+                    self.current_state["conditions"].append("injured")
+                    print_r(f"Character __{self.name}__ is injured but awake")
+                    return False
+                if fails == 3:
+                    self.current_state["conditions"].append("dead")
+                    print_c_red(f"Character __{self.name}__ is dead...")
+                    return True
+
+    def drop_loot(self):
+        """Drop one of the properties of the character"""
+        loot = random.choice(self.equipment)
+        return loot
+
+    # ---------- Pretty terminal display ----------
     def __repr__(self):
         """Nicely formatted display of the character in terminal."""
         print(f"{Fore.CYAN}{'='*40}")
-        print(f"{Fore.YELLOW}{self.name} {Fore.WHITE}(Level {self.level} {self.race} {self.char_class})")
+        print(
+            f"{Fore.YELLOW}{self.name} {Fore.WHITE}(Level {self.level} {self.race} {self.char_class})"
+        )
         if self.alignment:
             print(f"{Fore.LIGHTBLACK_EX}Alignment: {self.alignment}")
         print(f"{Fore.CYAN}{'-'*40}")
@@ -160,4 +220,3 @@ class Character:
 # liora = Character.load("liora.yml")
 # print(liora.name, liora.level)
 # print(liora)
-

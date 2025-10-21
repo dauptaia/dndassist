@@ -29,7 +29,7 @@ from typing import Dict, Tuple, List, Optional
 #     theme: Theme
 #     actors: Dict[str, Tuple[int,int,str]] = field(default_factory=dict)   # id -> [x,y,facing]
 #     loots: Dict[str, Tuple[int,int,str]] = field(default_factory=dict)  # id -> [x,y,name]
-    
+
 #     @classmethod
 #     def load(cls, path: str, theme: Theme) -> "Room":
 #         with open(path, "r", encoding="utf-8") as f:
@@ -50,6 +50,7 @@ from typing import Dict, Tuple, List, Optional
 
 from dndassist.room import RoomMap, Actor, Loot
 
+
 class IsometricRenderer:
     """
     Render a Room with a Theme in Pygame using isometric projection.
@@ -57,7 +58,13 @@ class IsometricRenderer:
 
     ORIENTATIONS = ["NE", "NW", "SW", "SE"]  # cycling order for left/right rotate
 
-    def __init__(self, room: RoomMap, tile_w: int = 130, tile_h: int = 76, screen_size=(1200, 600)):
+    def __init__(
+        self,
+        room: RoomMap,
+        tile_w: int = 130,
+        tile_h: int = 76,
+        screen_size=(1200, 600),
+    ):
         self.room = room
         self.theme = room.theme
         self.tile_w = tile_w
@@ -68,7 +75,9 @@ class IsometricRenderer:
         self.zoom = 1.0
         pygame.init()
         self.screen = pygame.display.set_mode((self.screen_w, self.screen_h))
-        pygame.display.set_caption(f"Isometric Renderer - {room.name} ({self.theme.name})")
+        pygame.display.set_caption(
+            f"Isometric Renderer - {room.name} ({self.theme.name})"
+        )
         self.clock = pygame.time.Clock()
 
         self.orientation_index = 0  # start NE
@@ -86,7 +95,7 @@ class IsometricRenderer:
         self.loots: Dict[str, Loot] = self.room.loots
 
         # preload actors and loots from Room
-        #self._init_actors_loots()
+        # self._init_actors_loots()
 
         # prepare tile grid and pre-load sprites declared by theme
         self._prepare_tiles_and_sprites()
@@ -160,7 +169,7 @@ class IsometricRenderer:
     #         self.actors["Player"] = Actor(id="Player", name="Player", pos=(px,py), facing=self.room.player_facing, sprite=player_sprite)
 
     # ---------- coordinate transforms ----------
-    def _transform_coord_for_orientation(self, x: int, y: int) -> Tuple[int,int]:
+    def _transform_coord_for_orientation(self, x: int, y: int) -> Tuple[int, int]:
         """Return transformed grid coords according to current orientation.
         We reorder/flip (x,y) so that same projection formula works for all views.
         Orientation mapping:
@@ -170,39 +179,39 @@ class IsometricRenderer:
             SE: flip Y? (we'll implement symmetrical transforms)
         We'll implement transforms that produce visually correct rotation/mirror for isometric projection below.
         """
-        #w = len(self.room.ascii_map[0])
-        #h = len(self.room.ascii_map)
+        # w = len(self.room.ascii_map[0])
+        # h = len(self.room.ascii_map)
         w = self.room.width
         h = self.room.height
         if self.orientation == "NE":
             return x, y
         elif self.orientation == "NW":
             # mirror horizontally (x -> w-1-x)
-            return  y,(w - 1 - x)
+            return y, (w - 1 - x)
         elif self.orientation == "SW":
             # rotate 180 degrees (x->w-1-x, y->h-1-y)
             return (w - 1 - x), (h - 1 - y)
         elif self.orientation == "SE":
             # mirror vertically (y -> h-1-y)
-            return (h - 1 - y),x
+            return (h - 1 - y), x
         else:
             return x, y
 
-    def project(self, x: int, y: int) -> Tuple[int,int]:
+    def project(self, x: int, y: int) -> Tuple[int, int]:
         """Project grid coord (x,y) to screen px,py using standard isometric formula.
-           Projection origin will be centered horizontally and slightly offset vertically.
+        Projection origin will be centered horizontally and slightly offset vertically.
         """
         tx, ty = self._transform_coord_for_orientation(x, y)
         # basic isometric projection
         sx = (tx - ty) * (self.tile_w // 2) * self.zoom
         sy = (tx + ty) * (self.tile_h // 2) * self.zoom
         # offset to center map on screen
-       # w = self.room.width
-        #h = self.room.height
-        
-        #map_px_width = (w + h - 1) * (self.tile_w // 2)
+        # w = self.room.width
+        # h = self.room.height
 
-        offset_x = (self.screen_w ) / 2  + self.cam_x
+        # map_px_width = (w + h - 1) * (self.tile_w // 2)
+
+        offset_x = (self.screen_w) / 2 + self.cam_x
         offset_y = 80 + self.cam_y
         return int(sx + offset_x), int(sy + offset_y)
 
@@ -210,23 +219,24 @@ class IsometricRenderer:
     def _draw_diamond(self, surf, cx, cy, w, h, color):
         # draw a filled isometric diamond centered at (cx, cy)
         points = [
-            (cx, cy - h//2),   # top
-            (cx + w//2, cy),   # right
-            (cx, cy + h//2),   # bottom
-            (cx - w//2, cy)    # left
+            (cx, cy - h // 2),  # top
+            (cx + w // 2, cy),  # right
+            (cx, cy + h // 2),  # bottom
+            (cx - w // 2, cy),  # left
         ]
         pygame.draw.polygon(surf, color, points)
 
     def _draw_rect(self, surf, cx, cy, w, h, color):
         # draw a filled isometric square centered at (cx, cy)
         points = [
-            (cx, cy + h),   # top
-            (cx, cy ),   # right
-            (cx + w, cy),   # right
-            (cx + w, cy + h),   # right
-               # left
+            (cx, cy + h),  # top
+            (cx, cy),  # right
+            (cx + w, cy),  # right
+            (cx + w, cy + h),  # right
+            # left
         ]
         pygame.draw.polygon(surf, color, points)
+
     # ---------- main render pass ----------
     def _build_hitboxes_and_draw_order(self):
         """Create a list of tile cells with screen coords and bounding rects for hit detection and ordering."""
@@ -237,10 +247,22 @@ class IsometricRenderer:
             for x in range(width):
                 sx, sy = self.project(x, y)
                 # bounding rectangle roughly covering tile sprite area
-                rect = pygame.Rect(sx - self.tile_w//2, sy - self.tile_h//2, self.tile_w, self.tile_h)
-                self.tile_hitboxes.append({"coord": (x,y), "screen": (sx,sy), "rect": rect})
+                rect = pygame.Rect(
+                    sx - self.tile_w // 2,
+                    sy - self.tile_h // 2,
+                    self.tile_w,
+                    self.tile_h,
+                )
+                self.tile_hitboxes.append(
+                    {"coord": (x, y), "screen": (sx, sy), "rect": rect}
+                )
         # sort back-to-front by depth key (tx+ty) using transformed coords
-        self.tile_hitboxes.sort(key=lambda d: (self._transform_coord_for_orientation(*d["coord"])[0] + self._transform_coord_for_orientation(*d["coord"])[1]))
+        self.tile_hitboxes.sort(
+            key=lambda d: (
+                self._transform_coord_for_orientation(*d["coord"])[0]
+                + self._transform_coord_for_orientation(*d["coord"])[1]
+            )
+        )
 
     def render_frame(self):
         # clear background
@@ -257,7 +279,11 @@ class IsometricRenderer:
         for tileinfo in self.tile_hitboxes:
             x, y = tileinfo["coord"]
             sx, sy = tileinfo["screen"]
-            ch = self.room.ascii_map[y][x] if y < len(self.room.ascii_map) and x < len(self.room.ascii_map[y]) else " "
+            ch = (
+                self.room.ascii_map[y][x]
+                if y < len(self.room.ascii_map) and x < len(self.room.ascii_map[y])
+                else " "
+            )
             spec = self.theme.tiles.get(ch)
             if spec and spec.sprite:
                 surf = self._load_sprite(spec.sprite)
@@ -266,17 +292,25 @@ class IsometricRenderer:
                     w_exact, h_exact = surf.get_size()
                     w_exact *= self.zoom
                     h_exact *= self.zoom
-                    blit_x = sx - w_std//2
-                    blit_y = sy + (h_std-h_exact) #+ (self.tile_h)  # slight vertical offset
+                    blit_x = sx - w_std // 2
+                    blit_y = sy + (
+                        h_std - h_exact
+                    )  # + (self.tile_h)  # slight vertical offset
                     if self.zoom != 1.0:
                         surf = pygame.transform.scale_by(surf, self.zoom)
 
                     self.screen.blit(surf, (blit_x, blit_y))
-                    tileinfo["blit_rect"] = pygame.Rect(blit_x- w_std//2, blit_y-h_std//2, w_std//2, h_std//2)
+                    tileinfo["blit_rect"] = pygame.Rect(
+                        blit_x - w_std // 2, blit_y - h_std // 2, w_std // 2, h_std // 2
+                    )
 
                     continue
             # fallback: colored diamond
-            color = self._hex_to_color(spec.color) if spec and spec.color else pygame.Color("#666666")
+            color = (
+                self._hex_to_color(spec.color)
+                if spec and spec.color
+                else pygame.Color("#666666")
+            )
             self._draw_diamond(self.screen, sx, sy, w_std, h_std, color)
             tileinfo["blit_rect"] = tileinfo["rect"]
 
@@ -300,17 +334,30 @@ class IsometricRenderer:
                 w_exact, h_exact = sprite.get_size()
                 w_exact *= self.zoom
                 h_exact *= self.zoom
-                blit_x = sx - w_std//2
-                blit_y = sy + (h_std- h_exact) - h_std
-                #if self.zoom != 1.0:
+                blit_x = sx - w_std // 2
+                blit_y = sy + (h_std - h_exact) - h_std
+                # if self.zoom != 1.0:
                 sprite = pygame.transform.scale_by(sprite, self.zoom)
                 self.screen.blit(sprite, (blit_x, blit_y))
-                obj._screen_rect = pygame.Rect(blit_x+0*w_std//2, blit_y+1*h_std//2, w_std//2, h_exact//2)
+                obj._screen_rect = pygame.Rect(
+                    blit_x + 0 * w_std // 2,
+                    blit_y + 1 * h_std // 2,
+                    w_std // 2,
+                    h_exact // 2,
+                )
             else:
                 # draw placeholder circle
-                color = pygame.Color("#FFD700") if etype == "loot" else pygame.Color("#00BFFF")
-                pygame.draw.circle(self.screen, color, (sx, sy - self.tile_h//4), self.tile_h // 6)
-                obj._screen_rect = pygame.Rect(sx - 6, sy - 6 - self.tile_h//4, 12, 12)
+                color = (
+                    pygame.Color("#FFD700")
+                    if etype == "loot"
+                    else pygame.Color("#00BFFF")
+                )
+                pygame.draw.circle(
+                    self.screen, color, (sx, sy - self.tile_h // 4), self.tile_h // 6
+                )
+                obj._screen_rect = pygame.Rect(
+                    sx - 6, sy - 6 - self.tile_h // 4, 12, 12
+                )
 
         # draw tooltip if any
         mx, my = pygame.mouse.get_pos()
@@ -340,24 +387,33 @@ class IsometricRenderer:
                 spec = self.theme.tiles.get("M") if "M" in self.theme.tiles else None
                 short = actor.name
                 longdesc = spec.long_description if spec else "A creature."
-                return {"title": short, "body": f"{actor.name}\nFacing: {actor.facing}\n{longdesc}\n{actor.pos}"}
+                return {
+                    "title": short,
+                    "body": f"{actor.name}\nFacing: {actor.facing}\n{longdesc}\n{actor.pos}",
+                }
 
         for lid, loot in self.loots.items():
             r = getattr(loot, "_screen_rect", None)
             if r and r.collidepoint(mx, my):
                 spec = self.theme.tiles.get("l") if "l" in self.theme.tiles else None
                 longdesc = spec.long_description if spec else "An item."
-                return {"title": loot.name, "body": f"{loot.name}\n{longdesc}\n{loot.pos}"}
+                return {
+                    "title": loot.name,
+                    "body": f"{loot.name}\n{longdesc}\n{loot.pos}",
+                }
 
         # tiles hitboxes
         for t in reversed(self.tile_hitboxes):  # topmost first
             r = t["rect"]
             if r.collidepoint(mx, my):
-                x,y = t["coord"]
+                x, y = t["coord"]
                 ch = self.room.ascii_map[y][x]
                 spec = self.theme.tiles.get(ch)
                 if spec:
-                    return {"title": spec.name, "body": f"{spec.long_description}\n{x}-{y}"}
+                    return {
+                        "title": spec.name,
+                        "body": f"{spec.long_description}\n{x}-{y}",
+                    }
                 else:
                     return {"title": f"Tile '{ch}'", "body": f"Unknown tile\n{x}-{y}"}
         return None
@@ -374,7 +430,7 @@ class IsometricRenderer:
     # ---------- main loop ----------
     def run(self):
         running = True
-        zoom_step=1.1
+        zoom_step = 1.1
         while running:
             self.clock.tick(30)
             for ev in pygame.event.get():
@@ -387,21 +443,25 @@ class IsometricRenderer:
                         self.rotate_left()
                     elif ev.key == pygame.K_x:
                         self.rotate_right()
-                    elif ev.key == pygame.K_UP: 
+                    elif ev.key == pygame.K_UP:
                         self.cam_y += 50
-                    elif ev.key == pygame.K_DOWN: 
+                    elif ev.key == pygame.K_DOWN:
                         self.cam_y -= 50
-                    elif ev.key == pygame.K_LEFT: 
+                    elif ev.key == pygame.K_LEFT:
                         self.cam_x += 50
-                    elif ev.key == pygame.K_RIGHT: 
+                    elif ev.key == pygame.K_RIGHT:
                         self.cam_x -= 50
                     elif ev.key == pygame.K_a:
-                        self.zoom *= 1./zoom_step
-                        self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
+                        self.zoom *= 1.0 / zoom_step
+                        self.zoom = max(
+                            1.0 / zoom_step**6, min(self.zoom, zoom_step**6)
+                        )
                         print(self.zoom)
                     elif ev.key == pygame.K_z:
-                        self.zoom *= zoom_step 
-                        self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
+                        self.zoom *= zoom_step
+                        self.zoom = max(
+                            1.0 / zoom_step**6, min(self.zoom, zoom_step**6)
+                        )
                         print(self.zoom)
                     # elif ev.type == pygame.MOUSEWHEEL:
                     #     self.zoom *= zoom_step if ev.y > 0 else 1./zoom_step
@@ -409,13 +469,15 @@ class IsometricRenderer:
             self.render_frame()
         pygame.quit()
 
+
 # -------------------------
 # Tooltip helper
 # -------------------------
 
+
 class Tooltip:
     @staticmethod
-    def draw(surface: pygame.Surface, info: Dict[str,str], mouse_pos: Tuple[int,int]):
+    def draw(surface: pygame.Surface, info: Dict[str, str], mouse_pos: Tuple[int, int]):
         """Draw a small translucent tooltip box with title/body near mouse_pos."""
         x, y = mouse_pos
         title = info.get("title", "")
@@ -432,8 +494,8 @@ class Tooltip:
             rendered.append(s)
             w = max(w, s.get_width())
             h += s.get_height()
-        box_w = w + padding*2
-        box_h = h + padding*2
+        box_w = w + padding * 2
+        box_h = h + padding * 2
         box_x = x + 16
         box_y = y + 16
         # keep on screen
@@ -444,8 +506,8 @@ class Tooltip:
             box_y = y - box_h - 16
         # background
         bg = pygame.Surface((box_w, box_h), pygame.SRCALPHA)
-        bg.fill((0,0,0,200))
-        pygame.draw.rect(bg, (255,255,255,30), bg.get_rect(), 1)
+        bg.fill((0, 0, 0, 200))
+        pygame.draw.rect(bg, (255, 255, 255, 30), bg.get_rect(), 1)
         surface.blit(bg, (box_x, box_y))
         # draw text
         oy = box_y + padding
@@ -453,9 +515,11 @@ class Tooltip:
             surface.blit(s, (box_x + padding, oy))
             oy += s.get_height()
 
+
 # -------------------------
 # Main (example usage)
 # -------------------------
+
 
 def main(theme_yaml: str, room_yaml: str):
     # load theme + room
@@ -463,6 +527,7 @@ def main(theme_yaml: str, room_yaml: str):
     room = Room.load(room_yaml, theme)
     renderer = IsometricRenderer(room)
     renderer.run()
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

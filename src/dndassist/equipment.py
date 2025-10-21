@@ -1,5 +1,3 @@
-
-
 # import json
 
 # with open("equipment.json", "r") as fin:
@@ -8,18 +6,22 @@
 #     EQUIPMENT_CATEGORIES = json.load(fin)
 
 
-
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, List
 import json
 import os
 from importlib_resources import files
 
-DATA_PATH = files("dndassist").joinpath("equipment.json") #os.path.join("data", "weapons.json")
-DATA_CATEGORIES_PATH =  files("dndassist").joinpath("equipment_categories.json") #os.path.join("data", "weapons.json")
+DATA_PATH = files("dndassist").joinpath(
+    "equipment.json"
+)  # os.path.join("data", "weapons.json")
+DATA_CATEGORIES_PATH = files("dndassist").joinpath(
+    "equipment_categories.json"
+)  # os.path.join("data", "weapons.json")
 
 with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
-        DATA_CATEGORIES = json.load(f)
+    DATA_CATEGORIES = json.load(f)
+
 
 def weapon_catg(weapon_name):
     for cat in DATA_CATEGORIES:
@@ -31,6 +33,7 @@ def weapon_catg(weapon_name):
             else:
                 return "martial"
     return None
+
 
 @dataclass
 class Weapon:
@@ -46,7 +49,7 @@ class Weapon:
     cost: int
 
     # Path to your weapon definitions (adjust to your project structure)
-    
+
     @classmethod
     def _load_all_weapons(cls) -> Dict[str, Dict[str, Any]]:
         """Load all weapon specs into a dict indexed by name (case-insensitive)."""
@@ -61,11 +64,11 @@ class Weapon:
         if not name:
             # Bare hands fallback
             return cls(
-                name="Unarmed",
+                name="Unarmed strike",
                 weapon_category="Simple",
                 weapon_range="Melee",
                 damage_dice="1d1",
-                damage_bonus=0,
+                damage_bonus=1,
                 damage_type="Bludgeoning",
                 range_normal=5,
                 range_long=None,
@@ -76,17 +79,16 @@ class Weapon:
         all_weapons = cls._load_all_weapons()
         key = name.lower()
         if key not in all_weapons:
-            raise ValueError(f"Weapon '{name}' not found in {cls.DATA_PATH}")
+            raise ValueError(f"Weapon '{name}' not found in {DATA_PATH}")
         return cls(**all_weapons[key])
 
     # ------------------ GAME LOGIC ------------------
-
 
     def attributes(self) -> List[str]:
         """Return which ability (e.g. Strength, Dexterity) is used to attack with this weapon."""
         props = [p.lower() for p in self.properties or []]
         w_range = self.weapon_range.lower()
-        
+
         if "finesse" in props and w_range == "melee":
             return ["dexterity", "strength"]
         elif "thrown" in props:
@@ -99,9 +101,6 @@ class Weapon:
             return ["strength"]
 
 
-
-
-
 @dataclass
 class Armor:
     name: str
@@ -112,7 +111,7 @@ class Armor:
     cost: int
 
     # Path to your weapon definitions (adjust to your project structure)
-    
+
     @classmethod
     def _load_all_armors(cls) -> Dict[str, Dict[str, Any]]:
         """Load all armor specs into a dict indexed by name (case-insensitive)."""
@@ -123,14 +122,12 @@ class Armor:
     @classmethod
     def from_name(cls, name: str) -> "Armor":
         """Create a Armor instance by name (case-insensitive lookup)."""
-       
+
         all_weapons = cls._load_all_armors()
         key = name.lower()
         if key not in all_weapons:
             raise ValueError(f"Armor '{name}' not found in {DATA_PATH}")
         return cls(**all_weapons[key])
-
-   
 
 
 @dataclass
@@ -140,7 +137,7 @@ class Shield:
     cost: int
 
     # Path to your weapon definitions (adjust to your project structure)
-    
+
     @classmethod
     def _load_all_shields(cls) -> Dict[str, Dict[str, Any]]:
         """Load all shield specs into a dict indexed by name (case-insensitive)."""
@@ -155,5 +152,5 @@ class Shield:
         all_weapons = cls._load_all_shields()
         key = name.lower()
         if key not in all_weapons:
-            raise ValueError(f"Shield '{name}' not found in {cls.DATA_PATH}")
+            raise ValueError(f"Shield '{name}' not found in { DATA_PATH}")
         return cls(**all_weapons[key])

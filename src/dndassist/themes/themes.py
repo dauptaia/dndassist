@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class TileSpec:
     name: str
@@ -11,18 +12,20 @@ class TileSpec:
     move_difficulty: int = 1
     enter_condition: Optional[str] = None
     leave_condition: Optional[str] = None
-    lighting: float = 1.0                  # relative brightness (0–1)
-    color: Optional[str] = None            # hex or color name
+    lighting: float = 1.0  # relative brightness (0–1)
+    color: Optional[str] = None  # hex or color name
     sprite: Optional[str] = None
+
 
 from dataclasses import dataclass, field
 from typing import Dict
 import yaml
 
+
 @dataclass
 class Theme:
     name: str
-    environment: str = "outdoor"           # "indoor" or "outdoor"
+    environment: str = "outdoor"  # "indoor" or "outdoor"
     default_lighting: float = 1.0
     base_color: str = "#FFFFFF"
     tiles: Dict[str, TileSpec] = field(default_factory=dict)

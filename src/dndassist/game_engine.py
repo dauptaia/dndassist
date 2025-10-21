@@ -4,139 +4,174 @@ import random
 
 from dndassist.character import Character
 
-from dndassist.room import RoomMap,Actor
+from dndassist.room import RoomMap, Actor
 from dndassist.autoroll import rolldice, max_dice
+from dndassist.attack import attack
+from dndassist.storyprint import print_l,print_c,print_r,print_color,user_select_option,user_select_quantity
 
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
+
+
+banner = u"""
+                            ==(W{==========-      /===-                        
+                              ||  (.--.)         /===-_---~~~~~~~~~------____  
+                              | \_,|**|,__      |===-~___                _,-' `
+                 -==\\        `\ ' `--'   ),    `//~\\   ~~~~`---.___.-~~      
+             ______-==|        /`\_. .__/\ \    | |  \\           _-~`         
+       __--~~~  ,-/-==\\      (   | .  |~~~~|   | |   `\        ,'             
+    _-~       /'    |  \\     )__/==0==-\<>/   / /      \      /               
+  .'        /       |   \\      /~\___/~~\/  /' /        \   /'                
+ /  ____  /         |    \`\.__/-~~   \  |_/'  /          \/'                  
+/-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`                   
+                  \_|      /        _) | ;  ),   __--~~                        
+                    '~~--_/      _-~/- |/ \   '-~ \                            
+                   {\__--_/}    / \\_>-|)<__\      \                           
+                   /'   (_/  _-~  | |__>--<__|      |                          
+                  |   _/) )-~     | |__>--<__|      |                          
+                  / /~ ,_/       / /__>---<__/      |                          
+                 o-o _//        /-~_>---<__-~      /                           
+                 (^(~          /~_>---<__-      _-~                            
+                ,/|           /__>--<__/     _-~                               
+             ,//('(          |__>--<__|     /  -Alex Wargacki  .----_          
+            ( ( '))          |__>--<__|    |                 /' _---_~\        
+         `-)) )) (           |__>--<__|    |               /'  /     ~\`\      
+        ,/,'//( (             \__>--<__\    \            /'  //        ||      
+      ,( ( ((, ))              ~-__>--<_~-_  ~--____---~' _/'/        /'       
+    `~/  )` ) ,/|                 ~-_~>--<_/-__       __-~ _/                  
+  ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~~~__--~                    
+   ;'( ')/ ,)(                              ~~~~~~~~~~                         
+  ' ') '( (/                                                                   
+    '   '  `
+
+DND-assist, a dungeon's and dragon GameMaster helper. 
+By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
+
+"""
+
 class GameEngine:
     room: RoomMap
     turn_counter: int = 0
     round_counter: int = 1
-    
 
-    def __init__(self, room:RoomMap):
+    def __init__(self, room: RoomMap):
+        print_color(banner, width=80, primary="YELLOW")
         self.room: RoomMap = room
-        self.round_counter:int = 0
-        self.now: datetime = datetime(1000, 1, 1)+ timedelta(0,3600*12)
+        self.room.print_map()
+        
+        self.round_counter: int = 0
+        self.now: datetime = datetime(1000, 1, 1) + timedelta(0, 3600 * 12)
         self.run_round()
-    
+
     # ---------- MAIN LOOP ----------
     def run_round(self):
         """Run one round (each actor acts once in initiative order)."""
-        self.round_counter +=1
-        print(f"\n=== ROUND {self.round_counter} START ===")
-        print(f"\n   Room {self.room.name}, time {self.now.time()}")
+        self.round_counter += 1
+        print_c(f"\n=== ROUND {self.round_counter} START ===")
+        print_c(f"\n   Room {self.room.name}, time {self.now.time()}")
         # 1️⃣ Filter out inactive actors
         active_actors = []
-        for key,actor in self.room.actors.items():
-            
-            conditions =  actor.character.current_state["conditions"]
-            if "unconscious" in conditions:
-                continue
-            if "stunned" in conditions:
-                continue
-            if "sleeping" in conditions:
-                continue
-            if  actor.character.current_state["current_hp"] <= 0:
-                continue
-            active_actors.append(actor)
+        for actor_key, actor in self.room.actors.items():
+            for skip_state in ["dead", "resting"]:
+                if skip_state in actor.character.current_state["conditions"]:
+                    continue
 
+            active_actors.append(actor)
         # 2️⃣ Compute initiative for all active actors
         initiative_order = self.compute_initiative(active_actors)
 
+        killed_actors = []
         # 3️⃣ Execute each actor's turn in initiative order
         for actor in initiative_order:
-            self.now += timedelta(0,6)
-            print(f"\n--- {actor.name}'s turn ---")
+            for skip_state in ["dead", "resting"]:
+                if skip_state in actor.character.current_state["conditions"]:
+                    continue
+            self.now += timedelta(0, 6)
+            print_c(f"\n--- __{actor.name}__'s turn ---")
 
-            remaining_moves =  actor.character.max_speed
+            remaining_moves = actor.character.max_speed
+            remaining_actions = 100
+            while remaining_moves > 0 and remaining_actions > 0:
+                print_c(f"\n    Remaining moves: {remaining_moves}m")
+                actions_avail = ["round finished", "look around", "move in direction"]
 
-            while remaining_moves >0 : 
-                print(f"\n    Remaining moves: {remaining_moves}m")
-                actions_avail = [ "look around", "move to a direction"]
-                
-                all_visible_actors_, all_visible_loots = self.room.visible_actors_n_loots(actor.name)
+                (
+                    all_visible_actors_,
+                    all_visible_loots,
+                ) = self.room.visible_actors_n_loots(actor.name)
 
-                
-                for (other, dist) in all_visible_actors_:
+                for other, dist in all_visible_actors_:
                     if dist > 3:
-                        actions_avail.append(f"move to person {other} at {dist}m ")
-                    if dist <=3:
+                        actions_avail.append(f"move to {other} at {dist}m ")
+                    if dist <= 3:
                         actions_avail.append(f"talk to {other}")
 
-                for (other, dist) in all_visible_loots:
+                for other, dist in all_visible_loots:
                     if dist > 3:
-                        actions_avail.append(f"move to object {other} at {dist}m ")
-                    if dist <=3:
+                        actions_avail.append(f"move to {other} at {dist}m ")
+                    if dist <= 3:
                         actions_avail.append(f"pick up {other}")
-
 
                 # Attack solutions
                 faction = actor.character.faction
                 visible_foes = []
-                for (other, dist) in all_visible_actors_:
-                    if self.room.actors[other].character.faction not in ["neutral", faction]:
-                        visible_foes.append((other, dist) )
-                
-                for (other, dist) in visible_foes:
-                    weapon,dmg = actor_attack_solutions(actor, dist)
-                    actions_avail.append(f"attack {other} with {weapon} ({dmg})")
-                
-                print("Actions available:")
-                for i, action in enumerate(actions_avail):
-                    print(f" {i} - {action}")
-                
+                for other, dist in all_visible_actors_:
+                    if self.room.actors[other].character.faction not in [
+                        "neutral",
+                        faction,
+                    ]:
+                        visible_foes.append((other, dist))
 
-                select_action = True
-                while select_action:
-                    act  = input("What action do you take?")
-                    try:
-                        act = int(act)
-                    except ValueError:
-                        print(". enter a valid action number")
-                        continue
-                    if act > len(actions_avail)-1:
-                        print(". enter a valid action number")
-                        continue
-                    if act < 0:
-                        print(". enter a valid action number")
-                        continue
-                    action = actions_avail[act]
-                    select_action = False
+                for other, dist in visible_foes:
+                    weapon, dmg = actor_attack_solutions(actor, dist)
+                    if weapon is not None:
+                        actions_avail.append(
+                            f"attack {other} with {weapon} ; damage max {dmg} HP"
+                        )
 
-                print(f"you selected: {action}")
+                action = user_select_option("Select an action:", actions_avail)
 
-                if action.startswith("move to"):
-                    tgt = action.split(" ")[2]
-                    if action.startswith("move to person"):
-                        pos = self.room.actors[tgt].pos
-                    elif action.startswith("move to object"):
-                        pos = self.room.actors[tgt].pos
-                    elif action.startswith("move to a direction"):
-                        dir = input("which direction? (N,S,E, NW etc..)")
-                                            
-                        
+                if action.startswith("round finished"):
+                    remaining_moves = 0
+                    remaining_actions = 0
+                elif action.startswith("move"):
+                    if action.startswith("move to"):
+                        tgt = action.split(" ")[2]
+                        used_dist = self.room.move_actor_to_target(
+                            actor.name, tgt, remaining_moves
+                        )
+                        remaining_moves -= used_dist
 
+                    elif action.startswith("move in direction"):
+                        dir = user_select_option(
+                            "Which direction:",
+                            ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+                        )
+                        select_dist = user_select_quantity(
+                            "Which distance:", 0, remaining_moves
+                        )
+                        used_dist = self.room.move_actor_to_direction(
+                            actor.name, dir, select_dist
+                        )
+                        remaining_moves -= used_dist
+                elif action.startswith("attack"):
+                    remaining_actions -= 100
+                    defender_name = action.split(" ")[1]
+                    weapon_name = action.split(";")[0].split("with")[-1].strip()
+                    defender = self.room.actors[defender_name]
+                    dmg = attack(actor.character, weapon_name, defender.character)
+                    is_dead = defender.character.get_damage(dmg)
+                    if is_dead:
+                        self.room.add_loot(defender.character.drop_loot(), defender.pos)
+                        killed_actors.append(defender_name)
 
-
-            # Refresh temporary states
-            #actor.start_turn()
-
-            # 3.1 Determine possible actions
-            # 3.2 Select action (AI or player input)
-            #action = self.select_action(actor, actions)
-
-            # 3.3 Execute the chosen action
-            #self.execute_action(actor, action)
-
-            # 3.4 End turn housekeeping
-            #actor.end_turn()
+        for dead_name in killed_actors:
+            self.room.del_actor(dead_name)
 
         # 4️⃣ End of round
-        print(f"\n=== ROUND {self.round_counter} END ===")
+        print_c(f"\n=== ROUND {self.round_counter} END ===")
 
         cont = input("Continue? (y/n):")
-        if cont=="y":
+        if cont == "y":
             self.run_round()
 
     # ---------- INITIATIVE ----------
@@ -144,81 +179,38 @@ class GameEngine:
         """Compute initiative order based on dice rolls and dexterity modifiers."""
         initiatives = []
         for a in active_actors:
-            d20,_ = rolldice("1d20",autoroll=True)
+            print_r(f"Initiative roll for __{a.name}__")
+            d20, _ = rolldice("1d20", autoroll=True)
             init_value = a.character.attr_mod("dexterity") + d20
             initiatives.append((init_value, random.random(), a))
-           # print(f"{a.name} initiative: {init_value}")
+        # print(f"{a.name} initiative: {init_value}")
         # Sort by initiative descending (then random tie-breaker)
         initiatives.sort(key=lambda x: (-x[0], x[1]))
 
-        ordered=  [a for (_, _, a) in initiatives]
-        print("Order for this turn:")
-        for i,a in enumerate(ordered):
-            print(f"{i}, {a}")
+        ordered = [a for (_, _, a) in initiatives]
+        print_r("Order for this turn:")
+        for i, a in enumerate(ordered):
+            print_r(f".  {i}, __{a.name}__")
         return ordered
 
-def list_of_foes(actor: Actor, other_actors_:List[Actor])-> List[Actor]:
-    """ return the foes of this actor"""
+
+def list_of_foes(actor: Actor, other_actors_: List[Actor]) -> List[Actor]:
+    """return the foes of this actor"""
     out = []
     for other in other_actors_:
         if other.character.faction not in ["neutral", actor.character.faction]:
             out.append(other)
     return out
 
-def actor_attack_solutions(actor: Actor, dist:int)-> Tuple[str, str]:
+
+def actor_attack_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
     """return strongest available weapon  in range"""
     max_dmg = 0
     weap = None
-    print(actor.character.available_ranges(),"d", dist)
-        
     for weapon, range, damage in actor.character.available_ranges():
-
-        if range>= dist:
+        if range >= dist:
             if max_dice(damage) > max_dmg:
-                weap, max_dmg = weapon,max_dice(damage)
+                weap, max_dmg = weapon, max_dice(damage)
 
     return weap, max_dmg
 
-    # ---------- ACTION SELECTION ----------
-    # def select_action(self, actor: "Character", actions: List[str]) -> str:
-    #     """Decide which action to take. NPCs choose automatically, players are prompted."""
-    #     if actor.is_npc:
-    #         # Simple AI: choose first valid or random action
-    #         return random.choice(actions)
-    #     else:
-    #         # For players, you can replace this with interactive input later
-    #         print(f"\n{actor.name}, available actions: {', '.join(actions)}")
-    #         choice = input("Choose your action: ").strip().lower()
-    #         if choice in actions:
-    #             return choice
-    #         return "rest"
-
-    # ---------- ACTION EXECUTION ----------
-    # def execute_action(self, actor: "Character", action: str):
-    #     """Stub for executing an action."""
-    #     # In full system, you would dispatch to Action subclasses (AttackAction, MoveAction, etc.)
-    #     if action == "attack":
-    #         visible = self.room.visible_actors(actor)
-    #         if visible:
-    #             target = random.choice(visible)
-    #             print(f"{actor.name} attacks {target.name}!")
-    #         else:
-    #             print(f"{actor.name} wants to attack, but sees no target.")
-    #     elif action == "move":
-    #         print(f"{actor.name} moves tactically.")
-    #     elif action == "dash":
-    #         print(f"{actor.name} dashes forward.")
-    #     elif action == "rest":
-    #         print(f"{actor.name} takes a moment to rest.")
-    #     else:
-    #         print(f"{actor.name} does nothing.")
-
-    # ---------- GAME STATE ----------
-    # def add_actor(self, actor: "Character"):
-    #     self.actors.append(actor)
-
-    # def remove_actor(self, actor: "Character"):
-    #     self.actors = [a for a in self.actors if a != actor]
-
-    # def print_log(self):
-    #     print("\n".join(self.log))

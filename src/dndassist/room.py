@@ -8,6 +8,9 @@ from collections import defaultdict
 
 from dndassist.themes.themes import Theme
 from dndassist.character import Character
+
+from dndassist.storyprint import print_l,print_c,print_r,print_color
+
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
 MAX_UNITS = 50  # max scanning distance in units
@@ -39,7 +42,6 @@ def _angle_to_vector(angle_deg: float):
     dx = math.sin(rad)  # x component (right positive)
     dy = -math.cos(rad)  # y component (down positive) => -cos so 0deg -> (0,-1)
     return dx, dy
-
 
 
 # -----------------------------------------------------------
@@ -77,6 +79,7 @@ class Actor:
     
     through attribute character, you get the complete DND Character of the NPC/player
     """
+
     def turn(self, direction: str):
         self.facing = direction.upper()
 
@@ -111,7 +114,6 @@ class Loot:
         out = f"{self.name} ({self.symbol}), pos: {self.pos}"
         return out
 
-
     def to_dict(self):
         return asdict(self)
 
@@ -139,19 +141,22 @@ class RoomMap:
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
 
-    # -------------------------------------------
-    # def add_player(self, index:int, name: str, pos: Tuple[int, int], facing: str = "N"):
-    #     self.actors["Player"+str(index)] = Actor(name, "@", index, pos, facing=facing)
-
-    # to refine
-
-
     def unit_to_m(self, u: float) -> int:
         """Convert map units to meters (rounded integer)."""
         return int(round(u * self.unit_m))
 
+    def m_to_unit(self, u: float) -> int:
+        """Convert map meters to units (rounded integer)."""
+        return int(round(u / self.unit_m))
 
-    def add_actor(self, name: str, pos: Tuple[int, int], symbol="M", facing: str = "N", character:Character=None):
+    def add_actor(
+        self,
+        name: str,
+        pos: Tuple[int, int],
+        symbol="M",
+        facing: str = "N",
+        character: Character = None,
+    ):
         """add an actor in the room.
 
         Actors are identified by their unique names, handled outside the room concept.
@@ -161,7 +166,9 @@ class RoomMap:
         if name in self.actors:
             print(f"Actor {name} is already in the room")
         else:
-            self.actors[name] = Actor(name, symbol, pos, facing=facing, character=character)
+            self.actors[name] = Actor(
+                name, symbol, pos, facing=facing, character=character
+            )
 
     def del_actor(self, name: str):
         """remove an actor in the room"""
@@ -189,47 +196,6 @@ class RoomMap:
         else:
             print(f"Loot {name} is not in the room")
 
-    def move_actor_towards(self, actor_name: str, max_range: int, any_name: str):
-        """Move an actor in the room toward an other actor
-
-        Motion will be limited by the maximum range,
-        the terrain difficulty
-        and the ostacles
-
-        Motion will stop against walls or void
-        """
-
-        # find the correct final position
-        # self.actors[actor_name].pos = new_position
-        pass
-
-    # -------------------------------------------
-    def move_actor(self, actor_name: str, dx: int, dy: int):
-        actor = self.actors[actor_name]
-        dir = ""
-        if dx > 0:
-            dir += "S"
-        if dx < 0:
-            dir += "N"
-        if dy > 0:
-            dir += "E"
-        if dy < 0:
-            dir += "W"
-        dist = self.unit_to_m(math.hypot(dx, dy))
-
-        nx, ny = actor.pos[0] + dx, actor.pos[1] + dy
-        tile = self.tiles.get((nx, ny))
-        if tile is None:
-            print(f"Tile {(nx, ny)} not existing")
-            return
-
-        if not tile.traversable:
-            print(f"Tile {(nx, ny)} {tile.description} not traversable")
-            return
-
-        print(f"{actor_name} is moving {dist:.2f}m to {dir}")
-        actor.pos = (nx, ny)
-
     # -------------------------------------------
     def pick_up_loot(self, actor_name: str):
         actor = self.actors[actor_name]
@@ -239,7 +205,9 @@ class RoomMap:
                 del self.loots[key]
 
     # -------------------------------------------
-    def render_ascii(self, mode="symbol", spaced:bool=False) -> str:
+    def render_ascii(
+        self, mode="symbol", spaced: bool = True, path: List[Tuple[int, int]] = None
+    ) -> str:
         if mode == "symbol":
             grid = [
                 [
@@ -261,18 +229,70 @@ class RoomMap:
         else:
             raise ValueError(f"render_acii {mode} not implemented...")
 
-        print(f"Size {self.width}x{self.height}")
-        for loot in self.loots.values():
-            x, y = loot.pos
-            grid[y][x] = loot.symbol
-        for actor in self.actors.values():
-            x, y = actor.pos
-            grid[y][x] = actor.symbol
+        # print(f"Size {self.width}x{self.height}")
+
+        
+
+        
+
         if spaced:
+            if path is not None:
+                for x, y in path:
+                    grid[y][x] = "__*__"
+            for loot in self.loots.values():
+                x, y = loot.pos
+                grid[y][x] = "__"+loot.symbol+"__"
+            for actor in self.actors.values():
+                x, y = actor.pos
+                grid[y][x] = "__"+actor.symbol+"__"
+            # add coordinates
+            top = []
+            idx = 0
+            for x in range(self.width):
+                top.append(f"__{str(idx)}__")
+                idx += 1
+                if idx == 10:
+                    idx = 0
+            grid.insert(0, top)
+
+            idx = -1
+            for y in range(self.height + 1):
+                if idx == -1:
+                    grid[y].insert(0, " ")
+                else:
+                    grid[y].insert(0, f"__{str(idx)}__")
+                
+                if y == 1:
+                    grid[y].append(f"   __ ' ' normal ground      '.' special ground __")
+                if y == 2:
+                    grid[y].append(f"   __ 'X' void               's' special       __")
+                if y == 3:
+                    grid[y].append(f"   __ 'O' Tall obsctacle     'O' small obstacle __")
+                if y == 4:
+                    grid[y].append(f"   __ 'G' gate,              'l' loot           __")
+                if y == 6:
+                    grid[y].append(f"   __       N                                  __")
+                if y == 7:
+                    grid[y].append(f"   __     W   E     1 unit =  {self.unit_m}m   __")
+                if y == 8:
+                    grid[y].append(f"   __       S                                   __")
+                idx += 1
+                if idx == 10:
+                    idx = 0
             return "\n".join(" ".join(row) for row in grid)
         else:
             return "\n".join("".join(row) for row in grid)
+
+    def print_map(
+        self,  path: List[Tuple[int, int]] = None
+    ):
+        map = self.render_ascii(mode="symbol", spaced = True, path = path)
+        print("\n\n")
+        print_color(map, width=self.width*2,primary="LIGHTRED_EX", secondary="RED")
+        print_color(self.name, width=len(self.name),primary="LIGHTRED_EX", secondary="RED")
+        print("\n")
         
+
     # -------------------------------------------
     def describe_view_los(self, actor_name: str) -> str:
         """
@@ -292,8 +312,9 @@ class RoomMap:
 
         return "\n".join(report_lines)
 
-
-    def visible_actors_n_loots(self, actor_name: str) -> Tuple[List[Tuple[str,int]],List[Tuple[str,int]]]:
+    def visible_actors_n_loots(
+        self, actor_name: str
+    ) -> Tuple[List[Tuple[str, int]], List[Tuple[str, int]]]:
         """
         True LoS description using multiple rays per sector.
         Returns a list of (visible actors distance in m)
@@ -302,26 +323,30 @@ class RoomMap:
             actor_name, self.actors, self.loots, self.tiles, self.width, self.height
         )
 
-        _visible_actors = [(actor, self.unit_to_m(dist)) for actor, dist in _visible_actors]
+        _visible_actors = [
+            (actor, self.unit_to_m(dist)) for actor, dist in _visible_actors
+        ]
         _visible_loots = [(loot, self.unit_to_m(dist)) for loot, dist in _visible_loots]
-        
-        print("??", _visible_actors)
-        print("!!", _visible_loots)
-        return _visible_actors,_visible_loots
+
+        return _visible_actors, _visible_loots
 
     def _neighbors(self, x: int, y: int) -> List[Tuple[int, int, float]]:
         """Return all valid 8-directional neighbors with cost multiplier."""
         deltas = [
-            (-1,  0, 1.0), (1,  0, 1.0),
-            (0, -1, 1.0), (0,  1, 1.0),
-            (-1, -1, math.sqrt(2)), (1, -1, math.sqrt(2)),
-            (-1,  1, math.sqrt(2)), (1,  1, math.sqrt(2))
+            (-1, 0, 1.0),
+            (1, 0, 1.0),
+            (0, -1, 1.0),
+            (0, 1, 1.0),
+            (-1, -1, math.sqrt(2)),
+            (1, -1, math.sqrt(2)),
+            (-1, 1, math.sqrt(2)),
+            (1, 1, math.sqrt(2)),
         ]
         neighbors = []
         for dx, dy, mult in deltas:
             nx, ny = x + dx, y + dy
             if 0 <= nx < self.width and 0 <= ny < self.height:
-                neighbors.append((nx, ny, mult))
+                neighbors.append((nx, ny, self.unit_to_m(mult)))
         return neighbors
 
     def _heuristic(self, a: Tuple[int, int], b: Tuple[int, int]) -> float:
@@ -329,21 +354,85 @@ class RoomMap:
         (x1, y1), (x2, y2) = a, b
         return math.hypot(x2 - x1, y2 - y1)
 
+    # -------------------------------------------
+    def move_actor_to_direction(self, actor_name: str, dir: str, distance_m: int):
+        """Move an actor toward a direction.
+
+        Return used distance in m"""
+        actor = self.actors[actor_name]
+
+        if dir == "N":
+            dy = -self.m_to_unit(distance_m)
+            dx = 0
+        elif dir == "NE":
+            dx = self.m_to_unit(distance_m * 1.414)
+            dy = -self.m_to_unit(distance_m * 1.414)
+        elif dir == "E":
+            dx = self.m_to_unit(distance_m)
+            dy = 0
+        elif dir == "SE":
+            dx = self.m_to_unit(distance_m * 1.414)
+            dy = self.m_to_unit(distance_m * 1.414)
+        elif dir == "S":
+            dy = self.m_to_unit(distance_m)
+            dx = 0
+        elif dir == "SW":
+            dx = -self.m_to_unit(distance_m * 1.414)
+            dy = self.m_to_unit(distance_m * 1.414)
+        elif dir == "W":
+            dx = -self.m_to_unit(distance_m)
+            dy = 0
+        elif dir == "NW":
+            dx = -self.m_to_unit(distance_m * 1.414)
+            dy = -self.m_to_unit(distance_m * 1.414)
+        x0, y0 = actor.pos
+        path, used_dist = self.move_to(
+            x0, y0, x0 + dx, y0 + dy, max_distance_m=distance_m
+        )
+        print(f"Inital pos: {x0},{y0}")
+        print(f"Aiming pos: {x0+dx},{y0+dy}")
+        actor.pos = path[-1]
+        xf, yf = actor.pos
+        print(f"final pos: {xf},{yf}")
+        return used_dist
+
+    def move_actor_to_target(
+        self, actor_name: str, target_name: str, distance_m: int
+    ) -> int:
+        """Move an actor toward a target , loot or actors.
+
+        Return used distance in m"""
+        actor = self.actors[actor_name]
+        x0, y0 = actor.pos
+        target = None
+        if target_name in self.actors:
+            target = self.actors[target_name]
+            x1, y1 = target.pos
+            print(f"going from {x0},{y0} to actor {target_name} at {x1},{y1}")
+
+        elif target_name in self.loots:
+            target = self.loots[target_name]
+            x1, y1 = target.pos
+            print(f"going from {x0},{y0} to loot {target_name} at {x1},{y1}")
+
+        else:
+            print(f"Target {target_name} not found in actors nor loots")
+            return None
+
+        path, used_dist = self.move_to(x0, y0, x1, y1, max_distance_m=distance_m)
+        actor.pos = path[-1]
+        print(f"final pos {actor.pos}")
+        return used_dist
 
     def move_to(
-        self, 
-        x0: int, 
-        y0: int, 
-        x: int, 
-        y: int, 
-        max_distance: Optional[float] = None
-    ) -> Tuple[List[Tuple[int, int]], List[int]]:
+        self, x0: int, y0: int, x: int, y: int, max_distance_m: Optional[float] = None
+    ) -> Tuple[List[Tuple[int, int]], int]:
         """
         Find shortest path from (x0, y0) to (x, y) using A* algorithm.
         Accounts for tile difficulty, diagonal movement, and movement limit.
-        
+
         If `max_distance` is provided, the path stops when movement allowance is exceeded.
-        Returns (path, list_of_difficulties).
+        Returns (path, used distance in meters).
         """
         start, goal = (x0, y0), (x, y)
 
@@ -353,12 +442,14 @@ class RoomMap:
 
         best_reached = start  # last reachable position if max_distance stops us
 
+        occupied_positions = [actor.pos for actor in self.actors.values()]
+
         while frontier:
             _, current = heapq.heappop(frontier)
 
             # If max distance exceeded, stop at the farthest reachable tile
-            if max_distance is not None and g_score[current] > max_distance:
-                break
+            if max_distance_m is not None and g_score[current] > max_distance_m:
+                continue
 
             # If we reached the goal before exceeding distance, stop
             if current == goal:
@@ -366,12 +457,15 @@ class RoomMap:
                 break
 
             for nx, ny, mult in self._neighbors(*current):
-                tile = self.tiles[ny][nx]
+                tile = self.tiles[(nx, ny)]
                 if tile.difficulty >= 999:  # impassable
+                    continue
+                if (nx, ny) in occupied_positions:  # position occupied by an actor
                     continue
 
                 tentative_g = g_score[current] + tile.difficulty * mult
-                if max_distance is not None and tentative_g > max_distance:
+
+                if max_distance_m is not None and tentative_g > max_distance_m:
                     continue  # skip unreachable within move allowance
 
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
@@ -379,23 +473,25 @@ class RoomMap:
                     f_score = tentative_g + self._heuristic((nx, ny), goal)
                     heapq.heappush(frontier, (f_score, (nx, ny)))
                     came_from[(nx, ny)] = current
-                    best_reached = (nx, ny)
+                    if self._heuristic((nx, ny), goal) < self._heuristic(
+                        best_reached, goal
+                    ):
+                        best_reached = (nx, ny)
 
         # --- Reconstruct path ---
         if best_reached not in came_from:
-            return [], []  # No path found
+            return [], 0  # No path found
 
-        path, diffs = [], []
+        path = []
         node = best_reached
         while node:
             path.append(node)
-            diffs.append(self.tiles[node[1]][node[0]].difficulty)
             node = came_from[node]
         path.reverse()
-        diffs.reverse()
 
-        return path, diffs
-
+        # remove last path item, because you stop juste before destination.
+        self.print_map(path=path)
+        return path, int(round(g_score[path[-1]]))
 
     # -------------------------------------------
     # SAVE / LOAD
@@ -437,7 +533,7 @@ class RoomMap:
         """Save the room definition (excluding theme)."""
         data = {
             "name": self.name,
-            "ascii_map": self.render_ascii(),
+            "ascii_map": self.render_ascii(spaced=False),
             "actors": self.npcs,
             "loots": self.loots,
         }
@@ -484,7 +580,6 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
     )
 
 
-
 # def visible_actors(
 #     actor_name: str,
 #     actors: Dict[str, Actor],
@@ -497,12 +592,12 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
 #     List[Tuple[str, int]],
 #     List[Tuple[str, int]],
 # ]:
-    
+
 
 #     actor = actors[actor_name]
 #     px, py = actor.pos
 #     facing = actor.facing.upper()
-    
+
 #     f_angle = FACING_ANGLE[facing]
 
 #     # sector angle ranges relative to facing
@@ -511,7 +606,7 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
 
 #     # We'll gather nearest distance (in units) for each unique object name under each sector.
 #     # data structure: items_by_zone[band][sector] -> dict name -> nearest_distance_units
-    
+
 #     # Build list of ray angles to cast (for all three sectors)
 #     rays = []
 #     for sector_name, (a_min, a_max) in sector_ranges.items():
@@ -579,8 +674,6 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
 #     return visible_actors, visible_loots
 
 
-
-
 def compute_los(
     actor_name: str,
     actors: Dict[str, Actor],
@@ -593,12 +686,10 @@ def compute_los(
     List[Tuple[str, int]],
     List[Tuple[str, int]],
 ]:
-    
-
     actor = actors[actor_name]
     px, py = actor.pos
     facing = actor.facing.upper()
-    
+
     f_angle = FACING_ANGLE[facing]
 
     # sector angle ranges relative to facing
@@ -711,7 +802,7 @@ def compute_los(
     return items_by_zone, visible_actors, visible_loots
 
 
-def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]])->List[str]:
+def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]]) -> List[str]:
     # Now format the textual report using grouped data
     report_lines = []
     for band in ("close", "mid", "far"):
