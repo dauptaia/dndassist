@@ -168,7 +168,7 @@ def print_c(text:str):
         align="center",
         primary="LIGHTGREY_EX",
         secondary="WHITE",
-        wrap_width = None
+        wrap_width = 80
     )
 
 

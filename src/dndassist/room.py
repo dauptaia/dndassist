@@ -132,6 +132,7 @@ class Loot:
 class RoomMap:
     name: str
     ascii_map: str
+    description: str
     tiles: Dict[Tuple[int, int], Tile]
     theme: Theme
     width: int
@@ -290,6 +291,7 @@ class RoomMap:
         print("\n\n")
         print_color(map, width=self.width*2,primary="LIGHTRED_EX", secondary="RED")
         print_color(self.name, width=len(self.name),primary="LIGHTRED_EX", secondary="RED")
+        print_c(self.description)
         print("\n")
         
 
@@ -308,7 +310,7 @@ class RoomMap:
         actor = self.actors[actor_name]
         report_lines = [
             f"{actor.name} is facing {actor.facing}."
-        ] + assemble_description(items_by_zone)
+        ] + assemble_description(items_by_zone, self.unit_m)
 
         return "\n".join(report_lines)
 
@@ -511,6 +513,7 @@ class RoomMap:
 
         return cls(
             name=name,
+            description=data["description"],
             ascii_map=data["ascii_map"],
             width=width,
             height=height,
@@ -520,14 +523,6 @@ class RoomMap:
             loots=loots,
         )
 
-    # def save(self, path: str):
-    #     data = {
-    #         "name": self.name,
-    #         "ascii_map": self.render_ascii(),
-    #         "actors": {k: a.to_dict() for k, a in self.actors.items()},
-    #         "loots": {k: l.to_dict() for k, l in self.loots.items()},
-    #     }
-    #     with open(path, "w") as f: yaml.safe_dump(data, f)
 
     def save(self, yaml_path: str):
         """Save the room definition (excluding theme)."""
@@ -539,16 +534,6 @@ class RoomMap:
         }
         with open(yaml_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
-
-    # def get_tile_spec(self, x: int, y: int):
-    #     """Return the TileSpec from the theme for the map position."""
-    #     if y < 0 or y >= len(self.ascii_map):
-    #         return None
-    #     line = self.ascii_map[y]
-    #     if x < 0 or x >= len(line):
-    #         return None
-    #     char = line[x]
-    #     return self.theme.tiles.get(char)
 
 
 def from_ascii_map(ascii_map: str, tile_specs: dict):
@@ -579,99 +564,6 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
         description=tile_spec.short_description,
     )
 
-
-# def visible_actors(
-#     actor_name: str,
-#     actors: Dict[str, Actor],
-#     loots: Dict[str, Loot],
-#     tiles: Dict[Tuple[int, int], Tile],
-#     width: int,
-#     height: int,
-# ) -> Tuple[
-#     List[list[List[Tuple[str, str]]]],
-#     List[Tuple[str, int]],
-#     List[Tuple[str, int]],
-# ]:
-
-
-#     actor = actors[actor_name]
-#     px, py = actor.pos
-#     facing = actor.facing.upper()
-
-#     f_angle = FACING_ANGLE[facing]
-
-#     # sector angle ranges relative to facing
-#     # front: -30..+30 ; left: -90..-30 ; right: +30..+90 (deg)
-#     sector_ranges = {"front": (-20, 20), "left": (-60, -20), "right": (20, 60)}
-
-#     # We'll gather nearest distance (in units) for each unique object name under each sector.
-#     # data structure: items_by_zone[band][sector] -> dict name -> nearest_distance_units
-
-#     # Build list of ray angles to cast (for all three sectors)
-#     rays = []
-#     for sector_name, (a_min, a_max) in sector_ranges.items():
-#         # cast rays from a_min to a_max inclusive with step RAY_STEP_DEG
-#         a = a_min
-#         while a <= a_max:
-#             rays.append((sector_name, (f_angle + a) % 360))
-#             a += RAY_STEP_DEG
-
-#     # For actors and loots, build quick lookup by pos
-#     pos_to_actors = {
-#         a.pos: (k, a) for k, a in actors.items()
-#     }  # key includes Player too
-#     pos_to_loots = {l.pos: (k, l) for k, l in loots.items()}
-
-#     visible_actors = []
-#     visible_loots = []
-
-#     # Cast each ray
-#     for sector_name, ray_angle in rays:
-#         dx_unit, dy_unit = _angle_to_vector(ray_angle)  # per-unit vector in map units
-#         s = RAY_STEP_UNIT
-#         blocked = False
-#         visited_tiles = set()
-#         while s <= MAX_UNITS and not blocked:
-#             tx = px + dx_unit * s
-#             ty = py + dy_unit * s
-#             ix = int(round(tx))
-#             iy = int(round(ty))
-#             tile_coord = (ix, iy)
-
-#             # skip if same tile already processed along this ray
-#             if tile_coord in visited_tiles:
-#                 s += RAY_STEP_UNIT
-#                 continue
-#             visited_tiles.add(tile_coord)
-
-#             # out of bounds ?
-#             if ix < 0 or iy < 0 or ix >= width or iy >= height:
-#                 break
-
-#             tile = tiles.get(tile_coord)
-#             # check for actors (exclude the observer)
-#             if tile_coord in pos_to_actors:
-#                 akey, ak = pos_to_actors[tile_coord]
-#                 if akey != actor_name:
-#                     dist_units = math.hypot((ak.pos[0] - px), (ak.pos[1] - py))
-#                     pair = (akey, dist_units)
-#                     if pair not in visible_actors:
-#                         visible_actors.append(pair)
-#             # check for loots
-#             if tile_coord in pos_to_loots:
-#                 lkey, lo = pos_to_loots[tile_coord]
-#                 dist_units = math.hypot((lo.pos[0] - px), (lo.pos[1] - py))
-#                 pair = (lkey, dist_units)
-#                 if pair not in visible_loots:
-#                     visible_loots.append(pair)
-
-#             # if tile blocks view, terminate this ray
-#             if tile and tile.blocks_view:
-#                 blocked = True
-#                 break
-
-#             s += RAY_STEP_UNIT
-#     return visible_actors, visible_loots
 
 
 def compute_los(
@@ -802,7 +694,7 @@ def compute_los(
     return items_by_zone, visible_actors, visible_loots
 
 
-def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]]) -> List[str]:
+def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]], unit_to_m:float) -> List[str]:
     # Now format the textual report using grouped data
     report_lines = []
     for band in ("close", "mid", "far"):
@@ -828,7 +720,7 @@ def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]]) -> Li
                     parts.append(f"several {category}s")
                 else:
                     for name, dist_u in entries:
-                        parts.append(f"{name} ({_unit_to_m(dist_u)}m)")
+                        parts.append(f"{name} ({round(unit_to_m*dist_u)}m)")
 
             # Combine into a single readable sentence
             if parts:
@@ -842,3 +734,5 @@ def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]]) -> Li
         # only the facing line, no visible items found
         report_lines.append("You see only empty floor ahead.")
     return report_lines
+
+

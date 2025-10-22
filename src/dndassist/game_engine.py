@@ -85,8 +85,12 @@ class GameEngine:
             for skip_state in ["dead", "resting"]:
                 if skip_state in actor.character.current_state["conditions"]:
                     continue
+
+
+            
             self.now += timedelta(0, 6)
             print_c(f"\n--- __{actor.name}__'s turn ---")
+            print_c(f"{self.room.describe_view_los(actor.name)}")
 
             remaining_moves = actor.character.max_speed
             remaining_actions = 100

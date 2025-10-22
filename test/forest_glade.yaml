@@ -1,5 +1,9 @@
-name: "Forest Glade"
-
+name: Forest Glade
+description: >
+  A open-air place with an east-west rift that splits
+  a grassy plain at the south, and the beginning of 
+  a thick forest at the north. The rift is 6m wide,
+  and can be crossed through a wooden bridge.
 ascii_map:
   - "XOOXOOOOOOXX"
   - "XOOOOOOOOOOX"
@@ -24,23 +28,6 @@ actors: {}
   #   - 2
   #   symbol: M
   #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_023.png"
-  # Aelar:
-  #   facing: SE
-  #   name: Aelar
-  #   pos:
-  #   - 2
-  #   - 2
-  #   symbol: '@'
-  #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_012.png"
-
-  # Liana:
-  #   facing: SE
-  #   name: Liana
-  #   pos:
-  #   - 2
-  #   - 3
-  #   symbol: '@'
-  #   sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_actors/sprite_006.png"
 loots:
   sword:
     index: 1
