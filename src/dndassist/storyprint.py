@@ -112,8 +112,12 @@ def storyprint(
     # --- Detect terminal width
     term_width = shutil.get_terminal_size((100, 20)).columns
     
+    max_line_len = 0
+    for line in text.split("\n"):
+        max_line_len = max(max_line_len, len(line))
+
     if wrap_width is None:
-        wrap_width = term_width
+        wrap_width = int(term_width*0.6)
     # --- Choose colors dynamically
     primary_color = getattr(Fore, primary.upper(), Fore.WHITE)
     secondary_color = getattr(Fore, secondary.upper(), Fore.YELLOW)
@@ -123,24 +127,29 @@ def storyprint(
     parts = text.split("__")
     for i, part in enumerate(parts):
         if i % 2 == 1:
-            segments.append(secondary_color + part + primary_color)
+            segments.append(secondary_color + part )
         else:
-            segments.append(part)
-    colored_text = primary_color + "".join(segments) + Style.RESET_ALL
-
+            segments.append(primary_color + part)
+    colored_text = "".join(segments) + Style.RESET_ALL
     # --- Wrap text lines
-    wrapped_lines = textwrap.wrap(colored_text, width=wrap_width)
-
+    wrapped_lines = []
+    for line in colored_text.split("\n"):
+        if len(line) > wrap_width:
+            wrapped_lines.extend(textwrap.wrap(line, width=wrap_width))
+        else:
+            wrapped_lines.append(line)
 
     # --- Determine alignment
        
-    for line in wrapped_lines:       
+    for line in wrapped_lines:
+        line = primary_color +line
         if align == "right":
-            pad = term_width // 2 + int(0.2*term_width) 
-        elif align == "center":
-            pad = max((term_width - len(line)) // 2, 0)
+            pad = term_width // 2 + int(0.3*term_width) 
+        elif align == "center": 
+            pad = max((term_width - wrap_width) // 2, 0)
         else:
-            pad = + int(0.2*term_width) 
+            pad = + int(0.1*term_width) 
+        
         
         print(" " * pad + line)
 
@@ -167,7 +176,7 @@ def print_c(text:str):
         text,
         align="center",
         primary="LIGHTGREY_EX",
-        secondary="WHITE",
+        secondary="YELLOW",
         wrap_width = 80
     )
 

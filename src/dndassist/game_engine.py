@@ -68,6 +68,8 @@ class GameEngine:
         self.round_counter += 1
         print_c(f"\n=== ROUND {self.round_counter} START ===")
         print_c(f"\n   Room {self.room.name}, time {self.now.time()}")
+
+
         # 1️⃣ Filter out inactive actors
         active_actors = []
         for actor_key, actor in self.room.actors.items():
@@ -86,12 +88,14 @@ class GameEngine:
                 if skip_state in actor.character.current_state["conditions"]:
                     continue
 
-
-            
             self.now += timedelta(0, 6)
-            print_c(f"\n--- __{actor.name}__'s turn ---")
-            print_c(f"{self.room.describe_view_los(actor.name)}")
 
+            # ----- build context ---
+            actor_context =f"--- __{actor.name}__'s turn ---"            
+            actor_context += "\n" + actor.character.describe_situation()
+            actor_context += "\n" + self.room.describe_view_los(actor.name)
+            print_c(actor_context)
+            
             remaining_moves = actor.character.max_speed
             remaining_actions = 100
             while remaining_moves > 0 and remaining_actions > 0:
@@ -116,21 +120,7 @@ class GameEngine:
                         actions_avail.append(f"pick up {other}")
 
                 # Attack solutions
-                faction = actor.character.faction
-                visible_foes = []
-                for other, dist in all_visible_actors_:
-                    if self.room.actors[other].character.faction not in [
-                        "neutral",
-                        faction,
-                    ]:
-                        visible_foes.append((other, dist))
-
-                for other, dist in visible_foes:
-                    weapon, dmg = actor_attack_solutions(actor, dist)
-                    if weapon is not None:
-                        actions_avail.append(
-                            f"attack {other} with {weapon} ; damage max {dmg} HP"
-                        )
+                actions_avail.extend(self.build_attack_solutions(actor, all_visible_actors_))
 
                 action = user_select_option("Select an action:", actions_avail)
 
@@ -168,8 +158,8 @@ class GameEngine:
                         self.room.add_loot(defender.character.drop_loot(), defender.pos)
                         killed_actors.append(defender_name)
 
-        for dead_name in killed_actors:
-            self.room.del_actor(dead_name)
+        # for dead_name in killed_actors:
+        #     self.room.del_actor(dead_name)
 
         # 4️⃣ End of round
         print_c(f"\n=== ROUND {self.round_counter} END ===")
@@ -177,6 +167,25 @@ class GameEngine:
         cont = input("Continue? (y/n):")
         if cont == "y":
             self.run_round()
+
+    def build_attack_solutions(self, actor, all_visible_actors_):
+        actions_avail=[]
+        faction = actor.character.faction
+        visible_foes = []
+        for other, dist in all_visible_actors_:
+            if self.room.actors[other].character.faction not in [
+                        "neutral",
+                        faction,
+                    ]:
+                visible_foes.append((other, dist))
+
+        for other, dist in visible_foes:
+            weapon, dmg = actor_attack_solutions(actor, dist)
+            if weapon is not None:
+                actions_avail.append(
+                            f"attack {other} with {weapon} ; damage max {dmg} HP"
+                        )
+        return actions_avail
 
     # ---------- INITIATIVE ----------
     def compute_initiative(self, active_actors: List[Actor]) -> List[Actor]:

@@ -18,6 +18,7 @@ class Character:
     name: str
     race: str
     char_class: str
+    gender: str  = "neutral"
     level: int = 1
     xp: int = 0
     gold: int = 0
@@ -177,10 +178,37 @@ class Character:
                     return True
 
     def drop_loot(self):
-        """Drop one of the properties of the character"""
+        """Drop one of the properties of the character, radomly"""
         loot = random.choice(self.equipment)
         return loot
 
+    def describe_situation(self):
+        """Retur the current situation of the character"""
+        pronoun = "He"
+        possessive = "His"
+        if self.gender == "female":
+            pronoun = "She"
+            possessive = "Her"
+        
+        if self.gender == "unknown":
+            pronoun = "It"
+            possessive = "Its"
+        
+
+        situation  = f"__{self.name}__ is a {self.gender} {self.race} {self.char_class} character  of level {self.level} (xp {self.xp})"
+        situation  += "\n" +f"{pronoun} belongs to the faction {self.faction}, with the alignment {self.alignment}"
+        situation  += "\n" +self.notes
+        situation += "\nCurrently:"
+        situation  +=f"\n {possessive} hit points are  {self.current_state['current_hp']}"
+        if self.current_state["objectives"]:
+            situation  +=f"\n {possessive} objectives are {','.join(self.current_state['objectives'])}"
+        if self.current_state["conditions"]:
+            situation  +=f"\n {possessive} conditions are {','.join(self.current_state['conditions'])}"
+        situation  +=f"\n {possessive} last action was  {self.current_state['action']}"
+        if self.current_state["aggro"] is not None:
+            situation  +=f"\n {possessive} aggressivity is focused on {self.current_state['aggro']}"
+        return situation
+            
     # ---------- Pretty terminal display ----------
     def __repr__(self):
         """Nicely formatted display of the character in terminal."""

@@ -4,7 +4,10 @@ import textwrap, math, yaml, json
 import heapq
 import math
 import numpy
+import textwrap
 from collections import defaultdict
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from dndassist.themes.themes import Theme
 from dndassist.character import Character
@@ -206,6 +209,106 @@ class RoomMap:
                 del self.loots[key]
 
     # -------------------------------------------
+
+   
+    def draw_map(self, save_pdf: bool = False, filename: str = "map.pdf"):
+        """
+        Draws a black & white map with automatic scaling (autozoom) to fit an A4 landscape page.
+        Adds name, description, and legend.
+        Optionally saves the figure as a PDF.
+        """
+        # --- A4 landscape size (in inches for matplotlib) ---
+        fig_w, fig_h = 11.7, 8.3  # A4 landscape
+
+        # Compute a scaling factor to fit the map in the left ~70% of the width
+        legend_fraction = 0.25  # space for legend
+        map_fraction = 1.0 - legend_fraction
+        map_max_w = fig_w * map_fraction
+        map_max_h = fig_h * 0.85  # leave top/bottom margins
+
+        # Tile-based aspect ratio
+        if self.width / self.height > map_max_w / map_max_h:
+            zoom = map_max_w / self.width
+        else:
+            zoom = map_max_h / self.height
+        # general adusjt
+        zoom = zoom*0.1
+
+        shift_x = 2 * zoom
+        shift_y = 3 * zoom
+        
+        # --- Create figure ---
+        fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+        ax.set_aspect("equal")
+        ax.axis("off")
+        ax.set_facecolor("white")
+
+        # --- Draw Tiles ---
+        for (x, y), tile in self.tiles.items():
+            if tile.symbol in ("/", "", "X"):  # skip void
+                continue
+
+            rect = patches.Rectangle(
+                (shift_x+ x * zoom, shift_y + (self.height - y - 1) * zoom),
+                zoom, zoom,
+                linewidth=0.5,
+                edgecolor="black",
+                facecolor="white"
+            )
+            ax.add_patch(rect)
+            sym =tile.symbol
+            if sym == " ":
+                sym = ":"
+            
+            ax.text(
+                shift_x+(x + 0.5) * zoom,
+                shift_y+(self.height - y - 0.5) * zoom,
+                sym,
+                ha="center", va="center",
+                fontsize=8, color="black", family="monospace"
+            )
+
+        # --- Adjust axes limits so map fits nicely ---
+        #ax.set_xlim(0, self.width * zoom)
+        #ax.set_ylim(0, self.height * zoom)
+        #ax.invert_yaxis()
+
+        # --- Legend ---
+        unique_tiles = {}
+        for tile in self.tiles.values():
+            if tile.symbol not in ("/", "", "X") and tile.symbol not in unique_tiles:
+                unique_tiles[tile.symbol] = tile.description
+
+        # Legend position in figure coordinates
+        legend_ax = fig.add_axes([0.75, 0.1, 0.22, 0.8])
+        legend_ax.axis("off")
+        legend_ax.text(0, 1, "Legend", ha="left", va="top", fontsize=10, weight="bold", color="black")
+
+        y_pos = 0.9
+        for sym, desc in unique_tiles.items():
+            if sym == " ":
+                sym = ":"
+            legend_ax.text(
+                0, y_pos, f"{sym}  -  {desc}",
+                ha="left", va="center",
+                fontsize=8, color="black", family="monospace"
+            )
+            y_pos -= 0.05
+
+        # --- Map Name & Description (footer) ---
+        fig.text(0.5, 0.12, self.name, ha="center", va="center", fontsize=12, weight="bold", color="black")
+        fig.text(0.5, 0.08, "\n".join(textwrap.wrap(self.description, 80)), ha="center", va="center", fontsize=9, color="black")
+
+        plt.subplots_adjust(left=0.05, right=0.7, top=0.95, bottom=0.1)
+
+        # --- Save or show ---
+        if save_pdf:
+            fig.savefig(filename, format="pdf", bbox_inches="tight")
+            plt.close(fig)
+            print(f"Map saved to {filename}")
+        else:
+            plt.show()
+
     def render_ascii(
         self, mode="symbol", spaced: bool = True, path: List[Tuple[int, int]] = None
     ) -> str:
@@ -699,7 +802,7 @@ def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]], unit_
     report_lines = []
     for band in ("close", "mid", "far"):
         band_report = []
-        for sector in ("front", "left", "right"):
+        for sector in ( "left", "front", "right"):
             items_seen = items_by_zone[band][sector]
             if not items_seen:
                 continue
@@ -725,14 +828,14 @@ def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]], unit_
             # Combine into a single readable sentence
             if parts:
                 joined = ", ".join(parts)
-                band_report.append(f" {sector}, you see {joined}")
+                band_report.append(f" {sector}, There is {joined}")
         if band_report:
             report_lines.append(band.capitalize() + ":")
             report_lines.extend(band_report)
 
     if len(report_lines) == 1:
         # only the facing line, no visible items found
-        report_lines.append("You see only empty floor ahead.")
+        report_lines.append("There is empty floor ahead.")
     return report_lines
 
 
