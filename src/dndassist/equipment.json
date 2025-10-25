@@ -9,7 +9,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 1,
+            "cost": "1 sp",
+            "weight": 2,
             "properties": [
                 "Light",
                 "Monk"
@@ -24,7 +25,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 2,
+            "cost": "2 gp",
+            "weight": 1,
             "properties": [
                 "Finesse",
                 "Light",
@@ -41,7 +43,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 2,
+            "cost": "2 sp",
+            "weight": 10,
             "properties": [
                 "Two-Handed"
             ]
@@ -55,7 +58,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 gp",
+            "weight": 2,
             "properties": [
                 "Light",
                 "Thrown",
@@ -71,7 +75,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 sp",
+            "weight": 2,
             "properties": [
                 "Thrown",
                 "Monk"
@@ -86,7 +91,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 2,
+            "cost": "2 gp",
+            "weight": 2,
             "properties": [
                 "Light",
                 "Thrown",
@@ -102,7 +108,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 gp",
+            "weight": 4,
             "properties": [
                 "Monk"
             ]
@@ -116,7 +123,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 2,
+            "cost": "2 sp",
+            "weight": 4,
             "properties": [
                 "Versatile",
                 "Monk"
@@ -131,7 +139,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 1,
+            "cost": "1 gp",
+            "weight": 2,
             "properties": [
                 "Light",
                 "Monk"
@@ -146,7 +155,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 1,
+            "cost": "1 gp",
+            "weight": 3,
             "properties": [
                 "Thrown",
                 "Versatile",
@@ -162,7 +172,8 @@
             "damage_type": "Piercing",
             "range_normal": 80,
             "range_long": 320,
-            "cost": 25,
+            "cost": "25 gp",
+            "weight": 5,
             "properties": [
                 "Ammunition",
                 "Loading",
@@ -178,7 +189,8 @@
             "damage_type": "Piercing",
             "range_normal": 20,
             "range_long": 60,
-            "cost": 5,
+            "cost": "5 cp",
+            "weight": 0.25,
             "properties": [
                 "Finesse",
                 "Thrown"
@@ -193,7 +205,8 @@
             "damage_type": "Piercing",
             "range_normal": 80,
             "range_long": 320,
-            "cost": 25,
+            "cost": "25 gp",
+            "weight": 2,
             "properties": [
                 "Ammunition",
                 "Two-Handed"
@@ -208,7 +221,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 30,
             "range_long": 120,
-            "cost": 1,
+            "cost": "1 sp",
+            "weight": 0,
             "properties": [
                 "Ammunition"
             ]
@@ -222,7 +236,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 4,
             "properties": [
                 "Versatile"
             ]
@@ -236,7 +251,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 2,
             "properties": []
         },
         {
@@ -248,7 +264,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 20,
+            "cost": "20 gp",
+            "weight": 6,
             "properties": [
                 "Heavy",
                 "Reach",
@@ -264,7 +281,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 30,
+            "cost": "30 gp",
+            "weight": 7,
             "properties": [
                 "Heavy",
                 "Two-Handed"
@@ -279,7 +297,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 50,
+            "cost": "50 gp",
+            "weight": 6,
             "properties": [
                 "Heavy",
                 "Two-Handed"
@@ -294,7 +313,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 20,
+            "cost": "20 gp",
+            "weight": 6,
             "properties": [
                 "Heavy",
                 "Reach",
@@ -310,7 +330,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 6,
             "properties": [
                 "Reach",
                 "Special"
@@ -325,7 +346,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 15,
+            "cost": "15 gp",
+            "weight": 3,
             "properties": [
                 "Versatile"
             ]
@@ -339,7 +361,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 10,
             "properties": [
                 "Heavy",
                 "Two-Handed"
@@ -354,7 +377,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 15,
+            "cost": "15 gp",
+            "weight": 4,
             "properties": []
         },
         {
@@ -366,7 +390,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 gp",
+            "weight": 18,
             "properties": [
                 "Heavy",
                 "Reach",
@@ -382,7 +407,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 25,
+            "cost": "25 gp",
+            "weight": 2,
             "properties": [
                 "Finesse"
             ]
@@ -396,7 +422,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 25,
+            "cost": "25 gp",
+            "weight": 3,
             "properties": [
                 "Finesse",
                 "Light"
@@ -411,7 +438,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 2,
             "properties": [
                 "Finesse",
                 "Light",
@@ -427,7 +455,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 gp",
+            "weight": 4,
             "properties": [
                 "Thrown",
                 "Versatile"
@@ -442,7 +471,8 @@
             "damage_type": "Piercing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 5,
+            "cost": "5 gp",
+            "weight": 2,
             "properties": []
         },
         {
@@ -454,7 +484,8 @@
             "damage_type": "Bludgeoning",
             "range_normal": 5,
             "range_long": null,
-            "cost": 15,
+            "cost": "15 gp",
+            "weight": 2,
             "properties": [
                 "Versatile"
             ]
@@ -468,7 +499,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": null,
-            "cost": 2,
+            "cost": "2 gp",
+            "weight": 3,
             "properties": [
                 "Finesse",
                 "Reach"
@@ -483,7 +515,8 @@
             "damage_type": "Piercing",
             "range_normal": 25,
             "range_long": 100,
-            "cost": 10,
+            "cost": "10 gp",
+            "weight": 1,
             "properties": [
                 "Ammunition",
                 "Loading"
@@ -498,7 +531,8 @@
             "damage_type": "Piercing",
             "range_normal": 30,
             "range_long": 120,
-            "cost": 75,
+            "cost": "75 gp",
+            "weight": 3,
             "properties": [
                 "Ammunition",
                 "Light",
@@ -514,7 +548,8 @@
             "damage_type": "Piercing",
             "range_normal": 100,
             "range_long": 400,
-            "cost": 50,
+            "cost": "50 gp",
+            "weight": 18,
             "properties": [
                 "Ammunition",
                 "Light",
@@ -531,7 +566,8 @@
             "damage_type": "Piercing",
             "range_normal": 150,
             "range_long": 600,
-            "cost": 50,
+            "cost": "50 gp",
+            "weight": 2,
             "properties": [
                 "Ammunition",
                 "Heavy",
@@ -547,7 +583,8 @@
             "damage_type": "Slashing",
             "range_normal": 5,
             "range_long": 15,
-            "cost": 1,
+            "cost": "1 gp",
+            "weight": 3,
             "properties": [
                 "Thrown",
                 "Special"
@@ -558,7 +595,8 @@
         {
             "name": "Shield",
             "base": 2,
-            "cost": 10
+            "cost": 10,
+            "weight": 6
         }
     ],
     "Armor": [
@@ -568,7 +606,8 @@
             "base": 11,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 5
+            "cost": 5,
+            "weight": 8
         },
         {
             "name": "Leather Armor",
@@ -576,7 +615,8 @@
             "base": 11,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 10
+            "cost": 10,
+            "weight": 10
         },
         {
             "name": "Studded Leather Armor",
@@ -584,7 +624,8 @@
             "base": 12,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 45
+            "cost": 45,
+            "weight": 13
         },
         {
             "name": "Hide Armor",
@@ -592,7 +633,8 @@
             "base": 12,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 10
+            "cost": 10,
+            "weight": 12
         },
         {
             "name": "Chain Shirt Armor",
@@ -600,7 +642,8 @@
             "base": 13,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 50
+            "cost": 50,
+            "weight": 20
         },
         {
             "name": "Scale Mail Armor",
@@ -608,7 +651,8 @@
             "base": 14,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 50
+            "cost": 50,
+            "weight": 45
         },
         {
             "name": "Breastplate Armor",
@@ -616,7 +660,8 @@
             "base": 14,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 400
+            "cost": 400,
+            "weight": 20
         },
         {
             "name": "Half Plate Armor",
@@ -624,7 +669,8 @@
             "base": 15,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 750
+            "cost": 750,
+            "weight": 40
         },
         {
             "name": "Ring Mail Armor",
@@ -632,7 +678,8 @@
             "base": 14,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 30
+            "cost": 30,
+            "weight": 40
         },
         {
             "name": "Chain Mail Armor",
@@ -640,7 +687,8 @@
             "base": 16,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 75
+            "cost": 75,
+            "weight": 55
         },
         {
             "name": "Splint Armor",
@@ -648,7 +696,8 @@
             "base": 17,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 200
+            "cost": 200,
+            "weight": 60
         },
         {
             "name": "Plate Armor",
@@ -656,7 +705,8 @@
             "base": 18,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 1500
+            "cost": 1500,
+            "weight": 65
         }
     ]
 }

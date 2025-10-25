@@ -1,6 +1,6 @@
 name: Selra the Umbral Adept
 race: Human
-gender: female
+gender: male
 char_class: Warlock
 level: 3
 xp: 820
@@ -30,8 +30,9 @@ current_state:
   objectives:
   - stand watch
   conditions: []
-  action: idle
   aggro: null
+  action: "idle"
+  outcome: ""
 equipment:
 - Arcane Focus
 - Dagger

@@ -490,6 +490,8 @@ class RoomMap:
         elif dir == "NW":
             dx = -self.m_to_unit(distance_m * 1.414)
             dy = -self.m_to_unit(distance_m * 1.414)
+        else:
+            raise RuntimeError(f"Error, direction {dir} is not understood...")
         x0, y0 = actor.pos
         path, used_dist = self.move_to(
             x0, y0, x0 + dx, y0 + dy, max_distance_m=distance_m

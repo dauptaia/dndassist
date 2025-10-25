@@ -1,0 +1,49 @@
+
+                            ==(W{==========-      /===-                        
+                              ||  (.--.)         /===-_---~~~~~~~~~------____  
+                              | \_,|**|,__      |===-~___                _,-' `
+                 -==\        `\ ' `--'   ),    `//~\   ~~~~`---.___.-~~      
+             ______-==|        /`\_. .__/\ \    | |  \           _-~`         
+       __--~~~  ,-/-==\      (   | .  |~~~~|   | |   `\        ,'             
+    _-~       /'    |  \     )__/==0==-\<>/   / /      \      /               
+  .'        /       |   \      /~\___/~~\/  /' /        \   /'                
+ /  ____  /         |    \`\.__/-~~   \  |_/'  /          \/'                  
+/-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`                   
+                  \_|      /        _) | ;  ),   __--~~                        
+                    '~~--_/      _-~/- |/ \   '-~ \                            
+                   {\__--_/}    / \_>-|)<__\      \                           
+                   /'   (_/  _-~  | |__>--<__|      |                          
+                  |   _/) )-~     | |__>--<__|      |                          
+                  / /~ ,_/       / /__>---<__/      |                          
+                 o-o _//        /-~_>---<__-~      /                           
+                 (^(~          /~_>---<__-      _-~                            
+                ,/|           /__>--<__/     _-~                               
+             ,//('(          |__>--<__|     /  -Alex Wargacki  .----_          
+            ( ( '))          |__>--<__|    |                 /' _---_~\        
+         `-)) )) (           |__>--<__|    |               /'  /     ~\`\      
+        ,/,'//( (             \__>--<__\    \            /'  //        ||      
+      ,( ( ((, ))              ~-__>--<_~-_  ~--____---~' _/'/        /'       
+    `~/  )` ) ,/|                 ~-_~>--<_/-__       __-~ _/                  
+  ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~~~__--~                    
+   ;'( ')/ ,)(                              ~~~~~~~~~~                         
+  ' ') '( (/                                                                   
+    '   '  `
+
+DND-assist, a dungeon's and dragon GameMaster helper. 
+By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
+
+
+=== ROUND 1 START ===
+   Room Forest Glade, time 12:00:00
+
+--- __liora__'s turn ---
+__Liora Dawnblade__ is a female Elf Ranger character  of level 3
+She belongs to the faction player, with the alignment Chaotic Good
+Prefers ranged combat.
+Currently:
+ Her hit points :  10/24
+ Her objectives: stand watch
+ Her equipment: Longbow,Leather Armor,Dagger
+ Her last action was  idle
+ Her last outcome was  move in direction
+liora moved S over 26m

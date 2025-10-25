@@ -11,6 +11,7 @@ from typing import Optional, Dict, Any, List
 import json
 import os
 from importlib_resources import files
+from dndassist.storyprint import print_r
 
 DATA_PATH = files("dndassist").joinpath(
     "equipment.json"
@@ -19,8 +20,38 @@ DATA_CATEGORIES_PATH = files("dndassist").joinpath(
     "equipment_categories.json"
 )  # os.path.join("data", "weapons.json")
 
-with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
+with open(DATA_PATH, "r", encoding="utf-8") as f:
     DATA_CATEGORIES = json.load(f)
+
+with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
+    DATA_DICTS = json.load(f)
+
+
+def equipment_weight(equip_name):
+    weight = 0
+    for cat in ["Weapon", "Armor", "Shield"]:
+        for equip in DATA_DICTS[cat]:
+            if equip["name"] == equip_name:
+                weight = equip["weight"]
+        if equip_name in DATA_DICTS[cat]:
+            weight = DATA_DICTS[cat][equip_name]
+    if weight == 0:
+        print_r(f"{equip_name} not present in equipment ddb.")
+    return weight
+
+def equipment_cost(equip_name):
+    weight = 0
+    for cat in ["Weapon", "Armor", "Shield"]:
+        for equip in DATA_DICTS[cat]:
+            if equip["name"] == equip_name:
+                weight = equip["cost"]
+        if equip_name in DATA_DICTS[cat]:
+            weight = DATA_DICTS[cat][equip_name]
+    if weight == 0:
+        print_r(f"{equip_name} not present in equipment ddb.")
+    return weight
+
+
 
 
 def weapon_catg(weapon_name):
@@ -46,7 +77,8 @@ class Weapon:
     range_normal: int
     range_long: Optional[int]
     properties: List[str]
-    cost: int
+    cost: str
+    weight: int
 
     # Path to your weapon definitions (adjust to your project structure)
 
@@ -74,6 +106,7 @@ class Weapon:
                 range_long=None,
                 properties=[],
                 cost=0,
+                weight=0,
             )
 
         all_weapons = cls._load_all_weapons()
@@ -108,7 +141,9 @@ class Armor:
     base: int
     dex_bonus: bool
     max_bonus: bool
-    cost: int
+    cost: str
+    weight: int
+
 
     # Path to your weapon definitions (adjust to your project structure)
 
@@ -134,7 +169,9 @@ class Armor:
 class Shield:
     name: str
     base: int
-    cost: int
+    cost: str
+    weight: int
+
 
     # Path to your weapon definitions (adjust to your project structure)
 

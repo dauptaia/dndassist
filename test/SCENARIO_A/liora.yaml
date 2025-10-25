@@ -1,5 +1,6 @@
 name: Liora Dawnblade
 race: Elf
+gender: female
 char_class: Ranger
 level: 3
 xp: 850
@@ -26,6 +27,7 @@ current_state:
   - stand watch
   conditions: []
   action: idle
+  outcome: ""
   aggro: null
 equipment:
 - Longbow

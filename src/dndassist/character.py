@@ -8,7 +8,7 @@ from colorama import Fore, Style, init
 import random
 
 from dndassist.autoroll import rolldice
-from dndassist.equipment import weapon_catg, Weapon
+from dndassist.equipment import weapon_catg, Weapon, equipment_weight
 from dndassist.storyprint import print_r,print_c_red,print_c_orange
 
 
@@ -50,12 +50,13 @@ class Character:
     )
 
     # --Current state ---
-    current_state: Dict[str, int] = field(
+    current_state: Dict[str, any] = field(
         default_factory=lambda: {
             "current_hp": 10,
             "objectives": ["stand watch"],
             "conditions": [],
             "action": "idle",
+            "outcome": "",
             "aggro": None,
         }
     )
@@ -88,6 +89,7 @@ class Character:
     def push_objective(self, new_obj: str):
         self.current_state["objectives"].insert(0, new_obj)
 
+    
     def attr_mod(self, attr) -> int:
         """Return attribute modifier"""
         return floor((self.attributes[attr] - 10) / 2)
@@ -147,6 +149,7 @@ class Character:
                 return False
             else:
                 print_c_red(f"Character __{self.name}__ is dead...")
+                self.current_state["conditions"].append("dead")
                 return True
         # For players
         # .  - HP positive ? exit...
@@ -178,9 +181,36 @@ class Character:
                     return True
 
     def drop_loot(self):
-        """Drop one of the properties of the character, radomly"""
+        """Drop one of the properties of the character, randomly"""
         loot = random.choice(self.equipment)
         return loot
+
+    def _count_cargo(self):
+        weight = 0
+        for item in self.equipment:
+            weight+= equipment_weight(item)
+        return weight
+
+    def add_item(self, item:str)->bool:
+        """Add an item in Character inventory, return false if too heavy"""
+        weight = self._count_cargo()+equipment_weight(item)
+
+        if weight > self.max_cargo:
+            return False
+        
+        self.equipment.append(item)
+
+        if weight > 0.8*self.max_cargo:
+            if "heavy equipement" not in self.current_state["conditions"]:
+                self.current_state["conditions"].append("heavy equipement")
+        return True
+
+    def max_distance(self):
+        """return the maximum distance """
+        max_dist = self.max_speed
+        if "heavy equipement"  in self.current_state["conditions"]:
+            max_dist = int(max_dist*0.6)
+        return max_dist
 
     def describe_situation(self):
         """Retur the current situation of the character"""
@@ -195,16 +225,19 @@ class Character:
             possessive = "Its"
         
 
-        situation  = f"__{self.name}__ is a {self.gender} {self.race} {self.char_class} character  of level {self.level} (xp {self.xp})"
+        situation  = f"__{self.name}__ is a {self.gender} {self.race} {self.char_class} character  of level {self.level}"
         situation  += "\n" +f"{pronoun} belongs to the faction {self.faction}, with the alignment {self.alignment}"
         situation  += "\n" +self.notes
         situation += "\nCurrently:"
-        situation  +=f"\n {possessive} hit points are  {self.current_state['current_hp']}"
+        situation  +=f"\n {possessive} hit points :  {self.current_state['current_hp']}/{self.max_hp}"
         if self.current_state["objectives"]:
-            situation  +=f"\n {possessive} objectives are {','.join(self.current_state['objectives'])}"
+            situation  +=f"\n {possessive} objectives: {','.join(self.current_state['objectives'])}"
         if self.current_state["conditions"]:
-            situation  +=f"\n {possessive} conditions are {','.join(self.current_state['conditions'])}"
+            situation  +=f"\n {possessive} conditions: {','.join(self.current_state['conditions'])}"
+        if self.equipment:
+            situation  +=f"\n {possessive} equipment: {','.join(self.equipment)}"
         situation  +=f"\n {possessive} last action was  {self.current_state['action']}"
+        situation  +=f"\n {possessive} last outcome was  {self.current_state['outcome']}"
         if self.current_state["aggro"] is not None:
             situation  +=f"\n {possessive} aggressivity is focused on {self.current_state['aggro']}"
         return situation

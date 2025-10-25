@@ -1,6 +1,6 @@
 from typing import Tuple
 from random import randint
-from dndassist.storyprint import print_r
+from dndassist.storyprint import print_r, print_l
 
 def scan_dice(dice: str) -> Tuple[int, int, int]:
     """return the scan of a dice

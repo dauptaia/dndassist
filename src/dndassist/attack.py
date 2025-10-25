@@ -10,7 +10,6 @@ def attack(
     attacker: Character,
     weapon_name,
     defender: Character,
-    autoroll=False,
     advantage: int = 0,
 ):
     print_r(f"Defender {defender.name}, {defender.current_state['current_hp']} HP")
@@ -68,6 +67,9 @@ def attack(
     if weapon.damage_bonus > 0:
         print_r(f"    weapons bonus : {weapon.damage_bonus}")
 
+    autoroll = True
+    if "player" in  attacker.faction:
+        autoroll=False
     roll, dice_normed = rolldice("1d20", autoroll=autoroll, advantage=advantage)
 
     attack_score = roll + attr_modifier + attack_bonus + weapon.damage_bonus

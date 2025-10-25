@@ -31,7 +31,7 @@ actors: {}
 loots:
   sword:
     index: 1
-    name: Sword
+    name: Shortsword
     pos:
     - 8
     - 1

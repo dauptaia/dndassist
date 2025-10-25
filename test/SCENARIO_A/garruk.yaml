@@ -1,5 +1,6 @@
 name: Garruk Stonefang
 race: Half-Orc
+gender: male
 char_class: Barbarian
 level: 3
 xp: 800
@@ -31,11 +32,12 @@ current_state:
   - stand watch
   conditions: []
   action: idle
+  outcome: ""
   aggro: null
 equipment:
 - Greataxe
 - Javelin
-- Hide Armor
+- Padded Armor
 - Totem Necklace
 spells: []
 equipped:
