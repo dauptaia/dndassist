@@ -99,10 +99,11 @@ def auto_play_ollama(context:str, possible_actions:List[str])-> Tuple[str,str]:
     if ">" in result:
         result = result.split(">")[-1]
     if "|" in result:
-        index,comment = result.split("|")
+        index = result.split("|")[0]
+        comment = result.split("|")[-1]  
     else:
         print(f"⚠️ [LLM autoplay error in result: {result}]\n Switching to random autoplay...")
         return auto_play_random(context, possible_actions)
     option = possible_actions[int(index)]
 
-    return option.strip().lower(), comment.strip()
+    return option.strip(), comment.strip()

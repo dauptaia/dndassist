@@ -40,40 +40,49 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 --- __garruk__'s turn ---
 look around
-Garruk's gaze scans the surrounding area, his keen senses on high alert for any signs of trouble.
+Garruk sniffs the air, searching for any signs of trouble or potential prey.
 
+
+move in direction
+Garruk's gaze scans the surrounding area, his hand instinctively tightening around the grip of his greataxe.
+
+garruk moved N over 2m
+
+move in direction
+Garruk's bloodshot eyes squint at the surrounding area, his hand instinctively tightening around the grip of his greataxe.
+
+garruk moved N over 0m
+
+move in direction
+Garruk's gaze narrows, focusing on the surrounding trees for any sign of potential threats.
+
+garruk moved N over 0m
 
 pick up sword
-Garruk's hand instinctively closes around the hilt of the shortsword, ready to strike.
+Garruk snatches up the shortsword, his eyes fixed on its deadly curve.
 
 garruk has picked up sword Shortsword
 
 
 
---- __selra__'s turn ---
+--- __liora__'s turn ---
 look around
-Selra's gaze lingers on the surrounding area, searching for any signs of potential threats or hidden dangers.
+Liora squints her eyes, taking a closer look at the ravine in front of her.
 
 
-move to liora at 10m
-Selra's dark gaze focuses on Liora, his mind plotting her downfall.
+move to selra at 10m
+With a quick glance at Selra, Liora prepares to move closer.
 
-selra moved toward liora over 16m
+liora moved toward selra over 16m
 
-talk to liora
-Selra's eyes gleam with malevolent intent as he calls out to Liore, his voice low and menacing, seeking to unsettle her.
+talk to selra
+Liora calls out to Selra, her voice carried by the wind.
 
 blabla
 
 
 
---- __liora__'s turn ---
+--- __selra__'s turn ---
 look around
-Liora's gaze sweeps the surroundings, her sharp elven senses on high alert.
+Selra's eyes dart around, searching for any sign of potential threats or opportunities to manipulate from afar.
 
-
-attack selra with longbow ; damage max 8 hp
-With a swift draw of her Longbow, Liora looses an arrow at Selra, aiming for maximum damage.
-
-selra took 7 hp damage.
-selra is dead.
