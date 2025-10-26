@@ -124,10 +124,10 @@ class IsometricRenderer:
                 
         # preload actor/loot sprites if present in room object (or theme-specific)
         for a in self.actors.values():
-            if a.sprite:
+            if a.character.sprite:
                 self._load_sprite_in_cache(
                     os.path.join(self.room.wkdir, "Characters"),
-                    a.sprite
+                    a.character.sprite
                 )
         for l in self.loots.values():
             if l.sprite:
@@ -320,7 +320,7 @@ class IsometricRenderer:
             entity_draw_list.append(("loot", loot, sx, sy, sprite))
         for aid, actor in self.actors.items():
             sx, sy = self.project(*actor.pos)
-            sprite = self.sprite_cache[actor.sprite] if actor.sprite else None
+            sprite = self.sprite_cache[actor.character.sprite] if actor.character.sprite else None
             entity_draw_list.append(("actor", actor, sx, sy, sprite))
 
         # sort by sy (vertical) so lower items appear on top

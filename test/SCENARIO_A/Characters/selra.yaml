@@ -9,6 +9,7 @@ description: no particular trait
 alignment: Lawful Evil
 notes: Serves a shadowy patron; prefers to manipulate and curse from afar.
 faction: cult_of_shadows
+sprite: sprite_selra.png
 available_actions:
 - cast_spell
 - move

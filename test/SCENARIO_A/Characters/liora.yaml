@@ -9,6 +9,7 @@ description: no particular trait
 alignment: Chaotic Good
 notes: Prefers ranged combat.
 faction: ploooooyer
+sprite: sprite_liora.png
 available_actions: []
 max_cargo: 30
 max_hp: 24

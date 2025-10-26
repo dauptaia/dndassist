@@ -25,6 +25,8 @@ class Character:
     description: str = "no particular trait"
     alignment: Optional[str] = None
     notes: Optional[str] = None
+    sprite: Optional[str] = None
+    
 
     # ---game Engine----
     faction: str = "neutral"  # to simplfy firends and foes

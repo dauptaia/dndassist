@@ -9,6 +9,7 @@ description: no particular trait
 alignment: Neutral Evil
 notes: A savage mercenary who revels in close combat and bloodshed.
 faction: bandits
+sprite: sprite_garruk.png
 available_actions:
 - attack
 - dash
