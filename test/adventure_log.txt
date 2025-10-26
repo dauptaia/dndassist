@@ -33,17 +33,47 @@ DND-assist, a dungeon's and dragon GameMaster helper.
 By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
+
 === ROUND 1 START ===
    Room Forest Glade, time 12:00:00
 
+
+--- __garruk__'s turn ---
+look around
+Garruk's gaze scans the surrounding area, his keen senses on high alert for any signs of trouble.
+
+
+pick up sword
+Garruk's hand instinctively closes around the hilt of the shortsword, ready to strike.
+
+garruk has picked up sword Shortsword
+
+
+
+--- __selra__'s turn ---
+look around
+Selra's gaze lingers on the surrounding area, searching for any signs of potential threats or hidden dangers.
+
+
+move to liora at 10m
+Selra's dark gaze focuses on Liora, his mind plotting her downfall.
+
+selra moved toward liora over 16m
+
+talk to liora
+Selra's eyes gleam with malevolent intent as he calls out to Liore, his voice low and menacing, seeking to unsettle her.
+
+blabla
+
+
+
 --- __liora__'s turn ---
-__Liora Dawnblade__ is a female Elf Ranger character  of level 3
-She belongs to the faction player, with the alignment Chaotic Good
-Prefers ranged combat.
-Currently:
- Her hit points :  10/24
- Her objectives: stand watch
- Her equipment: Longbow,Leather Armor,Dagger
- Her last action was  idle
- Her last outcome was  move in direction
-liora moved S over 26m
+look around
+Liora's gaze sweeps the surroundings, her sharp elven senses on high alert.
+
+
+attack selra with longbow ; damage max 8 hp
+With a swift draw of her Longbow, Liora looses an arrow at Selra, aiming for maximum damage.
+
+selra took 7 hp damage.
+selra is dead.

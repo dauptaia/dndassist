@@ -13,7 +13,7 @@ tiles:
     move_difficulty: 1
     lighting: 1.0
     color: "#4CAF50"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_007.png"
+    sprite: "grass.png"
 
   "O":  # obstacle
     name: "tree"
@@ -24,7 +24,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: "#2E5A2E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_tree.png"
+    sprite: "tree.png"
 
   "o":  # obstacle (low)
     name: "bush"
@@ -36,7 +36,7 @@ tiles:
     lighting: 0.8
     enter_condition: "acrobatics_check"
     color: "#3E7E3E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_bush.png"
+    sprite: "bush.png"
 
   "W":  # Wall
     name: "wall"
@@ -47,7 +47,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: "#2E5A2E"
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_wall.png"
+    sprite: "wall.png"
 
   "X":  # Void
     name: "void"
@@ -58,7 +58,7 @@ tiles:
     move_difficulty: 999
     lighting: 0.6
     color: null
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain3/sprite_void2.png"
+    sprite: "void.png"
 
   ".":  # Bridge
     name: "bridge"
@@ -68,5 +68,5 @@ tiles:
     blocks_view: false
     move_difficulty: 1
     lighting: 0.6
-    color: null
-    sprite: "/Users/dauptain/Documents/PERSO/DD/ASSISTANT_DD/assist/ressources/sprites/sprites_terrain2/sprite_004.png"
+    color: "#885C35"
+    sprite: "wood.png"

@@ -90,7 +90,7 @@ def storyprint(
     for line in wrapped_lines:
         line = primary_color +line
         if align == "right":
-            pad = term_width // 2 + int(0.2*term_width) 
+            pad = term_width // 2 + int(0.1*term_width) 
         elif align == "center": 
             pad = max((term_width - wrap_width) // 2, 0)
         else:

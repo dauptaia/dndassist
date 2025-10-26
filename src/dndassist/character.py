@@ -36,6 +36,7 @@ class Character:
     max_hp: int = 10
     max_speed: int = 30  # max distance in one round (6 seconds) , in meters
     proficiency_bonus: int = 2
+    wkdir:str = None
 
     # --- Attributes ---
     attributes: Dict[str, int] = field(
@@ -74,16 +75,19 @@ class Character:
     # ---------- YAML I/O ----------
     def save(self, path: str):
         """Save the character to a YAML file."""
-        with open(path, "w", encoding="utf-8") as f:
-            yaml.safe_dump(asdict(self), f, sort_keys=False, allow_unicode=True)
+        full_path = os.path.join(wkdir,"Saves",path)
+        with open(full_path, "w", encoding="utf-8") as fout:
+            yaml.safe_dump(asdict(self), fout, sort_keys=False, allow_unicode=True)
 
     @classmethod
-    def load(cls, path: str) -> "Character":
+    def load(cls, wkdir:str, path: str) -> "Character":
         """Load a character from a YAML file."""
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"No such character file: {path}")
-        with open(path, "r", encoding="utf-8") as f:
+        full_path = os.path.join(wkdir,"Characters",path)
+        if not os.path.exists(full_path):
+            raise FileNotFoundError(f"No such character file: {full_path}")
+        with open(full_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
+            data["wkdir"]=wkdir
         return cls(**data)
 
     def push_objective(self, new_obj: str):

@@ -1,23 +1,22 @@
 
 
 from dndassist.room import RoomMap
-from dndassist.themes.themes import Theme
 from dndassist.character import Character
 from dndassist.game_engine import GameEngine
-from dndassist.isometric_renderer import IsometricRenderer
-liora = Character.load("SCENARIO_A/liora.yaml")
-garruk = Character.load("SCENARIO_A/garruk.yaml")
-selra = Character.load("SCENARIO_A/selra.yaml")
-# garruk.save("garruk_save.yaml")
-# liora.save("liora_save.yaml")
-# selra.save("selra_save.yaml")
 
-forest_theme = Theme.load("./SCENARIO_A/forest_theme.yaml")
-room = RoomMap.load("SCENARIO_A/forest_glade.yaml", forest_theme)
+scenario = "SCENARIO_A"
+
+#Load first characters
+liora = Character.load(scenario,"liora.yaml")
+garruk = Character.load(scenario,"garruk.yaml")
+selra = Character.load(scenario,"selra.yaml")
+#Load first room
+room = RoomMap.load(scenario,"forest_glade.yaml")
+
+#Place characters
 room.add_actor("liora", (2,3),symbol="@", facing="SE", character=liora)
 room.add_actor("garruk", (8,3),symbol="&", facing="N", character=garruk)
 room.add_actor("selra", (6,8),symbol="ç", facing="NW", character=selra)
 
-#renderer = IsometricRenderer(room)
-#renderer.run()
+#Start game
 game = GameEngine(room=room)

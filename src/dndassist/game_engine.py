@@ -7,7 +7,7 @@ from dndassist.character import Character
 from dndassist.room import RoomMap, Actor
 from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
-from dndassist.storyprint import print_l,print_c,print_r,print_color
+from dndassist.storyprint import print_l,print_c,print_r,print_color,print_c_red
 from dndassist.autoplay import auto_play_ollama,user_select_option,user_select_quantity
 from datetime import datetime, timedelta
 
@@ -108,8 +108,8 @@ class GameEngine:
 
             # ----- build context ---
             actor_context = f"--- __{actor.name}__'s turn ---"            
-            actor_context += "\n" + actor.character.describe_situation()
             self.adventure_log.append("\n\n"+actor_context)
+            actor_context += "\n" + actor.character.describe_situation()
             actor_context += "\n" + self.room.describe_view_los(actor.name)
             print_c(actor_context)
             remaining_moves = actor.character.max_distance()
@@ -126,12 +126,13 @@ class GameEngine:
                 ) = self.room.visible_actors_n_loots(actor.name)
 
                 for other, dist in all_visible_actors_:
-                    if other in killed_actors:
-                        continue
-                    if dist > 3:
-                        actions_avail.append(f"move to {other} at {dist}m ")
-                    if dist <= 3:
-                        actions_avail.append(f"talk to {other}")
+                    if "dead" in self.room.actors[other].character.current_state["conditions"]:
+                        pass
+                    else:
+                        if dist > 3:
+                            actions_avail.append(f"move to {other} at {dist}m ")
+                        if dist <= 3:
+                            actions_avail.append(f"talk to {other}")
 
                 for other, dist in all_visible_loots:
                     if other in killed_actors:
@@ -162,6 +163,8 @@ class GameEngine:
                 if action.startswith("round finished"):
                     remaining_moves = 0
                     remaining_actions = 0
+                if action.startswith("stand watch"):
+                    remaining_actions -= 100
                         
 
                 elif action.startswith("look around"):
@@ -205,6 +208,10 @@ class GameEngine:
                         )
                         outcome +=f"\n{actor.name} moved {dir} over {used_dist}m"
                         remaining_moves -= used_dist
+                    else:
+                        print_c_red(f"Action {action} not understood")
+                        remaining_actions -= 100
+                        remaining_moves =0
                 
                 elif action.startswith("attack"):
                     remaining_actions -= 100
@@ -237,9 +244,8 @@ class GameEngine:
                 actor.character.current_state["outcome"]=outcome
                 self.adventure_log.append(outcome+"\n")
                 print_l("__"+outcome+"__") 
-                print_l("Kills :"+",".join(killed_actors)) 
                 with open(LOGFILE,"w") as fout:
-                    fout.writelines(self.adventure_log)
+                    fout.write("\n".join(self.adventure_log))
         
         # for dead_name in killed_actors:
         #     self.room.del_actor(dead_name)

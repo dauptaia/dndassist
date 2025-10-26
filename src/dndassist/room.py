@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field, asdict
 from typing import Dict, Tuple, List, Optional
 import textwrap, math, yaml, json
@@ -9,7 +10,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-from dndassist.themes.themes import Theme
+from dndassist.themes import Theme
 from dndassist.character import Character
 
 from dndassist.storyprint import print_l,print_c,print_r,print_color
@@ -134,6 +135,7 @@ class Loot:
 @dataclass
 class RoomMap:
     name: str
+    wkdir: str
     ascii_map: str
     description: str
     tiles: Dict[Tuple[int, int], Tile]
@@ -605,12 +607,17 @@ class RoomMap:
     # -------------------------------------------
 
     @classmethod
-    def load(cls, yaml_path: str, theme: Theme):
+    def load(cls, wkdir:str, yaml_path: str):
         """Load a room map and apply a theme to it."""
-        with open(yaml_path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
 
-        name = data.get("name", "Unnamed Room")
+        room_path = os.path.join(wkdir,"Rooms",yaml_path)
+        with open(room_path, "r", encoding="utf-8") as fin:
+            data = yaml.safe_load(fin)
+
+        name = data["name"]
+        theme_path = data["theme"]
+        theme_path = os.path.join(wkdir,"Rooms","Themes", theme_path)
+        theme = Theme.load(theme_path)
         actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
         loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
         tile_specs = theme.tiles
@@ -618,6 +625,7 @@ class RoomMap:
 
         return cls(
             name=name,
+            wkdir = wkdir,
             description=data["description"],
             ascii_map=data["ascii_map"],
             width=width,
@@ -781,7 +789,7 @@ def compute_los(
                     visible_loots.append((lkey, dist_units))
 
             # check tile itself (non-floor items)
-            if tile and tile.symbol not in [" ", "."]:
+            if tile and tile.symbol not in [" "]:
                 # avoid duplicates if we've already registered this tile by its coordinate earlier rays
                 if tile_coord not in seen_positions:
                     # label tile descriptively

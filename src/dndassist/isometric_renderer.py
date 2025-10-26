@@ -9,40 +9,12 @@ Controls:
  - Move mouse to see tooltips for tiles / loots / actors
 """
 
-import sys
+import sys, os
 import math
 import pygame
 import yaml
 from dataclasses import dataclass, field
 from typing import Dict, Tuple, List, Optional
-
-# -------------------------
-# Small dataclasses: Theme, TileSpec, Room, Actor, Loot
-# (adjust if you already have these in your project)
-# -------------------------
-
-
-# @dataclass
-# class Room:
-#     name: str
-#     ascii_map: List[str]
-#     theme: Theme
-#     actors: Dict[str, Tuple[int,int,str]] = field(default_factory=dict)   # id -> [x,y,facing]
-#     loots: Dict[str, Tuple[int,int,str]] = field(default_factory=dict)  # id -> [x,y,name]
-
-#     @classmethod
-#     def load(cls, path: str, theme: Theme) -> "Room":
-#         with open(path, "r", encoding="utf-8") as f:
-#             data = yaml.safe_load(f)
-#         name = data.get("name", "Unnamed Room")
-#         ascii_map = data["ascii_map"]
-#         npcs = data.get("npcs", {})    # expected { "M1": [x,y,facing], ... }
-#         loots = data.get("loots", {})  # expected { "l1": [x,y,name], ... }
-#         player = data.get("player", {"pos": None, "facing": "N"})
-#         player_pos = tuple(player["pos"]) if player.get("pos") else None
-#         player_facing = player.get("facing", "N")
-#         room = cls(name, ascii_map, theme, npcs=npcs, loots=loots, player_pos=player_pos, player_facing=player_facing)
-#         return room
 
 # -------------------------
 # Isometric renderer
@@ -66,6 +38,7 @@ class IsometricRenderer:
         screen_size=(1200, 600),
     ):
         self.room = room
+        #self.scenario_path = scenario_path
         self.theme = room.theme
         self.tile_w = tile_w
         self.tile_h = tile_h
@@ -124,21 +97,44 @@ class IsometricRenderer:
             self.sprite_cache[path] = None
             return None
 
+    def _load_sprite_in_cache(self, wkdir:str, path: Optional[str], ) -> Optional[pygame.Surface]:
+        if not path:
+            return None
+        if path in self.sprite_cache:
+            return self.sprite_cache[path]
+        try:
+            img = pygame.image.load(os.path.join(wkdir, path)).convert_alpha()
+            self.sprite_cache[path] = img
+            return img
+        except Exception as e:
+            print(f"[renderer] Warning: cannot load sprite '{path}': {e}")
+            self.sprite_cache[path] = None
+            return None
+
+
     # ---------- prepare tiles/actors/loots ----------
     def _prepare_tiles_and_sprites(self):
         # preload all sprites referenced by theme tiles
         for ch, spec in self.theme.tiles.items():
             if spec.sprite:
-                self._load_sprite(spec.sprite)
-
+                self._load_sprite_in_cache(
+                    os.path.join(self.room.wkdir, "Tiles"),
+                    spec.sprite
+                )
+                
         # preload actor/loot sprites if present in room object (or theme-specific)
         for a in self.actors.values():
             if a.sprite:
-                self._load_sprite(a.sprite)
+                self._load_sprite_in_cache(
+                    os.path.join(self.room.wkdir, "Characters"),
+                    a.sprite
+                )
         for l in self.loots.values():
             if l.sprite:
-                self._load_sprite(l.sprite)
-
+                self._load_sprite_in_cache(
+                    os.path.join(self.room.wkdir, "Loots"), 
+                    l.sprite
+                )
     # def _init_actors_loots(self):
     #     # convert room.npcs and room.loots into Actor / Loot objects
     #     for nid, v in self.room.npcs.items():
@@ -286,7 +282,8 @@ class IsometricRenderer:
             )
             spec = self.theme.tiles.get(ch)
             if spec and spec.sprite:
-                surf = self._load_sprite(spec.sprite)
+                surf = self.sprite_cache[spec.sprite] if spec.sprite else None
+            
                 if surf:
                     # position sprite bottom-center on isometric tile
                     w_exact, h_exact = surf.get_size()
@@ -319,11 +316,11 @@ class IsometricRenderer:
         entity_draw_list = []
         for lid, loot in self.loots.items():
             sx, sy = self.project(*loot.pos)
-            sprite = self._load_sprite(loot.sprite) if loot.sprite else None
+            sprite = self.sprite_cache[loot.sprite] if loot.sprite else None
             entity_draw_list.append(("loot", loot, sx, sy, sprite))
         for aid, actor in self.actors.items():
             sx, sy = self.project(*actor.pos)
-            sprite = self._load_sprite(actor.sprite) if actor.sprite else None
+            sprite = self.sprite_cache[actor.sprite] if actor.sprite else None
             entity_draw_list.append(("actor", actor, sx, sy, sprite))
 
         # sort by sy (vertical) so lower items appear on top
@@ -456,16 +453,12 @@ class IsometricRenderer:
                         self.zoom = max(
                             1.0 / zoom_step**6, min(self.zoom, zoom_step**6)
                         )
-                        print(self.zoom)
                     elif ev.key == pygame.K_z:
                         self.zoom *= zoom_step
                         self.zoom = max(
                             1.0 / zoom_step**6, min(self.zoom, zoom_step**6)
                         )
-                        print(self.zoom)
-                    # elif ev.type == pygame.MOUSEWHEEL:
-                    #     self.zoom *= zoom_step if ev.y > 0 else 1./zoom_step
-                    #     self.zoom = max(1./zoom_step**6, min(self.zoom, zoom_step**6))
+                
             self.render_frame()
         pygame.quit()
 

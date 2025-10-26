@@ -21,10 +21,10 @@ DATA_CATEGORIES_PATH = files("dndassist").joinpath(
 )  # os.path.join("data", "weapons.json")
 
 with open(DATA_PATH, "r", encoding="utf-8") as f:
-    DATA_CATEGORIES = json.load(f)
+    DATA_DICTS = json.load(f)
 
 with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
-    DATA_DICTS = json.load(f)
+    DATA_CATEGORIES = json.load(f)
 
 
 def equipment_weight(equip_name):
