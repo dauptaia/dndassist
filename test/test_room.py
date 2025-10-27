@@ -7,7 +7,7 @@ scenario = "./CRIMSON_MOON"
 
 
 #Load first room
-room = RoomMap.load(scenario,"forest_bridge.yaml")
+room = RoomMap.load(scenario,"village_start.yaml")
 
 #Place characters
 liora = Character.load(scenario,"liora.yaml")
