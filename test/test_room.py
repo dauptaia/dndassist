@@ -3,11 +3,11 @@ from dndassist.character import Character
 from dndassist.isometric_renderer import IsometricRenderer
 
 
-scenario = "./SCENARIO_A"
+scenario = "./CRIMSON_MOON"
 
 
 #Load first room
-room = RoomMap.load(scenario,"forest_glade.yaml")
+room = RoomMap.load(scenario,"forest_bridge.yaml")
 
 #Place characters
 liora = Character.load(scenario,"liora.yaml")
@@ -19,5 +19,5 @@ room.add_actor("selra", (6,8),symbol="ç", facing="NW", character=selra)
 
 renderer = IsometricRenderer(room)
 renderer.run()
-#room.draw_map()
-#print(room.render_ascii())
+room.draw_map()
+print(room.render_ascii())

@@ -1,0 +1,46 @@
+name: Liora Dawnblade
+race: Elf
+gender: female
+char_class: Ranger
+level: 3
+xp: 850
+gold: 0
+description: no particular trait
+alignment: Chaotic Good
+notes: Prefers ranged combat.
+faction: ploooooyer
+sprite: sprite_liora.png
+available_actions: []
+max_cargo: 30
+max_hp: 24
+max_speed: 35
+proficiency_bonus: 2
+attributes:
+  strength: 12
+  dexterity: 16
+  constitution: 11
+  intelligence: 13
+  wisdom: 15
+  charisma: 10
+current_state:
+  current_hp: 10
+  objectives:
+  - stand watch
+  conditions: []
+  action: idle
+  outcome: ""
+  aggro: null
+equipment:
+- Longbow
+- Leather Armor
+- Dagger
+spells:
+- Hunter’s Mark
+- Cure Wounds
+equipped:
+  armor: Leather Armor
+  main_hand: Longbow
+  off_hand: Dagger
+weapon_mastery:
+  simple: proficient
+  martial: expert

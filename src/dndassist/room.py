@@ -618,8 +618,8 @@ class RoomMap:
         theme_path = data["theme"]
         theme_path = os.path.join(wkdir,"Rooms","Themes", theme_path)
         theme = Theme.load(theme_path)
-        actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
-        loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
+        #actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
+        #loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
         tile_specs = theme.tiles
         tiles, width, height = from_ascii_map(data["ascii_map"], tile_specs)
 
@@ -632,8 +632,8 @@ class RoomMap:
             height=height,
             tiles=tiles,
             theme=theme,
-            actors=actors,
-            loots=loots,
+            #actors=actors,
+            #loots=loots,
         )
 
 
