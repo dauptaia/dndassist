@@ -1,0 +1,75 @@
+
+                            ==(W{==========-      /===-                        
+                              ||  (.--.)         /===-_---~~~~~~~~~------____  
+                              | \_,|**|,__      |===-~___                _,-' `
+                 -==\        `\ ' `--'   ),    `//~\   ~~~~`---.___.-~~      
+             ______-==|        /`\_. .__/\ \    | |  \           _-~`         
+       __--~~~  ,-/-==\      (   | .  |~~~~|   | |   `\        ,'             
+    _-~       /'    |  \     )__/==0==-\<>/   / /      \      /               
+  .'        /       |   \      /~\___/~~\/  /' /        \   /'                
+ /  ____  /         |    \`\.__/-~~   \  |_/'  /          \/'                  
+/-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`                   
+                  \_|      /        _) | ;  ),   __--~~                        
+                    '~~--_/      _-~/- |/ \   '-~ \                            
+                   {\__--_/}    / \_>-|)<__\      \                           
+                   /'   (_/  _-~  | |__>--<__|      |                          
+                  |   _/) )-~     | |__>--<__|      |                          
+                  / /~ ,_/       / /__>---<__/      |                          
+                 o-o _//        /-~_>---<__-~      /                           
+                 (^(~          /~_>---<__-      _-~                            
+                ,/|           /__>--<__/     _-~                               
+             ,//('(          |__>--<__|     /  -Alex Wargacki  .----_          
+            ( ( '))          |__>--<__|    |                 /' _---_~\        
+         `-)) )) (           |__>--<__|    |               /'  /     ~\`\      
+        ,/,'//( (             \__>--<__\    \            /'  //        ||      
+      ,( ( ((, ))              ~-__>--<_~-_  ~--____---~' _/'/        /'       
+    `~/  )` ) ,/|                 ~-_~>--<_/-__       __-~ _/                  
+  ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~~~__--~                    
+   ;'( ')/ ,)(                              ~~~~~~~~~~                         
+  ' ') '( (/                                                                   
+    '   '  `
+
+DND-assist, a dungeon's and dragon GameMaster helper. 
+By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
+
+
+
+=== ROUND 1 START ===
+   Room Village start, time 00:17:07.127266
+
+
+--- __liora__'s turn ---
+move in direction
+Liora's eyes scan the path ahead, her senses alert for any signs of danger.
+
+liora moved North over 16m
+
+move in direction
+Liora takes a few swift strides to the north, her eyes scanning the area ahead for any signs of danger or the village elder.
+
+liora moved North over 8m
+
+move in direction
+Liora takes a few strides to the north, her eyes scanning the walls ahead.
+
+liora moved North over 4m
+
+move in direction
+Liora readies her longbow, preparing to continue searching for the village elder.
+
+liora moved North over 2m
+
+move in direction
+Liora continues her search, hoping to find the village elder and uncover more about the mysterious quest.
+
+liora moved North over 0m (movement to North is impossible!)
+
+move in direction
+Liora continues her journey, hoping to find the village elder and learn more about the quest.
+
+liora moved Center over 2m
+
+move in direction
+Liora readies her longbow and moves cautiously to the right, keeping an eye out for any signs of danger.
+
+liora moved North over 0m (movement to North is impossible!)

@@ -137,12 +137,12 @@ def print_c_red(text:str):
     )
 
 
-def print_c_orange(text:str):
+def print_c_blue(text:str):
     storyprint(
         text,
         align="center",
-        primary="YELLOW",
-        secondary="LIGHTYELLOW_EX",
+        primary="BLUE",
+        secondary="LIGHTBLUE_EX",
         wrap_width = None
     )
 

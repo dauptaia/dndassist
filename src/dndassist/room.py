@@ -12,6 +12,7 @@ import matplotlib.patches as patches
 
 from dndassist.themes import Theme
 from dndassist.character import Character
+from dndassist.matrix_utils import get_crown_pos
 
 from dndassist.storyprint import print_l,print_c,print_r,print_color
 
@@ -28,14 +29,14 @@ PLURAL_THRESHOLD = 3  # >3 items -> pluralize (user requested >3 -> plural)
 
 # facing -> base angle in degrees (0 = north/up, increases clockwise)
 FACING_ANGLE = {
-    "N": 0,
-    "NE": 45,
-    "E": 90,
-    "SE": 135,
-    "S": 180,
-    "SW": 225,
-    "W": 270,
-    "NW": 315,
+    "North": 0,
+    "NorthEast": 45,
+    "East": 90,
+    "SouthEast": 135,
+    "South": 180,
+    "SouthWest": 225,
+    "West": 270,
+    "NorthWest": 315,
 }
 
 
@@ -58,8 +59,7 @@ class Tile:
     difficulty: 1
     blocks_view: bool
     description: str = ""
-    metadata: Dict[str, str] = field(default_factory=dict)
-
+    
     def to_dict(self):
         return asdict(self)
 
@@ -76,7 +76,7 @@ class Actor:
     name: str
     symbol: str
     pos: Tuple[int, int]
-    facing: str = "N"
+    facing: str = "North"
     sprite: str = None
     character: Character = None
     """THis class is the simplified version of an actor, sufficient for RoomMap handling.
@@ -85,7 +85,7 @@ class Actor:
     """
 
     def turn(self, direction: str):
-        self.facing = direction.upper()
+        self.facing = direction
 
     def move(self, dx: int, dy: int):
         x, y = self.pos
@@ -146,7 +146,7 @@ class RoomMap:
     elevation: Optional[Dict[Tuple[int, int], int]] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
-
+    
     def unit_to_m(self, u: float) -> int:
         """Convert map units to meters (rounded integer)."""
         return int(round(u * self.unit_m))
@@ -155,13 +155,31 @@ class RoomMap:
         """Convert map meters to units (rounded integer)."""
         return int(round(u / self.unit_m))
 
+    
+    def add_gate(
+            self,
+            name: str,
+            pos: Tuple[int,int],
+            description: str
+        ):
+        """Turn a tile into a  gate"""
+        self.tiles[pos]= Tile(
+            symbol="G",
+            traversable= True,
+            difficulty=1,
+            blocks_view=False,
+            description=name +":"+description,
+        )
+
+
+
     def add_actor(
         self,
         name: str,
         pos: Tuple[int, int],
-        symbol="M",
-        facing: str = "N",
+        symbol="?",
         character: Character = None,
+        new_objective:str = None
     ):
         """add an actor in the room.
 
@@ -169,19 +187,64 @@ class RoomMap:
         - If name already present, the addition is refused
         - If position is occupied by object or actor, the addition is refused
         """
+
         if name in self.actors:
             print(f"Actor {name} is already in the room")
         else:
-            self.actors[name] = Actor(
-                name, symbol, pos, facing=facing, character=character
-            )
+            free_pos = self._free_pos_nearest(pos)
 
-    def del_actor(self, name: str):
-        """remove an actor in the room"""
-        if name in self.actors:
-            del self.actors[name]
-        else:
-            print(f"Actor {name} is not in the room")
+            facing ="North"
+            if free_pos[1]< 0.33*self.height: #in N
+                facing = "South"
+            elif free_pos[1]> 0.66*self.height: #in S
+                facing = "North"
+            if free_pos[0]< 0.33*self.width: # W
+                facing += "East"
+            elif free_pos[0]> 0.66*self.width: # E
+                facing += "West"
+                
+            print("????", facing)
+            self.actors[name] = Actor(
+                name, symbol, free_pos, facing=facing, character=character
+            )
+            if new_objective is not None:
+                self.actors[name].character.current_state["objectives"].append(new_objective)
+            
+            self.actors[name].character.current_state["action"]=f"Actor {name} just arrived in {self.name}"
+            print(f"Actor {name} arrived in room {self.name}")
+            
+
+    # def del_actor(self, name: str):
+    #     """remove an actor in the room"""
+    #     if name in self.actors:
+    #         del self.actors[name]
+    #     else:
+    #         print(f"Actor {name} is not in the room")
+
+    def _free_pos_nearest(self,pos: Tuple[int, int], max_crown=3)-> Tuple[int, int]:
+        """Return the free position nearest of pos,
+        maximum of 2 crowns"""
+
+        def _is_occupied(test_pos):
+            """Check that this position is neither an obstacle or filled with someone"""
+            if self.tiles[test_pos].symbol in ["X", "O", "W", "G"]:
+                return False
+            for actor in self.actors.values():
+                if actor.pos == test_pos:
+                 return False
+            return True
+
+        if not  _is_occupied(pos):
+            return pos
+        
+        for rad in range(1,max_crown+1):
+            elligible_pos = get_crown_pos(pos, self.width, self.height, rad)
+            for _pos in elligible_pos:
+                if not  _is_occupied(_pos):
+                    return _pos
+        raise RuntimeError(f"Could not find a free position around {pos}")
+
+
 
     # to refine
     def add_loot(self, name: str, pos: Tuple[int, int], symbol="l"):
@@ -400,6 +463,56 @@ class RoomMap:
         print("\n")
         
 
+
+
+    def actor_situation(self, actor_name: str):
+        
+        actor = self.actors[actor_name]
+        x,y = actor.pos
+        map_locate_x = ""
+        map_locate_y = ""
+        if x> 0.66*self.width:
+            map_locate_x = "East"
+        if x> 0.85*self.width:
+            map_locate_x = "far East"
+        if x< 0.33*self.width:
+            map_locate_x = "West"
+        if x< 0.15*self.width:
+            map_locate_x = "far West"
+        if y> 0.66*self.height:
+            map_locate_y = "South"
+        if y> 0.85*self.height:
+            map_locate_y = "far South"
+        if y< 0.33*self.height:
+            map_locate_y = "North"
+        if y< 0.15*self.height:
+            map_locate_y = "far North"
+
+        if map_locate_x == "" and map_locate_y == "":
+            locate= "center"
+        else:
+            locate = ",".join([map_locate_x , map_locate_y]).strip(",")
+        situation = f"{actor_name} is currently at the {locate} of the map, looking to the {actor.facing}"
+        return situation
+
+
+    def look_around(self, actor_name: str):
+        actor = self.actors[actor_name]
+        
+        report = self.actor_situation(actor_name)
+        facing_ = actor.facing
+
+        actor.facing = "North"
+        report+=self.describe_view_los(actor.name)
+        actor.facing = "East"
+        report+=self.describe_view_los(actor.name)
+        actor.facing = "South"
+        report+=self.describe_view_los(actor.name)
+        actor.facing = "West"
+        report+=self.describe_view_los(actor.name)
+        actor.facing = facing_
+        return report
+    
     # -------------------------------------------
     def describe_view_los(self, actor_name: str) -> str:
         """
@@ -412,11 +525,9 @@ class RoomMap:
         items_by_zone, _, _ = compute_los(
             actor_name, self.actors, self.loots, self.tiles, self.width, self.height
         )
-        actor = self.actors[actor_name]
-        report_lines = [
-            f"{actor.name} is facing {actor.facing}."
-        ] + assemble_description(items_by_zone, self.unit_m)
-
+        report_lines = assemble_description(items_by_zone, self.unit_m) + [
+            self.actor_situation(actor_name)
+        ] 
         return "\n".join(report_lines)
 
     def visible_actors_n_loots(
@@ -467,29 +578,33 @@ class RoomMap:
 
         Return used distance in m"""
         actor = self.actors[actor_name]
-
-        if dir == "N":
+        
+        x0, y0 = actor.pos
+        if dir == "Center":
+            dy = self.height//2 - y0
+            dx = self.width//2 - x0
+        elif dir == "North":
             dy = -self.m_to_unit(distance_m)
             dx = 0
-        elif dir == "NE":
+        elif dir == "NorthEast":
             dx = self.m_to_unit(distance_m * 1.414)
             dy = -self.m_to_unit(distance_m * 1.414)
-        elif dir == "E":
+        elif dir == "East":
             dx = self.m_to_unit(distance_m)
             dy = 0
-        elif dir == "SE":
+        elif dir == "SouthEast":
             dx = self.m_to_unit(distance_m * 1.414)
             dy = self.m_to_unit(distance_m * 1.414)
-        elif dir == "S":
+        elif dir == "South":
             dy = self.m_to_unit(distance_m)
             dx = 0
-        elif dir == "SW":
+        elif dir == "SouthWest":
             dx = -self.m_to_unit(distance_m * 1.414)
             dy = self.m_to_unit(distance_m * 1.414)
-        elif dir == "W":
+        elif dir == "West":
             dx = -self.m_to_unit(distance_m)
             dy = 0
-        elif dir == "NW":
+        elif dir == "NorthWest":
             dx = -self.m_to_unit(distance_m * 1.414)
             dy = -self.m_to_unit(distance_m * 1.414)
         else:
@@ -498,11 +613,31 @@ class RoomMap:
         path, used_dist = self.move_to(
             x0, y0, x0 + dx, y0 + dy, max_distance_m=distance_m
         )
-        print(f"Inital pos: {x0},{y0}")
-        print(f"Aiming pos: {x0+dx},{y0+dy}")
+        # print(f"Inital pos: {x0},{y0}")
+        # print(f"Aiming pos: {x0+dx},{y0+dy}")
         actor.pos = path[-1]
-        xf, yf = actor.pos
-        print(f"final pos: {xf},{yf}")
+        
+        new_facing = ""
+        try:
+            prev_pos = path[-2]
+            if actor.pos[1]>prev_pos[1]:
+                new_facing+="South"
+            if actor.pos[1]<prev_pos[1]:
+                new_facing+="North"
+            if actor.pos[0]>prev_pos[0]:
+                new_facing+="East"
+            if actor.pos[0]<prev_pos[0]:
+                new_facing+="West"
+        except IndexError:
+            pass
+
+        
+        
+        if new_facing != "":
+            actor.facing=new_facing
+
+        # xf, yf = actor.pos
+        # print(f"final pos: {xf},{yf}")
         return used_dist
 
     def move_actor_to_target(
@@ -693,9 +828,8 @@ def compute_los(
 ]:
     actor = actors[actor_name]
     px, py = actor.pos
-    facing = actor.facing.upper()
-
-    f_angle = FACING_ANGLE[facing]
+    
+    f_angle = FACING_ANGLE[actor.facing]
 
     # sector angle ranges relative to facing
     # front: -30..+30 ; left: -90..-30 ; right: +30..+90 (deg)

@@ -4,6 +4,7 @@ import random
 
 from dndassist.character import Character
 
+from dndassist.gates import Gates
 from dndassist.room import RoomMap, Actor
 from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
@@ -50,27 +51,40 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 """
 
 class GameEngine:
-    room: RoomMap
-    turn_counter: int = 0
-    round_counter: int = 1
-
-    def __init__(self, room: RoomMap):
+    def __init__(self, wkdir:str, gates_path: str):
         print_color(banner, width=80, primary="YELLOW")
 
         self.adventure_log=[]
         
         self.adventure_log.append(banner)
         
-        self.room: RoomMap = room
-        self.room.print_map()
+        self.gates: Gates = Gates()
+        self.room: RoomMap = None
         
+        self.startup(wkdir, gates_path)
+
         self.round_counter: int = 0
-        self.now: datetime = datetime(1000, 1, 1) + timedelta(0, 3600 * 12)
-        self.run_round()
+
+        self.main_loop()
+
+    def startup(self, wkdir:str, gates_path:str):
+
+        self.gates.load(wkdir,gates_path)        
+        # this will probably repeated at each gate
+        travelers_list, destination_room, destination_pos, objective, self.now = self.gates.resolve_gates()
+        self.room = RoomMap.load(wkdir, destination_room+".yaml")
+        list_gates  = self.gates.gates_by_room(destination_room)
+        for g_name, g_pos, g_desc, d_obj_play in list_gates:
+            self.room.add_gate(g_name, g_pos, g_desc)
+            
+        for i,traveler in enumerate(travelers_list):
+            _actor =  Character.load(wkdir,f"{traveler}.yaml")
+            self.room.add_actor(traveler, destination_pos, symbol=str(i), character=_actor, new_objective=objective)
+        self.room.print_map()
 
 
     # ---------- MAIN LOOP ----------
-    def run_round(self):
+    def main_loop(self):
         """Run one round (each actor acts once in initiative order)."""
         self.round_counter += 1
 
@@ -84,7 +98,7 @@ class GameEngine:
 
         # 1️⃣ Filter out inactive actors
         active_actors = []
-        for actor_key, actor in self.room.actors.items():
+        for actor_name, actor in self.room.actors.items():
             for skip_state in ["dead", "resting"]:
                 if skip_state in actor.character.current_state["conditions"]:
                     continue
@@ -109,13 +123,13 @@ class GameEngine:
             # ----- build context ---
             actor_context = f"--- __{actor.name}__'s turn ---"            
             self.adventure_log.append("\n\n"+actor_context)
-            actor_context += "\n" + actor.character.describe_situation()
-            actor_context += "\n" + self.room.describe_view_los(actor.name)
-            print_c(actor_context)
+            # actor_context += "\n" + actor.character.describe_situation()
+            # actor_context += "\n" + self.room.describe_view_los(actor.name)
+            # print_c(actor_context)
             remaining_moves = actor.character.max_distance()
             remaining_actions = 100
             lookaround_done = False
-            while remaining_moves > 0 and remaining_actions > 0:
+            while remaining_moves >= self.room.unit_m and remaining_actions > 0:
                 print_c(f"\n    Remaining moves: {remaining_moves}m")
                 actions_avail = ["round finished", "move in direction"]
                 if not lookaround_done:
@@ -148,7 +162,13 @@ class GameEngine:
                 if "player" in actor.character.faction:
                     npc = False
 
-                action,comment = user_select_option("Select an action:", actor_context, actions_avail, npc=npc)
+                action,comment = user_select_option(
+                    "What action will you do?", 
+                    actor.character.describe_situation() + "\n" +# what is not in the room
+                    self.room.describe_view_los(actor.name)+ "\n", # what is in view
+                    actions_avail, 
+                    npc=npc
+                )
                 
                 print_l("Actions available:")
                 print_l("\n".join(actions_avail))
@@ -168,18 +188,8 @@ class GameEngine:
                         
 
                 elif action.startswith("look around"):
-                    facing_ = actor.facing
-                    actor.facing = "N"
-                    print_c(self.room.describe_view_los(actor.name))
-                    actor.facing = "E"
-                    print_c(self.room.describe_view_los(actor.name))
-                    actor.facing = "S"
-                    print_c(self.room.describe_view_los(actor.name))
-                    actor.facing = "W"
-                    print_c(self.room.describe_view_los(actor.name))
-                    actor.facing = facing_
+                    self.room.look_around(actor.name)
                     lookaround_done = True
-                    self.room.print_map()
                 elif action.startswith("move"):
                     if action.startswith("move to"):
                         tgt = action.split(" ")[2]
@@ -192,22 +202,46 @@ class GameEngine:
 
                     elif action.startswith("move in direction"):
                         dir, _ = user_select_option(
-                            "Which direction:",
-                            actor_context, 
-                            ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+                            "In what direction ar you moving?",
+                            actor.character.describe_situation()+"\n"
+                            + self.room.actor_situation(actor_name)+"\n"
+                            +f"{actor.name} decided to move...", 
+                            ["South", "SouthWest", "West", "NorthWest","North", "NorthEast", "East", "SouthEast", "Center"],
                             npc=npc
                         )
-                        select_dist, _ = user_select_quantity(
-                            "Which distance:", 
-                            actor_context, 
-                            0, remaining_moves, 
+                        select_dist, _ = user_select_option(
+                            f"How far are you moving to the {dir}?",
+                            actor.character.describe_situation()+"\n"
+                            + self.room.actor_situation(actor_name)+"\n"
+                            +f"{actor.name} decided to move...", 
+                            ["As far as possible", "Half of my range", "Smallest movement possible"],
                             npc=npc
                         )
+                        if select_dist == "As far as possible":
+                            actual_dist = remaining_moves
+                        elif select_dist == "Half of my range":
+                            actual_dist = remaining_moves//2
+                        elif select_dist == "Smallest movement possible":
+                            actual_dist = self.room.unit_m
+                        else:
+                            raise RuntimeError()
+                    
+                        # select_dist, _ = user_select_quantity(
+                        #     f"How far are you moving to the {dir}, in meters? You can still move {remaining_moves} m during this turn." , 
+                        #     actor.character.describe_situation()+"\n"
+                        #     + self.room.actor_situation(actor_name)+"\n",  
+                        #     self.room.unit_m, remaining_moves, 
+                        #     npc=npc
+                        # )
                         used_dist = self.room.move_actor_to_direction(
-                            actor.name, dir, select_dist
+                            actor.name, dir, actual_dist
                         )
                         outcome +=f"\n{actor.name} moved {dir} over {used_dist}m"
-                        remaining_moves -= used_dist
+                        if used_dist == 0:
+                            outcome += f" (movement to {dir} is impossible!)"
+                            remaining_moves -= self.room.unit_m
+                        else:
+                            remaining_moves -= used_dist
                     else:
                         print_c_red(f"Action {action} not understood")
                         remaining_actions -= 100

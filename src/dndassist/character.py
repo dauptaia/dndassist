@@ -9,7 +9,7 @@ import random
 
 from dndassist.autoroll import rolldice
 from dndassist.equipment import weapon_catg, Weapon, equipment_weight
-from dndassist.storyprint import print_r,print_c_red,print_c_orange
+from dndassist.storyprint import print_r,print_c_red
 
 
 @dataclass
@@ -163,7 +163,7 @@ class Character:
             return False
         else:
             self.current_state["current_hp"] = 0
-            print_c_orange(f"Character __{self.name}__ is in the hands of fate...")
+            print_c_red(f"Character __{self.name}__ is in the hands of fate...")
             success = 0
             fails = 0
             while 1:
@@ -236,8 +236,6 @@ class Character:
         situation  += "\n" +self.notes
         situation += "\nCurrently:"
         situation  +=f"\n {possessive} hit points :  {self.current_state['current_hp']}/{self.max_hp}"
-        if self.current_state["objectives"]:
-            situation  +=f"\n {possessive} objectives: {','.join(self.current_state['objectives'])}"
         if self.current_state["conditions"]:
             situation  +=f"\n {possessive} conditions: {','.join(self.current_state['conditions'])}"
         if self.equipment:
@@ -246,6 +244,8 @@ class Character:
         situation  +=f"\n {possessive} last outcome was  {self.current_state['outcome']}"
         if self.current_state["aggro"] is not None:
             situation  +=f"\n {possessive} aggressivity is focused on {self.current_state['aggro']}"
+        if self.current_state["objectives"]:
+            situation  +=f"\n {possessive} objectives: {','.join(self.current_state['objectives'])}"
         return situation
             
     # ---------- Pretty terminal display ----------

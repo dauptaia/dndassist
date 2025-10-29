@@ -4,7 +4,7 @@ from dndassist.autoroll import rolldice
 from dndassist.character import Character
 
 from dndassist.equipment import Armor, Weapon, Shield
-from dndassist.storyprint import print_r,print_c_orange
+from dndassist.storyprint import print_r
 
 def attack(
     attacker: Character,
@@ -83,7 +83,7 @@ def attack(
         attack_result = -1
 
     if attack_result >= 0:
-        print_c_orange(f"Attack successful")
+        print_r(f"Attack successful")
         roll_dmg, _ = rolldice(
             weapon.damage_dice, autoroll=autoroll, advantage=advantage
         )
@@ -97,6 +97,6 @@ def attack(
 
     else:
         # Attaque rate
-        print_c_orange("Attack failed")
+        print_r("Attack failed")
 
     return damage

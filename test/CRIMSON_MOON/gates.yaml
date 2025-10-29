@@ -1,0 +1,35 @@
+
+start:
+  name: Starting
+  travelers: 
+  - liora
+  room0: null
+  pos0: 
+  - 0
+  - 0
+  player_objective_from_0: null
+  room1: village_start 
+  pos1: 
+  - 11
+  - 44
+  player_objective_from_1: Find the village elder for a quest, probably at the Center of the map.
+  duration: 1
+  oneway: True
+  description: A narrow path towards a peaceful village
+
+northpath:
+  name: The forest path
+  travelers : []
+  room0: start_village
+  pos0: 
+  - 14
+  - 0
+  player_objective_from_0: Find the path to the south
+  room1: forest_slope 
+  pos1: 
+  - 20
+  - 39
+  player_objective_from_1: Find the path to the north
+  duration: 1
+  oneway: True
+  description: A forest path, not really well attended.
