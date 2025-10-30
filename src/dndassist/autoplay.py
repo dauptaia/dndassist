@@ -62,7 +62,7 @@ def auto_play_random(context:str, possible_actions:List[str])-> Tuple[str,str]:
     comment = "I don't know what I am doing"
     return selected_action, comment
 
-def auto_play_ollama(context:str, title:str, possible_actions:List[str])-> Tuple[str,str]:
+def auto_play_ollama(context:str, title:str, possible_actions:List[str], verbose:bool=False)-> Tuple[str,str]:
     """Ollama-based action selection"""
 
     indexed_actions = []
@@ -79,17 +79,17 @@ def auto_play_ollama(context:str, title:str, possible_actions:List[str])-> Tuple
     Add a “>” character before the index.
     Add a “<” character after the index.
     Add a “|” character after the sentence.
-    Finish your answer by single, short, role-play sentence.
-
+    Finish your answer by a very short explanation of the decision.
     Exemple for an attack:
-      > 6 < attack beowulf | Fafnir says "You won’t see this coming..."'
+      > 6 < attack beowulf | fafnir and beowulf belongs to opposed non-neutral factions.'
     Exemple for moving:
-      > 3 < move North | Fafnir moves north as fast a possible"'
+      > 3 < move North | Fafnir moves north as fast a possible, to satisfy his objective.'
 """
    
     print_c_blue(".  LLM running...")
     #print_c_blue(context)
-    print_c(prompt)
+    if verbose:
+        print_c(prompt)
     
     cmd = ["ollama", "run", LLM_MODEL]
     try:
@@ -101,7 +101,6 @@ def auto_play_ollama(context:str, title:str, possible_actions:List[str])-> Tuple
         print(f"⚠️ [LLM autoplay error: {e}]\n Switching to random autoplay...")
         return auto_play_random(context, possible_actions)
     
-    #result = MY_LLM.invoke(prompt)
     print_c_blue("__"+result+"__")
     
     if ">" in result:

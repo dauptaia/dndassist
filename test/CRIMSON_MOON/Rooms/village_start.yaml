@@ -50,4 +50,23 @@ ascii_map:
   - "oooooooooo  O   O  ooooooooooo"
   - "ooooooooo       oooooooooooooo"
   - "oooooooo       ooooooooooooooo"
+actors:
+  thomas:
+    name: thomas
+    pos:
+    - 13
+    - 40
+    symbol: V
+    character: villager.yaml
+    objective: move around center of the village
+    sprite: villager.png
   
+  village_elder:
+    name: village_elder
+    pos:
+    - 25
+    - 25
+    symbol: E
+    character: village_elder.yaml
+    objective: move around center of the village
+    sprite: village_elder.png

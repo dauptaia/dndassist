@@ -78,6 +78,7 @@ class Actor:
     pos: Tuple[int, int]
     facing: str = "North"
     sprite: str = None
+    objective: str = None
     character: Character = None
     """THis class is the simplified version of an actor, sufficient for RoomMap handling.
     
@@ -753,7 +754,11 @@ class RoomMap:
         theme_path = data["theme"]
         theme_path = os.path.join(wkdir,"Rooms","Themes", theme_path)
         theme = Theme.load(theme_path)
-        #actors = {k: Actor.from_dict(v) for k, v in data["actors"].items()}
+        actors= {}
+        for a_name, a_dict in data["actors"].items():
+            char = Character.load(wkdir,a_dict["character"])
+            a_dict["character"] = char
+            actors[a_name] = Actor.from_dict(a_dict)
         #loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
         tile_specs = theme.tiles
         tiles, width, height = from_ascii_map(data["ascii_map"], tile_specs)
@@ -767,7 +772,7 @@ class RoomMap:
             height=height,
             tiles=tiles,
             theme=theme,
-            #actors=actors,
+            actors=actors,
             #loots=loots,
         )
 

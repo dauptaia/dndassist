@@ -35,41 +35,27 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 === ROUND 1 START ===
-   Room Village start, time 00:17:07.127266
+   Room Village start, time 22:57:36.253394
 
 
 --- __liora__'s turn ---
 move in direction
-Liora's eyes scan the path ahead, her senses alert for any signs of danger.
+Liora decides to move towards the peaceful village, fulfilling her objective of finding the village elder.
 
-liora moved North over 16m
+liora moved North over 34m
 
+
+
+--- __village_elder__'s turn ---
 move in direction
-Liora takes a few swift strides to the north, her eyes scanning the area ahead for any signs of danger or the village elder.
+I will wander in the village by moving left to explore further.
 
-liora moved North over 8m
+village_elder moved Center over 10m
 
+
+
+--- __thomas__'s turn ---
 move in direction
-Liora takes a few strides to the north, her eyes scanning the walls ahead.
+Villager decides to move towards the nice appletree on his left, satisfying his objective of staying close to the center of the village.
 
-liora moved North over 4m
-
-move in direction
-Liora readies her longbow, preparing to continue searching for the village elder.
-
-liora moved North over 2m
-
-move in direction
-Liora continues her search, hoping to find the village elder and uncover more about the mysterious quest.
-
-liora moved North over 0m (movement to North is impossible!)
-
-move in direction
-Liora continues her journey, hoping to find the village elder and learn more about the quest.
-
-liora moved Center over 2m
-
-move in direction
-Liora readies her longbow and moves cautiously to the right, keeping an eye out for any signs of danger.
-
-liora moved North over 0m (movement to North is impossible!)
+thomas moved Center over 10m

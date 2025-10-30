@@ -158,6 +158,7 @@ class GameEngine:
 
                 # Attack solutions
                 actions_avail.extend(self.build_attack_solutions(actor, all_visible_actors_))
+                
                 npc = True
                 if "player" in actor.character.faction:
                     npc = False
@@ -209,14 +210,19 @@ class GameEngine:
                             ["South", "SouthWest", "West", "NorthWest","North", "NorthEast", "East", "SouthEast", "Center"],
                             npc=npc
                         )
-                        select_dist, _ = user_select_option(
-                            f"How far are you moving to the {dir}?",
-                            actor.character.describe_situation()+"\n"
-                            + self.room.actor_situation(actor_name)+"\n"
-                            +f"{actor.name} decided to move...", 
-                            ["As far as possible", "Half of my range", "Smallest movement possible"],
-                            npc=npc
-                        )
+                        if npc: #non playable characters do not wonder about distance
+                            select_dist = "As far as possible"
+                        else:
+                            select_dist, _ = user_select_option(
+                                f"How far are you moving to the {dir}?",
+                                actor.character.describe_situation()+"\n"
+                                + self.room.actor_situation(actor_name)+"\n"
+                                +f"{actor.name} decided to move...", 
+                                ["As far as possible", "Half of my range", "Smallest movement possible"],
+                                npc=npc
+                            )
+                        
+
                         if select_dist == "As far as possible":
                             actual_dist = remaining_moves
                         elif select_dist == "Half of my range":
@@ -226,13 +232,6 @@ class GameEngine:
                         else:
                             raise RuntimeError()
                     
-                        # select_dist, _ = user_select_quantity(
-                        #     f"How far are you moving to the {dir}, in meters? You can still move {remaining_moves} m during this turn." , 
-                        #     actor.character.describe_situation()+"\n"
-                        #     + self.room.actor_situation(actor_name)+"\n",  
-                        #     self.room.unit_m, remaining_moves, 
-                        #     npc=npc
-                        # )
                         used_dist = self.room.move_actor_to_direction(
                             actor.name, dir, actual_dist
                         )
@@ -289,7 +288,7 @@ class GameEngine:
 
         cont = input("Continue? (y/n):")
         if cont == "y":
-            self.run_round()
+            self.main_loop()
 
     def build_attack_solutions(self, actor, all_visible_actors_):
         actions_avail=[]
