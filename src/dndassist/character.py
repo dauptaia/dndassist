@@ -56,11 +56,11 @@ class Character:
     current_state: Dict[str, any] = field(
         default_factory=lambda: {
             "current_hp": 10,
-            "objectives": ["stand watch"],
+       #     "objectives": ["stand watch"],
             "conditions": [],
-            "action": "idle",
-            "outcome": "",
-            "aggro": None,
+        #    "action": "idle",
+        #    "outcome": "",
+        #    "aggro": None,
         }
     )
 
@@ -92,9 +92,7 @@ class Character:
             data["wkdir"]=wkdir
         return cls(**data)
 
-    def push_objective(self, new_obj: str):
-        self.current_state["objectives"].insert(0, new_obj)
-
+   
     
     def attr_mod(self, attr) -> int:
         """Return attribute modifier"""
@@ -218,7 +216,7 @@ class Character:
             max_dist = int(max_dist*0.6)
         return max_dist
 
-    def describe_situation(self):
+    def situation(self):
         """Retur the current situation of the character"""
         pronoun = "He"
         possessive = "His"
@@ -228,8 +226,7 @@ class Character:
         
         if self.gender == "unknown":
             pronoun = "It"
-            possessive = "Its"
-        
+            possessive = "Its" 
 
         situation  = f"__{self.name}__ is a {self.gender} {self.race} {self.char_class} character  of level {self.level}"
         situation  += "\n" +f"{pronoun} belongs to the faction {self.faction}, with the alignment {self.alignment}"
@@ -240,12 +237,6 @@ class Character:
             situation  +=f"\n {possessive} conditions: {','.join(self.current_state['conditions'])}"
         if self.equipment:
             situation  +=f"\n {possessive} equipment: {','.join(self.equipment)}"
-        situation  +=f"\n {possessive} last action was  {self.current_state['action']}"
-        situation  +=f"\n {possessive} last outcome was  {self.current_state['outcome']}"
-        if self.current_state["aggro"] is not None:
-            situation  +=f"\n {possessive} aggressivity is focused on {self.current_state['aggro']}"
-        if self.current_state["objectives"]:
-            situation  +=f"\n {possessive} objectives: {','.join(self.current_state['objectives'])}"
         return situation
             
     # ---------- Pretty terminal display ----------

@@ -14,7 +14,7 @@ from dndassist.themes import Theme
 from dndassist.character import Character
 from dndassist.matrix_utils import get_crown_pos
 
-from dndassist.storyprint import print_l,print_c,print_r,print_color
+from dndassist.storyprint import print_l, print_c, print_r, print_color
 
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
@@ -59,7 +59,7 @@ class Tile:
     difficulty: 1
     blocks_view: bool
     description: str = ""
-    
+
     def to_dict(self):
         return asdict(self)
 
@@ -78,33 +78,74 @@ class Actor:
     pos: Tuple[int, int]
     facing: str = "North"
     sprite: str = None
-    objective: str = None
+    last_action: str = None
+    last_outcome: str = None
+    aggro: str = None
+    objectives: List[str] = field(
+        default_factory=list
+    )
     character: Character = None
-    """THis class is the simplified version of an actor, sufficient for RoomMap handling.
-    
-    through attribute character, you get the complete DND Character of the NPC/player
+    """This class is the simplified actor, the actual player in the Game.
+
+    We keep here attributes that are ROOM BOUNDED
+
+    through attribute character, you get the complete DND Character template of the NPC/player
+    Several actors can be built on the same character template!
     """
 
-    def turn(self, direction: str):
-        self.facing = direction
+    # def turn(self, direction: str):
+    #     self.facing = direction
 
-    def move(self, dx: int, dy: int):
-        x, y = self.pos
-        self.pos = (x + dx, y + dy)
+    # def move(self, dx: int, dy: int):
+    #     x, y = self.pos
+    #     self.pos = (x + dx, y + dy)
 
     def __repr__(self):
         out = f"{self.name} ({self.symbol}), pos: {self.pos}, facing {self.facing}"
         return out
 
-    def to_dict(self):
-        return asdict(self)
+    def situation(self):
+        """Return the current situation of the actor"""
+        if self.character.gender == "male":
+            pronoun = "He"
+            possessive = "His"
+        if self.character.gender == "female":
+            pronoun = "She"
+            possessive = "Her"
+        else:
+            pronoun = "It"
+            possessive = "Its"
+        situation = ""
+        if len(self.objectives)==0:
+            situation += f"{pronoun} has no current objectives."
+        elif len(self.objectives) == 1:
+            situation += f"{pronoun}'s objective is: {self.objectives[0]}"
+        elif len(self.objectives) == 1:
+            situation += f"{pronoun}'s objectives are: {','.join(self.objectives)}"
+
+        if self.last_action is not None:
+            situation += (
+                f"\n {possessive} last action was  {self.last_action}"
+            )
+        if self.last_outcome is not None:
+            situation += f"\n {possessive} last outcome was  {self.last_outcome}"
+        if self.aggro is not None:
+            situation += f"\n {pronoun} wants to attack {self.aggro}"
+        return situation
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d, wkdir):
         d["pos"] = tuple(
             d["pos"]
         )  # when read from safe yaml , tuple were stored as list
+        #transforma character string into character
+        char =  Character.load(wkdir, d["character"])
+        char.name = d["name"] #impose actor name in character description
+        d["character"] = char 
         return cls(**d)
+    
+    # def to_dict(self):
+    #     return asdict(self)
 
 
 @dataclass
@@ -147,7 +188,7 @@ class RoomMap:
     elevation: Optional[Dict[Tuple[int, int], int]] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
-    
+
     def unit_to_m(self, u: float) -> int:
         """Convert map units to meters (rounded integer)."""
         return int(round(u * self.unit_m))
@@ -156,31 +197,23 @@ class RoomMap:
         """Convert map meters to units (rounded integer)."""
         return int(round(u / self.unit_m))
 
-    
-    def add_gate(
-            self,
-            name: str,
-            pos: Tuple[int,int],
-            description: str
-        ):
+    def add_gate(self, name: str, pos: Tuple[int, int], description: str):
         """Turn a tile into a  gate"""
-        self.tiles[pos]= Tile(
+        self.tiles[pos] = Tile(
             symbol="G",
-            traversable= True,
+            traversable=True,
             difficulty=1,
             blocks_view=False,
-            description=name +":"+description,
+            description=name + ":" + description,
         )
-
-
 
     def add_actor(
         self,
+        wkdir:str,
         name: str,
         pos: Tuple[int, int],
         symbol="?",
-        character: Character = None,
-        new_objective:str = None
+        objectives: List[str] = None,
     ):
         """add an actor in the room.
 
@@ -194,26 +227,26 @@ class RoomMap:
         else:
             free_pos = self._free_pos_nearest(pos)
 
-            facing ="North"
-            if free_pos[1]< 0.33*self.height: #in N
+            facing = "North"
+            if free_pos[1] < 0.33 * self.height:  # in N
                 facing = "South"
-            elif free_pos[1]> 0.66*self.height: #in S
+            elif free_pos[1] > 0.66 * self.height:  # in S
                 facing = "North"
-            if free_pos[0]< 0.33*self.width: # W
+            if free_pos[0] < 0.33 * self.width:  # W
                 facing += "East"
-            elif free_pos[0]> 0.66*self.width: # E
+            elif free_pos[0] > 0.66 * self.width:  # E
                 facing += "West"
-                
-            print("????", facing)
-            self.actors[name] = Actor(
-                name, symbol, free_pos, facing=facing, character=character
-            )
-            if new_objective is not None:
-                self.actors[name].character.current_state["objectives"].append(new_objective)
-            
-            self.actors[name].character.current_state["action"]=f"Actor {name} just arrived in {self.name}"
+
+            self.actors[name] = Actor.from_dict({
+                "name":name,
+                "symbol": symbol,
+                "pos": free_pos,
+                "facing": facing,
+                "character":name+".yaml",
+                "objectives":objectives
+            }, wkdir)
+            self.actors[name].last_action = f"Actor {name} just arrived in {self.name}"
             print(f"Actor {name} arrived in room {self.name}")
-            
 
     # def del_actor(self, name: str):
     #     """remove an actor in the room"""
@@ -222,7 +255,7 @@ class RoomMap:
     #     else:
     #         print(f"Actor {name} is not in the room")
 
-    def _free_pos_nearest(self,pos: Tuple[int, int], max_crown=3)-> Tuple[int, int]:
+    def _free_pos_nearest(self, pos: Tuple[int, int], max_crown=3) -> Tuple[int, int]:
         """Return the free position nearest of pos,
         maximum of 2 crowns"""
 
@@ -232,20 +265,18 @@ class RoomMap:
                 return False
             for actor in self.actors.values():
                 if actor.pos == test_pos:
-                 return False
+                    return False
             return True
 
-        if not  _is_occupied(pos):
+        if not _is_occupied(pos):
             return pos
-        
-        for rad in range(1,max_crown+1):
+
+        for rad in range(1, max_crown + 1):
             elligible_pos = get_crown_pos(pos, self.width, self.height, rad)
             for _pos in elligible_pos:
-                if not  _is_occupied(_pos):
+                if not _is_occupied(_pos):
                     return _pos
         raise RuntimeError(f"Could not find a free position around {pos}")
-
-
 
     # to refine
     def add_loot(self, name: str, pos: Tuple[int, int], symbol="l"):
@@ -276,7 +307,6 @@ class RoomMap:
 
     # -------------------------------------------
 
-   
     def draw_map(self, save_pdf: bool = False, filename: str = "map.pdf"):
         """
         Draws a black & white map with automatic scaling (autozoom) to fit an A4 landscape page.
@@ -298,11 +328,11 @@ class RoomMap:
         else:
             zoom = map_max_h / self.height
         # general adusjt
-        zoom = zoom*0.1
+        zoom = zoom * 0.1
 
         shift_x = 2 * zoom
         shift_y = 3 * zoom
-        
+
         # --- Create figure ---
         fig, ax = plt.subplots(figsize=(fig_w, fig_h))
         ax.set_aspect("equal")
@@ -315,29 +345,33 @@ class RoomMap:
                 continue
 
             rect = patches.Rectangle(
-                (shift_x+ x * zoom, shift_y + (self.height - y - 1) * zoom),
-                zoom, zoom,
+                (shift_x + x * zoom, shift_y + (self.height - y - 1) * zoom),
+                zoom,
+                zoom,
                 linewidth=0.5,
                 edgecolor="black",
-                facecolor="white"
+                facecolor="white",
             )
             ax.add_patch(rect)
-            sym =tile.symbol
+            sym = tile.symbol
             if sym == " ":
                 sym = ":"
-            
+
             ax.text(
-                shift_x+(x + 0.5) * zoom,
-                shift_y+(self.height - y - 0.5) * zoom,
+                shift_x + (x + 0.5) * zoom,
+                shift_y + (self.height - y - 0.5) * zoom,
                 sym,
-                ha="center", va="center",
-                fontsize=8, color="black", family="monospace"
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="black",
+                family="monospace",
             )
 
         # --- Adjust axes limits so map fits nicely ---
-        #ax.set_xlim(0, self.width * zoom)
-        #ax.set_ylim(0, self.height * zoom)
-        #ax.invert_yaxis()
+        # ax.set_xlim(0, self.width * zoom)
+        # ax.set_ylim(0, self.height * zoom)
+        # ax.invert_yaxis()
 
         # --- Legend ---
         unique_tiles = {}
@@ -348,22 +382,53 @@ class RoomMap:
         # Legend position in figure coordinates
         legend_ax = fig.add_axes([0.75, 0.1, 0.22, 0.8])
         legend_ax.axis("off")
-        legend_ax.text(0, 1, "Legend", ha="left", va="top", fontsize=10, weight="bold", color="black")
+        legend_ax.text(
+            0,
+            1,
+            "Legend",
+            ha="left",
+            va="top",
+            fontsize=10,
+            weight="bold",
+            color="black",
+        )
 
         y_pos = 0.9
         for sym, desc in unique_tiles.items():
             if sym == " ":
                 sym = ":"
             legend_ax.text(
-                0, y_pos, f"{sym}  -  {desc}",
-                ha="left", va="center",
-                fontsize=8, color="black", family="monospace"
+                0,
+                y_pos,
+                f"{sym}  -  {desc}",
+                ha="left",
+                va="center",
+                fontsize=8,
+                color="black",
+                family="monospace",
             )
             y_pos -= 0.05
 
         # --- Map Name & Description (footer) ---
-        fig.text(0.5, 0.12, self.name, ha="center", va="center", fontsize=12, weight="bold", color="black")
-        fig.text(0.5, 0.08, "\n".join(textwrap.wrap(self.description, 80)), ha="center", va="center", fontsize=9, color="black")
+        fig.text(
+            0.5,
+            0.12,
+            self.name,
+            ha="center",
+            va="center",
+            fontsize=12,
+            weight="bold",
+            color="black",
+        )
+        fig.text(
+            0.5,
+            0.08,
+            "\n".join(textwrap.wrap(self.description, 80)),
+            ha="center",
+            va="center",
+            fontsize=9,
+            color="black",
+        )
 
         plt.subplots_adjust(left=0.05, right=0.7, top=0.95, bottom=0.1)
 
@@ -401,20 +466,16 @@ class RoomMap:
 
         # print(f"Size {self.width}x{self.height}")
 
-        
-
-        
-
         if spaced:
             if path is not None:
                 for x, y in path:
                     grid[y][x] = "__*__"
             for loot in self.loots.values():
                 x, y = loot.pos
-                grid[y][x] = "__"+loot.symbol+"__"
+                grid[y][x] = "__" + loot.symbol + "__"
             for actor in self.actors.values():
                 x, y = actor.pos
-                grid[y][x] = "__"+actor.symbol+"__"
+                grid[y][x] = "__" + actor.symbol + "__"
             # add coordinates
             top = []
             idx = 0
@@ -431,21 +492,29 @@ class RoomMap:
                     grid[y].insert(0, " ")
                 else:
                     grid[y].insert(0, f"__{str(idx)}__")
-                
+
                 if y == 1:
-                    grid[y].append(f"   __ ' ' normal ground      '.' special ground __")
+                    grid[y].append(
+                        f"   __ ' ' normal ground      '.' special ground __"
+                    )
                 if y == 2:
                     grid[y].append(f"   __ 'X' void               's' special       __")
                 if y == 3:
-                    grid[y].append(f"   __ 'O' Tall obsctacle     'O' small obstacle __")
+                    grid[y].append(
+                        f"   __ 'O' Tall obsctacle     'O' small obstacle __"
+                    )
                 if y == 4:
-                    grid[y].append(f"   __ 'G' gate,              'l' loot           __")
+                    grid[y].append(
+                        f"   __ 'G' gate,              'l' loot           __"
+                    )
                 if y == 6:
                     grid[y].append(f"   __       N                                  __")
                 if y == 7:
                     grid[y].append(f"   __     W   E     1 unit =  {self.unit_m}m   __")
                 if y == 8:
-                    grid[y].append(f"   __       S                                   __")
+                    grid[y].append(
+                        f"   __       S                                   __"
+                    )
                 idx += 1
                 if idx == 10:
                     idx = 0
@@ -453,67 +522,62 @@ class RoomMap:
         else:
             return "\n".join("".join(row) for row in grid)
 
-    def print_map(
-        self,  path: List[Tuple[int, int]] = None
-    ):
-        map = self.render_ascii(mode="symbol", spaced = True, path = path)
+    def print_map(self, path: List[Tuple[int, int]] = None):
+        map = self.render_ascii(mode="symbol", spaced=True, path=path)
         print("\n\n")
-        print_color(map, width=self.width*2,primary="LIGHTRED_EX", secondary="RED")
-        print_color(self.name, width=len(self.name),primary="LIGHTRED_EX", secondary="RED")
+        print_color(map, width=self.width * 2, primary="LIGHTRED_EX", secondary="RED")
+        print_color(
+            self.name, width=len(self.name), primary="LIGHTRED_EX", secondary="RED"
+        )
         print_c(self.description)
         print("\n")
-        
-
-
 
     def actor_situation(self, actor_name: str):
-        
         actor = self.actors[actor_name]
-        x,y = actor.pos
+        x, y = actor.pos
         map_locate_x = ""
         map_locate_y = ""
-        if x> 0.66*self.width:
+        if x > 0.66 * self.width:
             map_locate_x = "East"
-        if x> 0.85*self.width:
+        if x > 0.85 * self.width:
             map_locate_x = "far East"
-        if x< 0.33*self.width:
+        if x < 0.33 * self.width:
             map_locate_x = "West"
-        if x< 0.15*self.width:
+        if x < 0.15 * self.width:
             map_locate_x = "far West"
-        if y> 0.66*self.height:
+        if y > 0.66 * self.height:
             map_locate_y = "South"
-        if y> 0.85*self.height:
+        if y > 0.85 * self.height:
             map_locate_y = "far South"
-        if y< 0.33*self.height:
+        if y < 0.33 * self.height:
             map_locate_y = "North"
-        if y< 0.15*self.height:
+        if y < 0.15 * self.height:
             map_locate_y = "far North"
 
         if map_locate_x == "" and map_locate_y == "":
-            locate= "center"
+            locate = "center"
         else:
-            locate = ",".join([map_locate_x , map_locate_y]).strip(",")
+            locate = ",".join([map_locate_x, map_locate_y]).strip(",")
         situation = f"{actor_name} is currently at the {locate} of the map, looking to the {actor.facing}"
         return situation
 
-
     def look_around(self, actor_name: str):
         actor = self.actors[actor_name]
-        
+
         report = self.actor_situation(actor_name)
         facing_ = actor.facing
 
         actor.facing = "North"
-        report+=self.describe_view_los(actor.name)
+        report += self.describe_view_los(actor.name)
         actor.facing = "East"
-        report+=self.describe_view_los(actor.name)
+        report += self.describe_view_los(actor.name)
         actor.facing = "South"
-        report+=self.describe_view_los(actor.name)
+        report += self.describe_view_los(actor.name)
         actor.facing = "West"
-        report+=self.describe_view_los(actor.name)
+        report += self.describe_view_los(actor.name)
         actor.facing = facing_
         return report
-    
+
     # -------------------------------------------
     def describe_view_los(self, actor_name: str) -> str:
         """
@@ -528,7 +592,7 @@ class RoomMap:
         )
         report_lines = assemble_description(items_by_zone, self.unit_m) + [
             self.actor_situation(actor_name)
-        ] 
+        ]
         return "\n".join(report_lines)
 
     def visible_actors_n_loots(
@@ -579,11 +643,11 @@ class RoomMap:
 
         Return used distance in m"""
         actor = self.actors[actor_name]
-        
+
         x0, y0 = actor.pos
         if dir == "Center":
-            dy = self.height//2 - y0
-            dx = self.width//2 - x0
+            dy = self.height // 2 - y0
+            dx = self.width // 2 - x0
         elif dir == "North":
             dy = -self.m_to_unit(distance_m)
             dx = 0
@@ -617,25 +681,23 @@ class RoomMap:
         # print(f"Inital pos: {x0},{y0}")
         # print(f"Aiming pos: {x0+dx},{y0+dy}")
         actor.pos = path[-1]
-        
+
         new_facing = ""
         try:
             prev_pos = path[-2]
-            if actor.pos[1]>prev_pos[1]:
-                new_facing+="South"
-            if actor.pos[1]<prev_pos[1]:
-                new_facing+="North"
-            if actor.pos[0]>prev_pos[0]:
-                new_facing+="East"
-            if actor.pos[0]<prev_pos[0]:
-                new_facing+="West"
+            if actor.pos[1] > prev_pos[1]:
+                new_facing += "South"
+            if actor.pos[1] < prev_pos[1]:
+                new_facing += "North"
+            if actor.pos[0] > prev_pos[0]:
+                new_facing += "East"
+            if actor.pos[0] < prev_pos[0]:
+                new_facing += "West"
         except IndexError:
             pass
 
-        
-        
         if new_facing != "":
-            actor.facing=new_facing
+            actor.facing = new_facing
 
         # xf, yf = actor.pos
         # print(f"final pos: {xf},{yf}")
@@ -743,29 +805,28 @@ class RoomMap:
     # -------------------------------------------
 
     @classmethod
-    def load(cls, wkdir:str, yaml_path: str):
+    def load(cls, wkdir: str, yaml_path: str):
         """Load a room map and apply a theme to it."""
 
-        room_path = os.path.join(wkdir,"Rooms",yaml_path)
+        room_path = os.path.join(wkdir, "Rooms", yaml_path)
         with open(room_path, "r", encoding="utf-8") as fin:
             data = yaml.safe_load(fin)
 
         name = data["name"]
         theme_path = data["theme"]
-        theme_path = os.path.join(wkdir,"Rooms","Themes", theme_path)
+        theme_path = os.path.join(wkdir, "Rooms", "Themes", theme_path)
         theme = Theme.load(theme_path)
-        actors= {}
+        actors = {}
         for a_name, a_dict in data["actors"].items():
-            char = Character.load(wkdir,a_dict["character"])
-            a_dict["character"] = char
-            actors[a_name] = Actor.from_dict(a_dict)
-        #loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
+            a_dict["name"] = a_name
+            actors[a_name] = Actor.from_dict(a_dict, wkdir)
+        # loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
         tile_specs = theme.tiles
         tiles, width, height = from_ascii_map(data["ascii_map"], tile_specs)
 
         return cls(
             name=name,
-            wkdir = wkdir,
+            wkdir=wkdir,
             description=data["description"],
             ascii_map=data["ascii_map"],
             width=width,
@@ -773,9 +834,8 @@ class RoomMap:
             tiles=tiles,
             theme=theme,
             actors=actors,
-            #loots=loots,
+            # loots=loots,
         )
-
 
     def save(self, yaml_path: str):
         """Save the room definition (excluding theme)."""
@@ -818,7 +878,6 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
     )
 
 
-
 def compute_los(
     actor_name: str,
     actors: Dict[str, Actor],
@@ -833,7 +892,7 @@ def compute_los(
 ]:
     actor = actors[actor_name]
     px, py = actor.pos
-    
+
     f_angle = FACING_ANGLE[actor.facing]
 
     # sector angle ranges relative to facing
@@ -946,12 +1005,14 @@ def compute_los(
     return items_by_zone, visible_actors, visible_loots
 
 
-def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]], unit_to_m:float) -> List[str]:
+def assemble_description(
+    items_by_zone: List[list[List[Tuple[str, str]]]], unit_to_m: float
+) -> List[str]:
     # Now format the textual report using grouped data
     report_lines = []
     for band in ("close", "mid", "far"):
         band_report = []
-        for sector in ( "left", "front", "right"):
+        for sector in ("left", "front", "right"):
             items_seen = items_by_zone[band][sector]
             if not items_seen:
                 continue
@@ -986,5 +1047,3 @@ def assemble_description(items_by_zone: List[list[List[Tuple[str, str]]]], unit_
         # only the facing line, no visible items found
         report_lines.append("There is empty floor ahead.")
     return report_lines
-
-

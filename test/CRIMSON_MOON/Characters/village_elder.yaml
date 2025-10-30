@@ -23,12 +23,12 @@ attributes:
   charisma: 14
 current_state:
   current_hp: 10
-  objectives:
-  - Wander in the village
+  # objectives:
+  # - Wander in the village
   conditions: []
-  action: idle
-  outcome: ""
-  aggro: null
+  # action: idle
+  # outcome: ""
+  # aggro: null
 equipment:
 - Sickle
 - Leather Armor

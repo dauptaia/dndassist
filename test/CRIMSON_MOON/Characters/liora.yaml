@@ -24,12 +24,12 @@ attributes:
   charisma: 10
 current_state:
   current_hp: 10
-  objectives:
-  - stand watch
+  # objectives:
+  #- stand watch
   conditions: []
-  action: idle
-  outcome: ""
-  aggro: null
+  # action: idle
+  # outcome: ""
+  # aggro: null
 equipment:
 - Longbow
 - Leather Armor

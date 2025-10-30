@@ -23,12 +23,12 @@ attributes:
   charisma: 6
 current_state:
   current_hp: 10
-  objectives:
-  - move around the center of the village
+  # objectives:
+  # - move around the center of the village
   conditions: []
-  action: idle
-  outcome: ""
-  aggro: null
+  # action: idle
+  # outcome: ""
+  # aggro: null
 equipment:
 - Sickle
 - Leather Armor

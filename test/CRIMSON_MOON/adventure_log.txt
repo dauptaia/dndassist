@@ -35,27 +35,62 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 === ROUND 1 START ===
-   Room Village start, time 22:57:36.253394
+   Room Village start, time 21:51:56.288501
 
 
 --- __liora__'s turn ---
 move in direction
-Liora decides to move towards the peaceful village, fulfilling her objective of finding the village elder.
+Liora wants to head towards the village elder, and the path appears to be the most direct route.
 
 liora moved North over 34m
 
 
+=== ROUND 2 START ===
+   Room Village start, time 21:52:02.288501
 
---- __village_elder__'s turn ---
+
+--- __liora__'s turn ---
 move in direction
-I will wander in the village by moving left to explore further.
+Liora wants to continue searching for the village elder, and moving west is her best bet since that's where she thinks they might be.
 
-village_elder moved Center over 10m
+liora moved West over 22m
 
-
-
---- __thomas__'s turn ---
 move in direction
-Villager decides to move towards the nice appletree on his left, satisfying his objective of staying close to the center of the village.
+Liora heads towards the center of the map to find the village elder.
 
-thomas moved Center over 10m
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora sets off towards the village elder, following her objective to find them.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora continues her journey westward to reach the village elder, trying to stay on track and fulfill her quest.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora wants to continue her journey to find the village elder and is heading in that direction.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora will continue her journey to the village elder, getting closer to her objective.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora heads towards the village elder's location to complete her quest.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora wants to start her journey towards the village elder and needs to head in that direction.
+
+liora moved West over 0m (movement to West is impossible!)
+
+move in direction
+Liora will continue her journey westward to reach the village elder, staying on course to fulfill her objective.
+
+liora moved West over 0m (movement to West is impossible!)

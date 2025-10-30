@@ -58,7 +58,6 @@ actors:
     - 40
     symbol: V
     character: villager.yaml
-    objective: move around center of the village
     sprite: villager.png
   
   village_elder:
@@ -68,5 +67,4 @@ actors:
     - 25
     symbol: E
     character: village_elder.yaml
-    objective: move around center of the village
     sprite: village_elder.png
