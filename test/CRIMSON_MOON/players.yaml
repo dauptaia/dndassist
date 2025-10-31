@@ -1,0 +1,23 @@
+room: village_start
+players:
+  lana:
+    name: lana
+    pos:
+    - 13
+    - 14
+    symbol: L
+    character: liora.yaml
+    sprite: liora.png
+    objectives: 
+      - Quit the village map using the path to the forest
+  
+  neila:
+    name: neila
+    pos:
+    - 14
+    - 14
+    symbol: N
+    character: liora.yaml
+    sprite: liora.png
+    objectives: 
+      - Quit the village map using the path to the forest

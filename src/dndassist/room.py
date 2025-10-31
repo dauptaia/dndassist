@@ -119,9 +119,10 @@ class Actor:
         if len(self.objectives)==0:
             situation += f"{pronoun} has no current objectives."
         elif len(self.objectives) == 1:
-            situation += f"{pronoun}'s objective is: {self.objectives[0]}"
+            situation += f"{possessive}'s objective is: {self.objectives[0]}"
         elif len(self.objectives) == 1:
-            situation += f"{pronoun}'s objectives are: {','.join(self.objectives)}"
+            _objectives_list =" -"+'\n - '.join(self.objectives)
+            situation += f"{possessive}'s objectives are\n - : {_objectives_list}"
 
         if self.last_action is not None:
             situation += (
@@ -171,6 +172,31 @@ class Loot:
         return cls(**d)
 
 
+
+@dataclass
+class RoomGate:
+    name: str
+    # symbol: str
+    # sprite: str
+    # index: int
+    pos: Tuple[int, int]
+    description: str
+
+    def __repr__(self):
+        out = f"{self.name} ,pos: {self.pos}"
+        return out
+
+    # def to_dict(self):
+    #     return asdict(self)
+
+    # @classmethod
+    # def from_dict(cls, d):
+    #     d["pos"] = tuple(
+    #         d["pos"]
+    #     )  # when read from safe yaml , tuple were stored as list
+    #     return cls(**d)
+
+
 # -----------------------------------------------------------
 #  MAP CLASS
 # -----------------------------------------------------------
@@ -188,7 +214,8 @@ class RoomMap:
     elevation: Optional[Dict[Tuple[int, int], int]] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
-
+    gates: Dict[str, RoomGate] = field(default_factory=dict)
+    
     def unit_to_m(self, u: float) -> int:
         """Convert map units to meters (rounded integer)."""
         return int(round(u * self.unit_m))
@@ -206,6 +233,12 @@ class RoomMap:
             blocks_view=False,
             description=name + ":" + description,
         )
+        self.gates[name]= RoomGate(
+            name,
+            pos,
+            description
+        )
+        #print(f"Adding gate {name} at {pos}")
 
     def add_actor(
         self,
@@ -587,23 +620,23 @@ class RoomMap:
         """
         if actor_name not in self.actors:
             return f"No actor named {actor_name}."
-        items_by_zone, _, _ = compute_los(
-            actor_name, self.actors, self.loots, self.tiles, self.width, self.height
+        items_by_zone, _, _, _ = compute_los(
+            actor_name, self.actors, self.loots, self.gates, self.tiles, self.width, self.height
         )
         report_lines = assemble_description(items_by_zone, self.unit_m) + [
             self.actor_situation(actor_name)
         ]
         return "\n".join(report_lines)
 
-    def visible_actors_n_loots(
+    def visible_actors_n_loots_n_gates(
         self, actor_name: str
-    ) -> Tuple[List[Tuple[str, int]], List[Tuple[str, int]]]:
+    ) -> Tuple[List[Tuple[str, int]], List[Tuple[str, int]], List[Tuple[str, int]]]:
         """
         True LoS description using multiple rays per sector.
         Returns a list of (visible actors distance in m)
         """
-        _, _visible_actors, _visible_loots = compute_los(
-            actor_name, self.actors, self.loots, self.tiles, self.width, self.height
+        _, _visible_actors, _visible_loots, _visible_gates = compute_los(
+            actor_name, self.actors, self.loots, self.gates, self.tiles, self.width, self.height
         )
 
         _visible_actors = [
@@ -611,7 +644,9 @@ class RoomMap:
         ]
         _visible_loots = [(loot, self.unit_to_m(dist)) for loot, dist in _visible_loots]
 
-        return _visible_actors, _visible_loots
+        _visible_gates= [(gate, self.unit_to_m(dist)) for gate, dist in _visible_gates]
+
+        return _visible_actors, _visible_loots, _visible_gates
 
     def _neighbors(self, x: int, y: int) -> List[Tuple[int, int, float]]:
         """Return all valid 8-directional neighbors with cost multiplier."""
@@ -716,12 +751,14 @@ class RoomMap:
             target = self.actors[target_name]
             x1, y1 = target.pos
             print(f"going from {x0},{y0} to actor {target_name} at {x1},{y1}")
-
         elif target_name in self.loots:
             target = self.loots[target_name]
             x1, y1 = target.pos
             print(f"going from {x0},{y0} to loot {target_name} at {x1},{y1}")
-
+        elif target_name in self.gates:
+            target = self.gates[target_name]
+            x1, y1 = target.pos
+            print(f"going from {x0},{y0} to gates {target_name} at {x1},{y1}")
         else:
             print(f"Target {target_name} not found in actors nor loots")
             return None
@@ -882,11 +919,13 @@ def compute_los(
     actor_name: str,
     actors: Dict[str, Actor],
     loots: Dict[str, Loot],
+    gates: Dict[str, RoomGate],
     tiles: Dict[Tuple[int, int], Tile],
     width: int,
     height: int,
 ) -> Tuple[
     List[list[List[Tuple[str, str]]]],
+    List[Tuple[str, int]],
     List[Tuple[str, int]],
     List[Tuple[str, int]],
 ]:
@@ -942,9 +981,12 @@ def compute_los(
         a.pos: (k, a) for k, a in actors.items()
     }  # key includes Player too
     pos_to_loots = {l.pos: (k, l) for k, l in loots.items()}
+    pos_to_gates = {g.pos: (k, g) for k, g in gates.items()}
+
 
     visible_actors = []
     visible_loots = []
+    visible_gates = []
 
     # Cast each ray
     for sector_name, ray_angle in rays:
@@ -985,6 +1027,14 @@ def compute_los(
                 register(sector_name, dist_units, (lo.name.lower(), "loot"))
                 if (lkey, dist_units) not in visible_loots:
                     visible_loots.append((lkey, dist_units))
+            # check for gates
+            if tile_coord in pos_to_gates:
+                gkey, go = pos_to_gates[tile_coord]
+                dist_units = math.hypot((go.pos[0] - px), (go.pos[1] - py))
+                desc=  gkey +" : "+ go.description.lower()
+                register(sector_name, dist_units, (desc, "gate"))
+                if (desc, dist_units) not in visible_gates:
+                    visible_gates.append((desc, dist_units))
 
             # check tile itself (non-floor items)
             if tile and tile.symbol not in [" "]:
@@ -1002,7 +1052,7 @@ def compute_los(
                 break
 
             s += RAY_STEP_UNIT
-    return items_by_zone, visible_actors, visible_loots
+    return items_by_zone, visible_actors, visible_loots, visible_gates
 
 
 def assemble_description(

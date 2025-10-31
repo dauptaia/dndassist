@@ -62,7 +62,7 @@ def auto_play_random(context:str, possible_actions:List[str])-> Tuple[str,str]:
     comment = "I don't know what I am doing"
     return selected_action, comment
 
-def auto_play_ollama(context:str, title:str, possible_actions:List[str], verbose:bool=False)-> Tuple[str,str]:
+def auto_play_ollama(context:str, title:str, possible_actions:List[str], verbose:bool=True)-> Tuple[str,str]:
     """Ollama-based action selection"""
 
     indexed_actions = []

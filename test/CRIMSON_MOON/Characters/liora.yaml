@@ -8,7 +8,7 @@ gold: 0
 description: no particular trait
 alignment: Chaotic Good
 notes: Prefers ranged combat.
-faction: ploooooyer
+faction: player
 sprite: sprite_liora.png
 available_actions: []
 max_cargo: 30

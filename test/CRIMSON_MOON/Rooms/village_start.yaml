@@ -1,4 +1,4 @@
-name: Village start
+name: village_start
 theme: village_theme.yaml
 description: >
   A nice small village, Ap'wen, bordering a sount to north road.
@@ -63,7 +63,7 @@ actors:
   village_elder:
     name: village_elder
     pos:
-    - 25
+    - 20
     - 25
     symbol: E
     character: village_elder.yaml
