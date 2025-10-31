@@ -96,6 +96,8 @@ class GameEngine:
         for actor in travelers:
             print_r(f"Add Actor {actor.name} to {destination_room}")
             self.room.actors[actor.name]=actor
+        
+        self.room.spread_actors_loots()
 
         list_names=" -"+"\n -".join(self.room.actors.keys())
         print_r(list_names)
@@ -215,7 +217,11 @@ class GameEngine:
 
                 elif action.startswith("talk to"):
                     remaining_actions -= 100
-                    outcome = "\nblabla"
+                    npc_actor = self.room.actors[action.split()[2]]
+                    if npc_actor.dialog is None:
+                        outcome = f"{npc_actor.name} has nothing to say to you.."
+                    else:
+                        outcome = npc_actor.dialog.run(actor)
 
                 elif action.startswith("quit map"):
                     remaining_actions -= 100
@@ -344,7 +350,7 @@ class GameEngine:
             [
                 "to the South of the map",
                 "to the SouthWest of the map",
-                "to the Westof the map",
+                "to the West of the map",
                 "to the NorthWest of the map",
                 "to the North of the map",
                 "to the NorthEast of the map",
@@ -368,6 +374,7 @@ class GameEngine:
                 [
                     "As far as possible",
                     "Half of my range",
+                    "Quarter of my range",
                     "Smallest movement possible",
                 ],
                 npc=npc_bool,
@@ -377,6 +384,8 @@ class GameEngine:
             actual_dist = remaining_moves
         elif select_dist == "Half of my range":
             actual_dist = remaining_moves // 2
+        elif select_dist == "Quarter of my range":
+            actual_dist = remaining_moves // 4
         elif select_dist == "Smallest movement possible":
             actual_dist = self.room.unit_m
         else:

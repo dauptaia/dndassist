@@ -20,6 +20,15 @@ def max_dice(dice: str) -> int:
     nb, faces, mod = scan_dice(dice)
     return nb * faces + mod
 
+
+def _ask_advantage()-> int:
+    done = False
+    while not done:
+        result = int(input(f"Enter abritrary advantage : +1 or -1"))
+        if result in [-1,1,0]:
+            done = True
+    return result
+
 def _ask_dice(dice:str, min_:int, max_:int, mod:int)-> int:
     done = False
     while not done:
@@ -33,10 +42,11 @@ def rolldice(dice: str, autoroll=False, advantage: int = 0) -> Tuple[int, float]
     nb, faces, mod = scan_dice(dice)
     min_ = nb
     max_ = nb * faces
-
+    if not autoroll:
+        advantage = _ask_advantage()
     if autoroll:
         result = randint(min_, max_)
-        if advantage <= 1:
+        if advantage <= -1:
             for i in range(-advantage):
                 result = min(randint(min_, max_), result)
         if advantage >= 1:

@@ -68,3 +68,4 @@ actors:
     symbol: E
     character: village_elder.yaml
     sprite: village_elder.png
+    dialog: dialog_guard.yaml

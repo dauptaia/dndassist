@@ -44,3 +44,44 @@ ascii_map:
  - " o O O oO OooOOo  oooOO   O o  oo  OO OO"
  - "oO OOoo  o OOO o o    OoO oO   Oo o   oO"
  - "oo o    OoOo oOo Oooo  OO o O OOO o O OO"
+actors:
+  logger_chief:
+    name: logger_chief
+    pos:
+    - 18
+    - 18
+    symbol: C
+    character: logger_chief.yaml
+    sprite: logger_chief.png
+  logger1:
+    name: logger1
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    sprite: logger.png
+  logger2:
+    name: logger2
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    sprite: logger.png
+  logger3:
+    name: logger3
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    sprite: logger.png
+  logger4:
+    name: logger4
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    sprite: logger.png

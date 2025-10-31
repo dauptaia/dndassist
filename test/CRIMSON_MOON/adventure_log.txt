@@ -35,46 +35,20 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 === ROUND 1 START ===
-   Room village_start, time 23:16:06.948366
-
-
---- __lana__'s turn ---
-move to northpath : a path from the village to the forest at 21m 
-Manual input
-
-lana moved toward northpath over 28m
-
-quit map northpath : a path from the village to the forest
-Manual input
-actor lana enters a path from the village to the forest.
-
-
-
---- __neila__'s turn ---
-move to northpath : a path from the village to the forest at 21m 
-Manual input
-
-neila moved toward northpath over 28m
-
-quit map northpath : a path from the village to the forest
-Manual input
-actor neila enters a path from the village to the forest.
-
-
-=== ROUND 2 START ===
-   Room Forest Slopes, time 23:16:18.948366
+   Room village_start, time 23:54:06.129542
 
 
 --- __lana__'s turn ---
 move in direction
 Manual input
 
-lana moved North over 34m
+lana moved SouthEast over 16m
 
-
-
---- __neila__'s turn ---
-move in direction
+move to village_elder at 4m 
 Manual input
 
-neila moved North over 34m
+lana moved toward village_elder over 4m
+
+talk to village_elder
+Manual input
+end of conversation

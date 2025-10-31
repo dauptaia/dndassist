@@ -1,4 +1,4 @@
-npc: Old Gatekeeper
+npc: Village elder
 intro: start
 nodes:
   start:

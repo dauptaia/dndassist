@@ -13,6 +13,7 @@ import matplotlib.patches as patches
 from dndassist.themes import Theme
 from dndassist.character import Character
 from dndassist.matrix_utils import get_crown_pos
+from dndassist.dialog import Dialog
 
 from dndassist.storyprint import print_l, print_c, print_r, print_color
 
@@ -81,6 +82,7 @@ class Actor:
     last_action: str = None
     last_outcome: str = None
     aggro: str = None
+    dialog: Dialog = None
     objectives: List[str] = field(
         default_factory=list
     )
@@ -142,6 +144,8 @@ class Actor:
         #transforma character string into character
         char =  Character.load(wkdir, d["character"])
         char.name = d["name"] #impose actor name in character description
+        if "dialog" in d:
+            d["dialog"] = Dialog.from_yaml(wkdir,d["dialog"])
         d["character"] = char 
         return cls(**d)
     
@@ -240,6 +244,13 @@ class RoomMap:
         )
         #print(f"Adding gate {name} at {pos}")
 
+    def spread_actors_loots(self):
+
+        for actor in self.actors.values():
+            actor.pos = self._free_pos_nearest(actor.pos)
+        for loot in self.loots.values():
+            loot.pos = self._free_pos_nearest(loot.pos)
+
     def add_actor(
         self,
         wkdir:str,
@@ -295,13 +306,14 @@ class RoomMap:
         def _is_occupied(test_pos):
             """Check that this position is neither an obstacle or filled with someone"""
             if self.tiles[test_pos].symbol in ["X", "O", "W", "G"]:
-                return False
+                return True
             for actor in self.actors.values():
                 if actor.pos == test_pos:
-                    return False
-            return True
+                    return True
+            return False
 
         if not _is_occupied(pos):
+            print(pos, " is free")
             return pos
 
         for rad in range(1, max_crown + 1):

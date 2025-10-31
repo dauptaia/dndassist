@@ -1,6 +1,7 @@
-import yaml
+import yaml,os
 import random
-
+#from dndassist.room import Actor
+from dndassist.autoroll import rolldice
 class DialogNode:
     def __init__(self, node_id, data):
         self.id = node_id
@@ -16,13 +17,15 @@ class Dialog:
         self.nodes = nodes
 
     @classmethod
-    def from_yaml(cls, path: str):
+    def from_yaml(cls, wkdir:str, path: str):
+
+        path = os.path.join(wkdir, "Rooms", path)
         with open(path, "r") as f:
             data = yaml.safe_load(f)
         nodes = {nid: DialogNode(nid, nd) for nid, nd in data["nodes"].items()}
-        return cls(npc=data["npc"], start=data["start"], nodes=nodes)
+        return cls(npc=data["npc"], start=data["intro"], nodes=nodes)
 
-    def run(self, player):
+    def run(self, player:"Actor")->str: #player: Actor
         current = self.nodes[self.start]
         while True:
             print(f"\n[{self.npc}] {current.text}")
@@ -61,9 +64,10 @@ class Dialog:
             # Handle rolls
             if "roll" in option:
                 roll_attr = option["roll"]
-                roll_value = random.randint(1, 20) + player.attributes.get(roll_attr, 0)
-                print(f"You roll {roll_value} ({roll_attr})!")
-                if roll_value >= 12:
+                bonus = player.character.attr_mod(option["roll"])
+                roll_value = rolldice("1d20")
+                print(f"You roll {roll_value} + {bonus} ({roll_attr} )!")
+                if roll_value+bonus >= 12:
                     next_id = option.get("success")
                 else:
                     next_id = option.get("failure")
@@ -75,3 +79,5 @@ class Dialog:
                 break
 
             current = self.nodes.get(next_id)
+        outcome = "end of conversation"
+        return outcome
