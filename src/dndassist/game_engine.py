@@ -7,7 +7,7 @@ import random
 from dndassist.character import Character
 
 from dndassist.gates import Gates
-from dndassist.room import RoomMap, Actor
+from dndassist.room import RoomMap, Actor, Loot
 from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
 from dndassist.storyprint import print_l, print_c, print_r, print_color, print_c_red
@@ -85,6 +85,52 @@ class GameEngine:
         list_players_actors = [ Actor.from_dict(pdict, self.wkdir) for pdict in players_data["players"].values()]
         # startup room
         self.change_room(players_data["room"],list_players_actors,datetime.now() )
+    
+    def save_game(self):
+        save = {
+            "round_counter" : self.round_counter,
+            "now" : self.now,
+            "room" : self.room.name,
+            "players_sorted_list" : self.players_sorted_list,
+            "actors": {},
+            "loots": {}
+        }
+
+        for actor_name, actor in self.room.actors.items():
+            save["actors"][actor_name] = actor.to_dict_with_character_data()
+        for loot_name, loot in self.room.loots.items():
+            save["loots"][loot_name] = loot.to_dict()
+        
+        savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{ self.round_counter}.yaml")
+        print_r(f"Saving game {savefile}")
+        
+        with open(savefile,"w") as fout:
+            yaml.safe_dump(save, fout)
+    
+    def load_game(self, round_counter:int):
+        
+        savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{round_counter}.yaml")
+        print_r(f"Loading game {savefile}")
+        try:
+            with open(savefile,"r") as fin:
+                save = yaml.safe_load(fin)
+        except FileNotFoundError:
+            print_l(f"File {savefile} not found try again!")
+            return
+        self.gates.load(self.wkdir, "gates.yaml") #just in case
+        self.round_counter = save["round_counter"]
+        self.now = save["now"]
+        self.players_sorted_list = save["players_sorted_list"]
+        
+        self.room = RoomMap.load(self.wkdir, save["room"] + ".yaml")
+        list_gates = self.gates.gates_by_room(save["room"] )
+        for g_name, g_pos, g_desc, d_obj_play in list_gates:
+            self.room.add_gate(g_name, g_pos, g_desc)
+
+        for actor_name, actor_dict in save["actors"].items():
+            self.room.actors[actor_name]=Actor.from_dict_with_character_data(actor_dict)
+        for loot_name, loot_dict in save["loots"].items():
+            self.room.loots[loot_name]=Loot.from_dict(loot_dict)
         
     def change_room(self,destination_room:str, travelers:List[Actor], out_time:datetime):
         
@@ -181,7 +227,7 @@ class GameEngine:
                 if action.startswith("round finished"):
                     remaining_moves = 0
                     remaining_actions = 0
-                if action.startswith("stand watch"):
+                elif action.startswith("stand watch"):
                     remaining_actions -= 100
 
                 elif action.startswith("look around"):
@@ -252,11 +298,30 @@ class GameEngine:
         if self.gates.travelers_sorted_list() == self.players_sorted_list:
             travelers, destination_room, out_time = self.gates.resolve_gates(self.room.name, self.now)
             self.change_room(destination_room,travelers,out_time)
-        # This is where mor General controls               
-        cont = input("Continue? (y/n):")
-        if cont == "y":
-            self.run_one_round()
+        # This is where mor General controls
 
+
+        self.save_game()
+        end_of_turn_options= [
+            "Continue",
+            "Reload last turn, and continue",
+            "Exit game"
+        ]
+        option,comment = user_select_option(
+            "Turn has ended, what do you want to do?",
+            "Main dialog for the game master",
+            end_of_turn_options)
+        print(f"Selction:{option}")
+        if option == "Continue":
+            self.run_one_round()
+        elif option ==  "Reload last turn, and continue":
+            self.load_game(self.round_counter-1)
+            self.run_one_round()
+        else:
+            print_l("Thank you for playing dnd assist...")
+            return
+
+       
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 

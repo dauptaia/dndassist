@@ -1,0 +1,394 @@
+actors:
+  lana:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 10
+        constitution: 11
+        dexterity: 16
+        intelligence: 13
+        strength: 12
+        wisdom: 15
+      available_actions: []
+      char_class: Ranger
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: no particular trait
+      equipment:
+      - Longbow
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Longbow
+        off_hand: Dagger
+      faction: player
+      gender: female
+      gold: 0
+      level: 3
+      max_cargo: 30
+      max_hp: 24
+      max_speed: 35
+      name: lana
+      notes: Prefers ranged combat.
+      proficiency_bonus: 2
+      race: Elf
+      spells:
+      - "Hunter\u2019s Mark"
+      - Cure Wounds
+      sprite: sprite_liora.png
+      weapon_mastery:
+        martial: expert
+        simple: proficient
+      wkdir: ./
+      xp: 850
+    dialog: null
+    facing: NorthEast
+    last_action: move in direction
+    last_outcome: '
+
+      lana moved North over 34m'
+    name: lana
+    objectives:
+    - Quit the village map using the path to the forest
+    pos:
+    - 13
+    - 0
+    sprite: liora.png
+    symbol: L
+  logger1:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 8
+        constitution: 14
+        dexterity: 10
+        intelligence: 8
+        strength: 14
+        wisdom: 8
+      available_actions: []
+      char_class: null
+      current_state:
+        conditions: []
+        current_hp: 25
+      description: A rude , well built logger
+      equipment:
+      - Handaxe
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Handaxe
+        off_hand: Dagger
+      faction: loggers
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 50
+      max_hp: 24
+      max_speed: 25
+      name: logger1
+      notes: Prefers close combat in forests.
+      proficiency_bonus: 2
+      race: Human
+      spells: null
+      sprite: logger.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 400
+    dialog: null
+    facing: North
+    last_action: null
+    last_outcome: null
+    name: logger1
+    objectives: []
+    pos:
+    - 19
+    - 19
+    sprite: logger.png
+    symbol: L
+  logger2:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 8
+        constitution: 14
+        dexterity: 10
+        intelligence: 8
+        strength: 14
+        wisdom: 8
+      available_actions: []
+      char_class: null
+      current_state:
+        conditions: []
+        current_hp: 25
+      description: A rude , well built logger
+      equipment:
+      - Handaxe
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Handaxe
+        off_hand: Dagger
+      faction: loggers
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 50
+      max_hp: 24
+      max_speed: 25
+      name: logger2
+      notes: Prefers close combat in forests.
+      proficiency_bonus: 2
+      race: Human
+      spells: null
+      sprite: logger.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 400
+    dialog: null
+    facing: North
+    last_action: null
+    last_outcome: null
+    name: logger2
+    objectives: []
+    pos:
+    - 19
+    - 18
+    sprite: logger.png
+    symbol: L
+  logger3:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 8
+        constitution: 14
+        dexterity: 10
+        intelligence: 8
+        strength: 14
+        wisdom: 8
+      available_actions: []
+      char_class: null
+      current_state:
+        conditions: []
+        current_hp: 25
+      description: A rude , well built logger
+      equipment:
+      - Handaxe
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Handaxe
+        off_hand: Dagger
+      faction: loggers
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 50
+      max_hp: 24
+      max_speed: 25
+      name: logger3
+      notes: Prefers close combat in forests.
+      proficiency_bonus: 2
+      race: Human
+      spells: null
+      sprite: logger.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 400
+    dialog: null
+    facing: North
+    last_action: null
+    last_outcome: null
+    name: logger3
+    objectives: []
+    pos:
+    - 19
+    - 17
+    sprite: logger.png
+    symbol: L
+  logger4:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 8
+        constitution: 14
+        dexterity: 10
+        intelligence: 8
+        strength: 14
+        wisdom: 8
+      available_actions: []
+      char_class: null
+      current_state:
+        conditions: []
+        current_hp: 25
+      description: A rude , well built logger
+      equipment:
+      - Handaxe
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Handaxe
+        off_hand: Dagger
+      faction: loggers
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 50
+      max_hp: 24
+      max_speed: 25
+      name: logger4
+      notes: Prefers close combat in forests.
+      proficiency_bonus: 2
+      race: Human
+      spells: null
+      sprite: logger.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 400
+    dialog: null
+    facing: North
+    last_action: null
+    last_outcome: null
+    name: logger4
+    objectives: []
+    pos:
+    - 18
+    - 17
+    sprite: logger.png
+    symbol: L
+  logger_chief:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 12
+        constitution: 16
+        dexterity: 12
+        intelligence: 10
+        strength: 16
+        wisdom: 12
+      available_actions: []
+      char_class: null
+      current_state:
+        conditions: []
+        current_hp: 25
+      description: A rude , well built Chief logger
+      equipment:
+      - Handaxe
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Handaxe
+        off_hand: Dagger
+      faction: loggers
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 50
+      max_hp: 24
+      max_speed: 25
+      name: logger_chief
+      notes: Prefers close combat in forests.
+      proficiency_bonus: 2
+      race: Human
+      spells: null
+      sprite: logger.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 800
+    dialog: null
+    facing: North
+    last_action: null
+    last_outcome: null
+    name: logger_chief
+    objectives: []
+    pos:
+    - 18
+    - 19
+    sprite: logger_chief.png
+    symbol: C
+  neila:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 10
+        constitution: 11
+        dexterity: 16
+        intelligence: 13
+        strength: 12
+        wisdom: 15
+      available_actions: []
+      char_class: Ranger
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: no particular trait
+      equipment:
+      - Longbow
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Longbow
+        off_hand: Dagger
+      faction: player
+      gender: female
+      gold: 0
+      level: 3
+      max_cargo: 30
+      max_hp: 24
+      max_speed: 35
+      name: neila
+      notes: Prefers ranged combat.
+      proficiency_bonus: 2
+      race: Elf
+      spells:
+      - "Hunter\u2019s Mark"
+      - Cure Wounds
+      sprite: sprite_liora.png
+      weapon_mastery:
+        martial: expert
+        simple: proficient
+      wkdir: ./
+      xp: 850
+    dialog: null
+    facing: North
+    last_action: round finished
+    last_outcome: ''
+    name: neila
+    objectives:
+    - Quit the village map using the path to the forest
+    pos:
+    - 14
+    - 7
+    sprite: liora.png
+    symbol: N
+loots: {}
+now: 2025-11-01 08:04:10.484885
+players_sorted_list:
+- lana
+- neila
+room: forest_arena
+round_counter: 2

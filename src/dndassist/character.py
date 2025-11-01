@@ -75,12 +75,7 @@ class Character:
     )
 
     # ---------- YAML I/O ----------
-    def save(self, path: str):
-        """Save the character to a YAML file."""
-        full_path = os.path.join(wkdir,"Saves",path)
-        with open(full_path, "w", encoding="utf-8") as fout:
-            yaml.safe_dump(asdict(self), fout, sort_keys=False, allow_unicode=True)
-
+    
     @classmethod
     def load(cls, wkdir:str, path: str) -> "Character":
         """Load a character from a YAML file."""
@@ -92,7 +87,10 @@ class Character:
             data["wkdir"]=wkdir
         return cls(**data)
 
-   
+    @classmethod
+    def load_from_dict(cls, data:dict) -> "Character":
+        """Load a character from a dict descriptio,"""
+        return cls(**data)
     
     def attr_mod(self, attr) -> int:
         """Return attribute modifier"""

@@ -10,7 +10,7 @@ LLM_MODEL = "llama3:latest"
 # from langchain_ollama import OllamaLLM
 # MY_LLM = OllamaLLM(model=LLM_MODEL, temperature=LLM_TEMPERATURE, system=SYSTEM_PROMPT)
 
-def user_select_option(title: str, context:str , options: List[str], npc:bool=False) -> str:
+def user_select_option(title: str, context:str , options: List[str], npc:bool=False) ->Tuple[str, str]:
     """Dialog with the user to select an option"""
 
     

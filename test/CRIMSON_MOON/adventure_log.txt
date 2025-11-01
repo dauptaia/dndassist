@@ -35,20 +35,63 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 === ROUND 1 START ===
-   Room village_start, time 23:54:06.129542
+   Room forest_arena, time 08:03:46.484885
+
+
+--- __neila__'s turn ---
+move in direction
+Manual input
+
+neila moved North over 32m
+
+round finished
+Manual input
+
+
 
 
 --- __lana__'s turn ---
 move in direction
 Manual input
 
-lana moved SouthEast over 16m
+lana moved North over 32m
 
-move to village_elder at 4m 
+round finished
 Manual input
 
-lana moved toward village_elder over 4m
 
-talk to village_elder
+
+=== ROUND 2 START ===
+   Room forest_arena, time 08:03:58.484885
+
+
+--- __lana__'s turn ---
+move in direction
 Manual input
-end of conversation
+
+lana moved North over 34m
+
+
+
+--- __neila__'s turn ---
+round finished
+Manual input
+
+
+
+=== ROUND 3 START ===
+   Room forest_arena, time 08:04:10.484885
+
+
+--- __neila__'s turn ---
+move in direction
+Manual input
+
+neila moved North over 34m
+
+
+
+--- __lana__'s turn ---
+round finished
+Manual input
+

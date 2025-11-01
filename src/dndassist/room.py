@@ -149,6 +149,19 @@ class Actor:
         d["character"] = char 
         return cls(**d)
     
+    def to_dict_with_character_data(self):
+        data = asdict(self)
+        
+        return data
+
+    @classmethod
+    def from_dict_with_character_data(cls,data):
+        data["pos"] = tuple(
+            data["pos"]
+        )
+        data["character"] = Character(**data["character"])
+        return cls(**data)
+
     # def to_dict(self):
     #     return asdict(self)
 
@@ -190,6 +203,12 @@ class RoomGate:
         out = f"{self.name} ,pos: {self.pos}"
         return out
 
+    def save_to_dict(self):
+        return self.to_dict()
+
+    @classmethod
+    def load_from_dict(self,dict):
+        return self.from_dict(dict)
     # def to_dict(self):
     #     return asdict(self)
 
