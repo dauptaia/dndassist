@@ -42,8 +42,8 @@ def rolldice(dice: str, autoroll=False, advantage: int = 0) -> Tuple[int, float]
     nb, faces, mod = scan_dice(dice)
     min_ = nb
     max_ = nb * faces
-    if not autoroll:
-        advantage = _ask_advantage()
+    # if not autoroll:
+    #     advantage = _ask_advantage()
     if autoroll:
         result = randint(min_, max_)
         if advantage <= -1:

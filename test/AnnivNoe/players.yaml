@@ -1,0 +1,63 @@
+room: village_start
+players:
+  # youssef:
+  #   name: youssef
+  #   pos:
+  #   - 13
+  #   - 14
+  #   symbol: Y
+  #   character: humanoe.yaml
+  #   sprite: humanoe.png
+  #   objectives: 
+  #     - Quit the village map using the path to the forest
+  # antoine:
+  #   name: antoine
+  #   pos:
+  #   - 13
+  #   - 14
+  #   symbol: A
+  #   character: humanoe.yaml
+  #   sprite: humanoe.png
+  #   objectives: 
+  #     - Quit the village map using the path to the forest
+  # lucas:
+  #   name: lucas
+  #   pos:
+  #   - 13
+  #   - 14
+  #   symbol: L
+  #   character: humanoe.yaml
+  #   sprite: humanoe.png
+  #   objectives: 
+  #     - Quit the village map using the path to the forest
+  # noe:
+  #   name: noe
+  #   pos:
+  #   - 13
+  #   - 14
+  #   symbol: N
+  #   character: humanoe.yaml
+  #   sprite: humanoe.png
+  #   objectives: 
+  #     - Quit the village map using the path to the forest
+  # bastian:
+  #   name: bastian
+  #   pos:
+  #   - 13
+  #   - 14
+  #   symbol: B
+  #   character: humanoe.yaml
+  #   sprite: humanoe.png
+  #   objectives: 
+  #     - Quit the village map using the path to the forest
+  gaspard:
+    name: gaspard
+    pos:
+    - 13
+    - 44
+    symbol: G
+    character: humanoe.yaml
+    sprite: humanoe.png
+    objectives: 
+      - Quit the village map using the path to the forest
+  

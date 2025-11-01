@@ -92,6 +92,14 @@ class Character:
         """Load a character from a dict descriptio,"""
         return cls(**data)
     
+    def is_npc(self):
+        npc_bool = True
+        if "player" in self.faction:
+            npc_bool = False
+        if "gamemaster" in self.faction:
+            npc_bool =False
+        return npc_bool
+    
     def attr_mod(self, attr) -> int:
         """Return attribute modifier"""
         return floor((self.attributes[attr] - 10) / 2)

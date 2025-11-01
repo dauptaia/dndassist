@@ -1,0 +1,135 @@
+
+                            ==(W{==========-      /===-                        
+                              ||  (.--.)         /===-_---~~~~~~~~~------____  
+                              | \_,|**|,__      |===-~___                _,-' `
+                 -==\        `\ ' `--'   ),    `//~\   ~~~~`---.___.-~~      
+             ______-==|        /`\_. .__/\ \    | |  \           _-~`         
+       __--~~~  ,-/-==\      (   | .  |~~~~|   | |   `\        ,'             
+    _-~       /'    |  \     )__/==0==-\<>/   / /      \      /               
+  .'        /       |   \      /~\___/~~\/  /' /        \   /'                
+ /  ____  /         |    \`\.__/-~~   \  |_/'  /          \/'                  
+/-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`                   
+                  \_|      /        _) | ;  ),   __--~~                        
+                    '~~--_/      _-~/- |/ \   '-~ \                            
+                   {\__--_/}    / \_>-|)<__\      \                           
+                   /'   (_/  _-~  | |__>--<__|      |                          
+                  |   _/) )-~     | |__>--<__|      |                          
+                  / /~ ,_/       / /__>---<__/      |                          
+                 o-o _//        /-~_>---<__-~      /                           
+                 (^(~          /~_>---<__-      _-~                            
+                ,/|           /__>--<__/     _-~                               
+             ,//('(          |__>--<__|     /  -Alex Wargacki  .----_          
+            ( ( '))          |__>--<__|    |                 /' _---_~\        
+         `-)) )) (           |__>--<__|    |               /'  /     ~\`\      
+        ,/,'//( (             \__>--<__\    \            /'  //        ||      
+      ,( ( ((, ))              ~-__>--<_~-_  ~--____---~' _/'/        /'       
+    `~/  )` ) ,/|                 ~-_~>--<_/-__       __-~ _/                  
+  ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~~~__--~                    
+   ;'( ')/ ,)(                              ~~~~~~~~~~                         
+  ' ') '( (/                                                                   
+    '   '  `
+
+DND-assist, a dungeon's and dragon GameMaster helper. 
+By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
+
+
+
+=== ROUND 1 START ===
+   Room village_start, time 15:28:51.268719
+
+
+--- __gaspard__'s turn ---
+attack thomas with Longbow ; damage max 8 HP
+Manual input
+
+thomas took 11 hp damageand is dead
+
+
+=== ROUND 2 START ===
+   Room village_start, time 15:28:57.268719
+
+
+--- __gaspard__'s turn ---
+move in direction
+Manual input
+
+gaspard moved North over 34m
+
+
+=== ROUND 3 START ===
+   Room village_start, time 15:29:03.268719
+
+
+--- __gaspard__'s turn ---
+attack village_elder with Longbow ; damage max 8 HP
+Manual input
+
+village_elder took 11 hp damageand is dead
+
+
+=== ROUND 4 START ===
+   Room village_start, time 15:29:09.268719
+
+
+--- __gaspard__'s turn ---
+move in direction
+Manual input
+
+gaspard moved North over 34m
+
+
+=== ROUND 5 START ===
+   Room village_start, time 15:29:15.268719
+
+
+--- __gaspard__'s turn ---
+move to village_to_forest_bridge : a path from the village to the forest at 16m 
+Manual input
+
+gaspard moved toward village_to_forest_bridge over 20m
+
+quit map village_to_forest_bridge : a path from the village to the forest
+Manual input
+actor gaspard enters a path from the village to the forest.
+
+
+=== ROUND 6 START ===
+   Room Forest Bridge, time 15:29:21.268719
+
+
+--- __gaspard__'s turn ---
+move in direction
+Manual input
+
+gaspard moved North over 34m
+
+
+=== ROUND 7 START ===
+   Room Forest Bridge, time 15:29:27.268719
+
+
+--- __gaspard__'s turn ---
+move in direction
+Manual input
+
+gaspard moved North over 32m
+
+round finished
+Manual input
+
+
+
+=== ROUND 8 START ===
+   Room Forest Bridge, time 15:29:33.268719
+
+
+--- __gaspard__'s turn ---
+move in direction
+Manual input
+
+gaspard moved North over 32m
+
+move in direction
+Manual input
+
+MOVEMENT TO West IMPOSSIBLE DUE TO AN OBSTACLE!

@@ -1,0 +1,101 @@
+name: forest_arena
+theme: forest_theme.yaml
+description: >
+  An large open patch of prairie in the forest.
+  A straight path touch the north edge,
+  A large ravine blocks the south edge.
+ascii_map:
+ - "oOo   O  oo  oO oO O OOo  o  O oO oO O o"
+ - "  Ooo  OO o  ooooOOo OoooOooOo oO  OooOO"
+ - "o OOOoo OOO OoooOO O o  O O    Oooo oOoO"
+ - "OO Oo O OoOoOo O OOoO Oo  oOOo oOo O o O"
+ - " ......................................." 
+ - ".  o O OO                  OOo oo OOoooO"
+ - "OoOO  O                    oOOo Ooo O O "
+ - "Oo                             oO o  OOO"
+ - "  o o                          Ooo OooOo"
+ - "OO ooo                      oo  O ooo OO"
+ - "oOoOO                         O oOOOooOo"
+ - "    oo        o                 O o OOoo"
+ - "O O  o                            o OooO"
+ - "  OOO                            O   ooO"
+ - "    O                             oOoooo"
+ - "    oO                              OOoo"
+ - "oOooO o                           O OOoO"
+ - "OoOO o                            o o   "
+ - "    o                              OOOo "
+ - "OOO                                 Oo O"
+ - "  O                                 O OO"
+ - "OoooO                          oOo O oOO"
+ - " o OOo                        oOOOOo  O "
+ - "o  oo                    O  oO o   OOo  "
+ - "  OO o                       OoO   OO OO"
+ - "O O  oO O                        OoOO oo"
+ - " Ooo   o           o            OoOO  Oo"
+ - "  O o oooO  o   oo     o    Oo   OOoO O "
+ - "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ - "O  Oo  o o   o oOOooo   oOoO o   Oo  ooo"
+ - " ooooOo o oO o OoO   o OoooOOOOoOOO   OO"
+ - "o  Ooo      o o oo O oo oO o    o OO    "
+ - "O  o  ooOOO OO   ooOO O  OOoOo o o  o  o"
+ - " o O O oO OooOOo  oooOO   O o  oo  OO OO"
+ - "oO OOoo  o OOO o o    OoO oO   Oo o   oO"
+ - "oo o    OoOo oOo Oooo  OO o O OOO o O OO"
+enemy_multiplier: 5
+actors:
+  logger_chief:
+    name: logger_chief
+    xp_to_gain: 200
+    pos:
+    - 18
+    - 18
+    symbol: C
+    character: logger_chief.yaml
+    objectives: 
+    - kill any trepasser
+    sprite: logger_chief.png
+  logger1:
+    name: logger1
+    xp_to_gain: 100
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    objectives: 
+    - kill any trepasser
+    sprite: logger.png
+  logger2:
+    name: logger2
+    xp_to_gain: 100
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    sprite: logger.png
+  logger3:
+    name: logger3
+    xp_to_gain: 100
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    objectives: 
+    - kill any trepasser
+    sprite: logger.png
+  logger4:
+    name: logger4
+    xp_to_gain: 100
+    pos:
+    - 18
+    - 18
+    symbol: L
+    character: logger.yaml
+    objectives: 
+    - kill any trepasser
+    sprite: logger.png

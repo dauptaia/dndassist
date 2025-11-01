@@ -29,6 +29,12 @@ class Gates:
         list_names = [actor.name for actor in list_actors]
         return sorted(list_names)
 
+    def travelers_actors(self):
+        if self._active_gate() is None:
+            return []
+        list_actors =  self.gates_dict[self._active_gate()].travelers
+        return list_actors
+    
     def new_traveler(self, traveler_actor:Actor, gate:str):
         self.gates_dict[gate].new_traveler(traveler_actor)
        

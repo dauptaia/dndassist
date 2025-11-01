@@ -1,0 +1,67 @@
+actors:
+  gaspard:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 10
+        constitution: 11
+        dexterity: 16
+        intelligence: 13
+        strength: 12
+        wisdom: 15
+      available_actions: []
+      char_class: Ranger
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: no particular trait
+      equipment:
+      - Longbow
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Longbow
+        off_hand: Dagger
+      faction: player
+      gender: female
+      gold: 0
+      level: 3
+      max_cargo: 30
+      max_hp: 24
+      max_speed: 35
+      name: gaspard
+      notes: Prefers ranged combat.
+      proficiency_bonus: 2
+      race: Elf
+      spells:
+      - "Hunter\u2019s Mark"
+      - Cure Wounds
+      sprite: sprite_liora.png
+      weapon_mastery:
+        martial: expert
+        simple: proficient
+      wkdir: ./
+      xp: 850
+    dialog: null
+    facing: NorthWest
+    last_action: round finished
+    last_outcome: ''
+    name: gaspard
+    objectives:
+    - Quit the village map using the path to the forest
+    - Find the path to the NorthWest
+    pos:
+    - 18
+    - 20
+    sprite: humanoe.png
+    symbol: G
+    xp_accumulated: 20
+    xp_to_gain: 10
+kills: []
+now: 2025-11-01 15:29:33.268719
+players_sorted_list:
+- gaspard
+room: Forest Bridge
+round_counter: 7

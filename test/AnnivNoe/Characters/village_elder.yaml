@@ -1,0 +1,42 @@
+name: villager
+race: Human
+gender: male
+char_class: Countryman
+level: 2
+xp: 100
+gold: 0
+description: An old but energetic country man, head of the village
+alignment: Farming
+notes: Likes apples, peace and good harvests.
+faction: gamemaster
+sprite: village_elder.png
+max_cargo: 20
+max_hp: 10
+max_speed: 10
+proficiency_bonus: 0
+attributes:
+  strength: 10
+  dexterity: 12
+  constitution: 11
+  intelligence: 10
+  wisdom: 14
+  charisma: 14
+current_state:
+  current_hp: 10
+  # objectives:
+  # - Wander in the village
+  conditions: []
+  # action: idle
+  # outcome: ""
+  # aggro: null
+equipment:
+- Sickle
+- Leather Armor
+spells: []
+equipped:
+  armor: Leather Armor
+  main_hand: Sickle
+  off_hand: None
+weapon_mastery:
+  simple: proficient
+  martial: null

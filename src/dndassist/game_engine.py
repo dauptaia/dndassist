@@ -1,10 +1,7 @@
 import os
 import yaml
-from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 import random
-
-from dndassist.character import Character
 
 from dndassist.gates import Gates
 from dndassist.room import RoomMap, Actor, Loot
@@ -12,9 +9,7 @@ from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
 from dndassist.storyprint import print_l, print_c, print_r, print_color, print_c_red
 from dndassist.autoplay import (
-    auto_play_ollama,
     user_select_option,
-    user_select_quantity,
 )
 from datetime import datetime, timedelta
 
@@ -68,18 +63,18 @@ class GameEngine:
         self.gates: Gates = Gates()
         self.players_sorted_list: List[str] = None
         self.room: RoomMap = None
-        self.kills: List[str]
+        self.kills: List[str] = None
         if reload_from_save is None:
             self.round_counter: int = 0
             self.startup()
         else:
             self.load_game(reload_from_save)
-        self.run_one_round()
+        self.main_loop()
 
     def startup(self):
         # load gates
         self.gates.load(self.wkdir, "gates.yaml")
-
+        self.kills = []
         # load players 
         with open(os.path.join(self.wkdir, "players.yaml"), "r") as fin:
             players_data = yaml.safe_load(fin)
@@ -97,13 +92,13 @@ class GameEngine:
             "kills" : self.kills,
             "players_sorted_list" : self.players_sorted_list,
             "actors": {},
-            "loots": {}
+    #        "loots": {}
         }
 
         for actor_name, actor in self.room.actors.items():
             save["actors"][actor_name] = actor.to_dict_with_character_data()
-        for loot_name, loot in self.room.loots.items():
-            save["loots"][loot_name] = loot.to_dict()
+        # for loot_name, loot in self.room.loots.items():
+        #     save["loots"][loot_name] = loot.to_dict()
         
         savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{ self.round_counter}.yaml")
         print_r(f"Saving game {savefile}")
@@ -134,8 +129,8 @@ class GameEngine:
 
         for actor_name, actor_dict in save["actors"].items():
             self.room.actors[actor_name]=Actor.from_dict_with_character_data(actor_dict)
-        for loot_name, loot_dict in save["loots"].items():
-            self.room.loots[loot_name]=Loot.from_dict(loot_dict)
+        # for loot_name, loot_dict in save["loots"].items():
+        #     self.room.loots[loot_name]=Loot.from_dict(loot_dict)
         
     def change_room(self,destination_room:str, travelers:List[Actor], out_time:datetime):
         
@@ -154,7 +149,13 @@ class GameEngine:
         print_r(list_names)
         self.now=out_time
         
+    def main_loop(self):
+        running = True
+        while running:
+            running = self.run_one_round()
         
+        print_r("End of main loop")
+
     def run_one_round(self):
         """Run one round (each actor acts once in initiative order)."""
         self.round_counter += 1
@@ -210,7 +211,7 @@ class GameEngine:
             
 
 
-                npc_bool = ("player" not in actor.character.faction)
+                npc_bool = npc_bool = actor.character.is_npc()
                 
                 action, comment = user_select_option(
                     "What action will you do?",
@@ -279,9 +280,6 @@ class GameEngine:
                     gate_name = action.split()[2]
                     gate_desc = action.split(":")[-1].strip()   
                     self.gates.new_traveler(actor,gate_name)
-                    
-                    
-
                     del self.room.actors[actor.name]
                     # list_names=" -"+"\n -".join(self.room.actors.keys())
                     # print_r(list_names)
@@ -302,15 +300,17 @@ class GameEngine:
         print_l(str(self.gates.travelers_sorted_list()))
         print_l(str(self.players_sorted_list))
         
+
+            
         if self.gates.travelers_sorted_list() == self.players_sorted_list:
             # compute and distribute XP points when leaving the room
             xp_gained = 0
             for kill in self.kills:
                 xp_gained+= self.room.actors[kill].xp_to_gain
             xp_share = xp_gained // len(self.players_sorted_list)
-            for player in self.players_sorted_list:
-                self.room.actors[player].xp_accumulated += xp_share
-                print_l(f"[{player}] has gained {} XP points!" )
+            for actor in self.gates.travelers_actors():
+                actor.xp_accumulated += xp_share
+                print_l(f"[{actor.name}] has gained {xp_share} XP points!" )
             self.kills = []
 
             travelers, destination_room, out_time = self.gates.resolve_gates(self.room.name, self.now)
@@ -330,14 +330,15 @@ class GameEngine:
             end_of_turn_options)
         print(f"Selction:{option}")
         if option == "Continue":
-            self.run_one_round()
+            return True
         elif option ==  "Reload last turn, and continue":
             self.load_game(self.round_counter-1)
-            self.run_one_round()
-        else:
+            return True
+        elif option ==  "Reload last turn, and continue":
             print_l("Thank you for playing dnd assist...")
-            return
-
+            return False
+        else:
+            raise RuntimeError(f"End of turn action {option} not understood")
        
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
@@ -389,9 +390,9 @@ class GameEngine:
         success = actor.character.add_item(equipment_name)
         if success:
             del self.room.loots[loot]
-            outcome += f"\n{actor.name} has picked up {loot} {equipment_name}"
+            outcome = f"\n{actor.name} has picked up {loot} {equipment_name}"
         else:
-            outcome += f"\n{actor.name} cannot pick up {loot} {equipment_name}, too heavy to carry."
+            outcome = f"\n{actor.name} cannot pick up {loot} {equipment_name}, too heavy to carry."
         return outcome
 
     def action_attack(self, actor, action)->str:
@@ -419,8 +420,8 @@ class GameEngine:
 
     def action_move_to_direction(self, actor:Actor, remaining_moves:float)->Tuple[str,int]:
         
-        npc_bool = ("player" not in actor.character.faction)
-               
+
+        npc_bool = actor.character.is_npc()
         
         dir, _ = user_select_option(
             "In what direction ar you moving?",

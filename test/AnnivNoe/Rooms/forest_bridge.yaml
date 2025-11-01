@@ -1,0 +1,95 @@
+name: Forest Bridge
+theme: forest_theme.yaml
+description: >
+  A ravine is splitting the forest from est to west.
+  A wooden bridge allows to cros the ravine.
+
+
+
+ascii_map:
+ - "oo oOOOoO oOOo o o   O o  OOOoOo O  oOo "
+ - "   OOOOoO ooo   Ooooo O  oooOo OoOoOo Oo"
+ - "O O  oo OoO o OoooOoO  OOO   O o    oo  "
+ - "  OO   O O oOO O   O O   oOOoO  oOOO O o"
+ - " OOo oOo  oo Oo  OOoooOO  oo  OOOOO o  O"
+ - "O  oOO  OoOO O    O  Oo O OOO oOo O  O O"
+ - "Oo   ooOo       oOoOOOooo Oo oOO oooo o "
+ - "o o  oo  oo  o  OO   o oooOoO  ooOoO  o "
+ - "OO oo  OOO oOOo  OOO o o oo o OOOO   o  "
+ - "ooOOOo  oOoOo    ooOO     Oo O ooOooo  O"
+ - "  O OOoo  o OO    Ooooo O  O OOOo  OOOo "
+ - "  Oo oOo o    OoOOoOOo  o O oO o  o O  o"
+ - "   oo  oo   O ooO O   o  ooo  O  oO  o o"
+ - "oO  O  OOO     OO   OOOO O     OOO oo oO"
+ - " oo oOOOo  oO oOo O O   oo Oo oO ooo  OO"
+ - "o   Ooo o oo  OOOoOoO      o OO  o Oo oO"
+ - "OOOO  O oOoO  oo oo  o O    OoO O OO o O"
+ - " oo  o oo oo o    oo oO OOO  oOO Oooo oO"
+ - " OoO  o oo ooO oO O o OOoOOOO O ooO O oO"
+ - "Oo oO o  O O oO oO  OO   oOO     Ooo    "
+ - "o  o   oO   O   O  Oo   ooo O O  oOoo  o"
+ - "XXXXXXXXXXXXXXXXXX..XXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXX..XXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXX..XXXXXXXXXXXXXXXXXXXX"
+ - "XXXXXXXXXXXXXXXXXX..XXXXXXXXXXXXXXXXXXXX"
+ - "OoO   O O oO oo  O  o o    oo    oO    o"
+ - "ooo oo O OOO   OoOo  O   O   oOOooo OOoo"
+ - "O oOO  Oo   OoooO ooo o        oOOO ooO "
+ - " O  oO OO oo OoOOo  Oo  Oo  oo O OO O OO"
+ - "O oO OoO oo   o OO  O  O O  OoOo  ooOo  "
+ - " Oo OOO ooo  OOOO O oo  OoOO O  oOO    O"
+ - "O   O Oo o O O o     o OOO   oOOO  Oo o "
+ - "OooOOOOO    Ooo oOO OOoo O ooo OOoo O Oo"
+ - "o  oO   o OoOOO O o  O    O oo O oOOOOO "
+ - " oooO OOOooo O OOOO O O o     OO OO  oO "
+ - " O  o   oo OOOOO  o o   o    oOo  O  O  "
+ - "oOoOOoO  OoO O o  oo ooOo O O      O OO "
+ - "OoOO Oo OOoOOOO ooo    O OOo  O OOo  oo "
+ - " o oOO O o o o oO o  o OO oO o    oo Ooo"
+ - "o  o o OooO  O o  oOOO O O   oooO  ooo  "
+enemy_multiplier: 5
+actors :
+  dryad1:
+      name: dryad1
+      xp_to_gain: 100
+      pos:
+      - 20
+      - 34
+      symbol: D
+      character: dryad.yaml
+      objectives: 
+      - kill any trepasser
+      sprite: dryad.png 
+  dryad2:
+      name: dryad2
+      xp_to_gain: 100
+      pos:
+      - 20
+      - 24
+      symbol: D
+      character: dryad.yaml
+      objectives: 
+      - kill any trepasser
+      sprite: dryad.png
+  dryad3:
+      name: dryad3
+      xp_to_gain: 100
+      pos:
+      - 20
+      - 14
+      symbol: D
+      character: dryad.yaml
+      objectives: 
+      - kill any trepasser
+      sprite: dryad.png 
+  dryad4:
+      name: dryad4
+      xp_to_gain: 100
+      pos:
+      - 20
+      - 4
+      symbol: D
+      character: dryad.yaml
+      objectives: 
+      - kill any trepasser
+      sprite: dryad.png 

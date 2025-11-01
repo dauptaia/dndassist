@@ -1,0 +1,43 @@
+npc: Village elder
+intro: start
+nodes:
+  start:
+    npc_text: "Halt! The gate is closed to strangers. What brings you here?"
+    options:
+      - text: "I'm here to trade."
+        next: trade
+      - text: "I seek passage to the northern woods."
+        check: charisma
+        dc: 12
+        success: passage
+        fail: refusal
+      - text: "None of your business, old man."
+        next: insult
+
+  trade:
+    npc_text: "Trade, eh? Then you’ll need to speak to the quartermaster. South building."
+    event: open_trade_menu
+    end: true
+
+  passage:
+    npc_text: "You seem honest enough. Take this token — it will get you through."
+    event: give_token
+    end: true
+
+  refusal:
+    npc_text: "You think your charm will work on me? Move along before I call the guards."
+    event: increase_hostility
+    end: true
+
+  insult:
+    npc_text: "Watch your tongue, whelp. You want trouble?"
+    options:
+      - text: "Bring it on."
+        event: start_brawl
+        end: true
+      - text: "Apologies, I meant no offense."
+        next: apology
+
+  apology:
+    npc_text: "Hmph. Keep your manners next time."
+    end: true
