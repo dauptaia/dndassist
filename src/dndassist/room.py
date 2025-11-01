@@ -78,6 +78,8 @@ class Actor:
     symbol: str
     pos: Tuple[int, int]
     facing: str = "North"
+    xp_to_gain: int = 10
+    xp_accumulated: int = 0
     sprite: str = None
     last_action: str = None
     last_outcome: str = None

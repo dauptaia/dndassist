@@ -68,7 +68,7 @@ class GameEngine:
         self.gates: Gates = Gates()
         self.players_sorted_list: List[str] = None
         self.room: RoomMap = None
-
+        self.kills: List[str]
         if reload_from_save is None:
             self.round_counter: int = 0
             self.startup()
@@ -94,6 +94,7 @@ class GameEngine:
             "round_counter" : self.round_counter,
             "now" : self.now,
             "room" : self.room.name,
+            "kills" : self.kills,
             "players_sorted_list" : self.players_sorted_list,
             "actors": {},
             "loots": {}
@@ -123,6 +124,7 @@ class GameEngine:
         self.gates.load(self.wkdir, "gates.yaml") #just in case
         self.round_counter = save["round_counter"]
         self.now = save["now"]
+        self.kills = save["kills"]
         self.players_sorted_list = save["players_sorted_list"]
         
         self.room = RoomMap.load(self.wkdir, save["room"] + ".yaml")
@@ -278,9 +280,11 @@ class GameEngine:
                     gate_desc = action.split(":")[-1].strip()   
                     self.gates.new_traveler(actor,gate_name)
                     
+                    
+
                     del self.room.actors[actor.name]
-                    list_names=" -"+"\n -".join(self.room.actors.keys())
-                    print_r(list_names)
+                    # list_names=" -"+"\n -".join(self.room.actors.keys())
+                    # print_r(list_names)
         
                     outcome = f"actor {actor.name} enters {gate_desc}."
                 
@@ -299,6 +303,16 @@ class GameEngine:
         print_l(str(self.players_sorted_list))
         
         if self.gates.travelers_sorted_list() == self.players_sorted_list:
+            # compute and distribute XP points when leaving the room
+            xp_gained = 0
+            for kill in self.kills:
+                xp_gained+= self.room.actors[kill].xp_to_gain
+            xp_share = xp_gained // len(self.players_sorted_list)
+            for player in self.players_sorted_list:
+                self.room.actors[player].xp_accumulated += xp_share
+                print_l(f"[{player}] has gained {} XP points!" )
+            self.kills = []
+
             travelers, destination_room, out_time = self.gates.resolve_gates(self.room.name, self.now)
             self.change_room(destination_room,travelers,out_time)
         # This is where mor General controls
@@ -392,6 +406,7 @@ class GameEngine:
         if is_dead:
             outcome += f"and is dead"
             self.room.add_loot(defender.character.drop_loot(), defender.pos)
+            self.kills.append(defender_name)
         return outcome
 
     def action_move_to_target(self, actor:Actor, remaining_moves:float, action:str)->Tuple[str,int]:
