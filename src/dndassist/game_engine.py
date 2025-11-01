@@ -58,7 +58,7 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 class GameEngine:
-    def __init__(self, wkdir: str):
+    def __init__(self, wkdir: str, reload_from_save:int=None):
         print_color(banner, width=80, primary="YELLOW")
         self.wkdir=wkdir
         self.adventure_log = []
@@ -69,8 +69,11 @@ class GameEngine:
         self.players_sorted_list: List[str] = None
         self.room: RoomMap = None
 
-        self.round_counter: int = 0
-        self.startup()
+        if reload_from_save is None:
+            self.round_counter: int = 0
+            self.startup()
+        else:
+            self.load_game(reload_from_save)
         self.run_one_round()
 
     def startup(self):
