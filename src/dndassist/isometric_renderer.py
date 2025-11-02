@@ -460,7 +460,7 @@ class IsometricRenderer:
                         )
                 
             self.render_frame()
-        pygame.quit()
+        #pygame.quit()
 
 
 # -------------------------

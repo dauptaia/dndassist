@@ -11,6 +11,9 @@ from dndassist.storyprint import print_l, print_c, print_r, print_color, print_c
 from dndassist.autoplay import (
     user_select_option,
 )
+from dndassist.isometric_renderer import (
+    IsometricRenderer
+)
 from datetime import datetime, timedelta
 
 LOGFILE = "./adventure_log.txt"
@@ -238,6 +241,10 @@ class GameEngine:
 
                 elif action.startswith("look around"):
                     self.room.look_around(actor.name)
+                    # renderer = IsometricRenderer(self.room)
+                    # renderer.run()
+                    self.room.draw_map()
+
                     remaining_actions -= 100
                 elif action.startswith("move"):
                     if action.startswith("move to"):

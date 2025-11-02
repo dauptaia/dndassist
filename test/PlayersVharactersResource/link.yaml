@@ -1,0 +1,47 @@
+name: Link
+race: Elf
+gender: male
+char_class: Rodeur
+level: 2
+xp: 723
+gold: 322
+description: Le link de zelda
+alignment: Nuetral Good
+notes: Prefers ranged combat.
+faction: player
+#sprite: sprite_selra.png
+available_actions: []
+max_cargo: 20
+max_hp: 13
+max_speed: 30
+proficiency_bonus: 2
+attributes:
+  strength: 17
+  dexterity: 19
+  constitution: 16
+  intelligence: 16
+  wisdom: 12
+  charisma: 10
+current_state:
+  current_hp: 9
+  # objectives:
+  #- stand watch
+  conditions: []
+  # action: idle
+  # outcome: ""
+  # aggro: null
+equipment:
+- Longbow
+- Studded Leather Armor
+- Shield
+- Shortsword
+spells: []
+# - Hunter’s Mark
+# - Cure Wounds
+equipped:
+  armor: Studded Leather Armor
+  main_hand: Longbow
+  off_hand: Shortsword
+weapon_mastery:
+  simple: proficient
+  martial: proficient

@@ -1,0 +1,46 @@
+name: Taelith
+race: Elf
+gender: male
+char_class: null
+level: 1
+xp: 723
+gold: 322
+description: NE SAIT PAS
+alignment: Nuetral Good
+notes: Prefers ranged combat.
+faction: player
+#sprite: sprite_selra.png
+available_actions: []
+max_cargo: 20
+max_hp: 13
+max_speed: 30
+proficiency_bonus: 2
+attributes:
+  strength: 8
+  dexterity: 16
+  constitution: 12
+  intelligence: 16
+  wisdom: 10
+  charisma: 14
+current_state:
+  current_hp: 9
+  # objectives:
+  #- stand watch
+  conditions: []
+  # action: idle
+  # outcome: ""
+  # aggro: null
+equipment:
+- Dagger
+- Shield
+- Dart
+spells: []
+# - Hunter’s Mark
+# - Cure Wounds
+equipped:
+  armor: null
+  main_hand: Dart
+  off_hand: Dagger
+weapon_mastery:
+  simple: proficient
+  martial: proficient
