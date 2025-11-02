@@ -53,9 +53,10 @@ actors:
     - Quit the village map using the path to the forest
     - Find the path to the north
     - Find the path to the south
+    - Find the path to the north
     pos:
-    - 14
-    - 1
+    - 20
+    - 38
     sprite: liora.png
     state: manual
     symbol: L
@@ -115,130 +116,19 @@ actors:
     - Quit the village map using the path to the forest
     - Find the path to the north
     - Find the path to the south
+    - Find the path to the north
     pos:
-    - 15
-    - 1
+    - 19
+    - 38
     sprite: liora.png
     state: manual
     symbol: N
     xp_accumulated: 0
     xp_to_gain: 10
-  thomas:
-    aggro: null
-    character:
-      alignment: Farming
-      attributes:
-        charisma: 6
-        constitution: 12
-        dexterity: 14
-        intelligence: 8
-        strength: 14
-        wisdom: 10
-      available_actions: []
-      char_class: Countryman
-      current_state:
-        conditions: []
-        current_hp: 10
-      description: A usual hard working country man.
-      equipment:
-      - Sickle
-      - Leather Armor
-      equipped:
-        armor: Leather Armor
-        main_hand: Sickle
-        off_hand: None
-      faction: neutral
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 30
-      max_hp: 10
-      max_speed: 10
-      name: thomas
-      notes: Likes apples, peace and good harvests.
-      proficiency_bonus: 0
-      race: Human
-      spells: []
-      sprite: villager.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 100
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: thomas
-    objectives: []
-    pos:
-    - 13
-    - 41
-    sprite: villager.png
-    state: idle
-    symbol: V
-    xp_accumulated: 0
-    xp_to_gain: 10
-  village_elder:
-    aggro: null
-    character:
-      alignment: Farming
-      attributes:
-        charisma: 14
-        constitution: 11
-        dexterity: 12
-        intelligence: 10
-        strength: 10
-        wisdom: 14
-      available_actions: []
-      char_class: Countryman
-      current_state:
-        conditions: []
-        current_hp: 10
-      description: An old but energetic country man, head of the village
-      equipment:
-      - Sickle
-      - Leather Armor
-      equipped:
-        armor: Leather Armor
-        main_hand: Sickle
-        off_hand: None
-      faction: neutral
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 20
-      max_hp: 10
-      max_speed: 10
-      name: village_elder
-      notes: Likes apples, peace and good harvests.
-      proficiency_bonus: 0
-      race: Human
-      spells: []
-      sprite: village_elder.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 100
-    dialog: dialog_guard.yaml
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: village_elder
-    objectives: []
-    pos:
-    - 20
-    - 26
-    sprite: village_elder.png
-    state: idle
-    symbol: E
-    xp_accumulated: 0
-    xp_to_gain: 10
 kills: []
-now: 2025-11-02 22:25:00.243294
+now: 2025-11-02 22:25:12.243294
 players_sorted_list:
 - lana
 - neila
-room: village_start
-round_counter: 3
+room: forest_slopes
+round_counter: 4

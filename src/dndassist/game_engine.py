@@ -9,7 +9,7 @@ from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
 from dndassist.storyprint import print_l, print_c, print_r, print_color, print_c_red
 from dndassist.autoplay import (
-    user_select_option,
+    user_select_option,user_ask_coordinates
 )
 from dndassist.isometric_renderer import (
     IsometricRenderer
@@ -83,7 +83,11 @@ class GameEngine:
             players_data = yaml.safe_load(fin)
 
         self.players_sorted_list = sorted([ actor_name for actor_name in players_data["players"].keys()])
-        list_players_actors = [ Actor.from_dict(pdict, self.wkdir) for pdict in players_data["players"].values()]
+
+        list_players_actors = [ ]
+        for pdict in players_data["players"].values():
+            pdict["state"] = "manual"
+            list_players_actors.append(Actor.from_dict(pdict, self.wkdir))
         # startup room
         self.change_room(players_data["room"],list_players_actors,datetime.now() )
     
@@ -104,7 +108,7 @@ class GameEngine:
         #     save["loots"][loot_name] = loot.to_dict()
         
         savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{ self.round_counter}.yaml")
-        print_r(f"Saving game {savefile}")
+        print_r(f"Saving game at {savefile}")
         
         with open(savefile,"w") as fout:
             yaml.safe_dump(save, fout)
@@ -177,8 +181,8 @@ class GameEngine:
             for skip_state in ["dead", "resting"]:
                 if skip_state in actor.character.current_state["conditions"]:
                     skip = True
-            if not actor.objectives:
-                print_r(f"{actor.name} has no objectives, skipping this turn")
+            if  actor.state == "idle":
+                print_r(f"{actor.name} is idle, skipping this turn")
                 skip = True
             if skip:
                 continue
@@ -214,7 +218,7 @@ class GameEngine:
             
 
 
-                npc_bool = npc_bool = actor.character.is_npc()
+                npc_bool = actor.state == "auto"
                 
                 action, comment = user_select_option(
                     "What action will you do?",
@@ -326,27 +330,141 @@ class GameEngine:
 
 
         self.save_game()
+
+
+        continue_game = self.end_of_round_dialog()
+       
+        if continue_game is False:
+            print_l("Thank you for playing dnd assist...")
+            return False
+                
+        # end of round, if a gate is full, players are changing rooms
+        if self.gates.travelers_sorted_list() == self.players_sorted_list:        
+            # Must compute and distribute XP points when leaving the room
+            self.distribute_xp_points()
+            travelers, destination_room, out_time = self.gates.resolve_gates(self.room.name, self.now)
+            self.change_room(destination_room,travelers,out_time)
+
+        return True
+
+    def distribute_xp_points(self):
+        """Distribute XP to players"""
+        xp_gained = 0
+        for kill in self.kills:
+            xp_gained+= self.room.actors[kill].xp_to_gain
+        xp_share = xp_gained // len(self.players_sorted_list)
+        for actor in self.gates.travelers_actors():
+            actor.xp_accumulated += xp_share
+            print_l(f"[{actor.name}] has gained {xp_share} XP points!" )
+        self.kills = []
+
+        
+    def end_of_round_dialog(self):
+        """Game master dialog to fine-tune actions btw rounds"""
         end_of_turn_options= [
             "Continue",
-            "Reload last turn, and continue",
-            "Exit game"
+            "Reload last turn",
+            "Change actor(s) status : idle < > manual < > auto",
+            "Move actor(s) to coordinates",
+            "Send player(s) to gate",    
+            "Exit game",
         ]
-        option,comment = user_select_option(
+        continue_game = None
+        gamemaster_dialog_running = True
+        while gamemaster_dialog_running:
+            option,_ = user_select_option(
             "Turn has ended, what do you want to do?",
             "Main dialog for the game master",
             end_of_turn_options)
-        print(f"Selction:{option}")
-        if option == "Continue":
-            return True
-        elif option ==  "Reload last turn, and continue":
-            self.load_game(self.round_counter-1)
-            return True
-        elif option ==  "Reload last turn, and continue":
-            print_l("Thank you for playing dnd assist...")
-            return False
-        else:
-            raise RuntimeError(f"End of turn action {option} not understood")
-       
+
+            if option == "Continue":
+                gamemaster_dialog_running = False
+                continue_game = True
+            elif option ==  "Exit game":
+                continue_game = False
+                gamemaster_dialog_running =False
+            elif option ==  "Reload last turn":
+                self.load_game(self.round_counter-1)
+                
+            elif option == "Change actor(s) status : idle < > manual < > auto":
+                targets_options = ["all_actors", "all_players", "all_npcs"]
+                for actor_name in self.room.actors:
+                    if actor_name in self.players_sorted_list:
+                        targets_options.append(f"{actor_name} : player")
+                    else:
+                        targets_options.append(f"{actor_name} : npc")
+
+                target,_ = user_select_option(
+                    "What actors must change status?",
+                    "no context provided",
+                    targets_options)
+
+                if target == "all_actors":
+                    target_list = self.players_sorted_list+self.room.npc_ordered_list
+                elif target == "all_players":
+                    target_list = self.players_sorted_list
+                elif target == "all_npcs":
+                    target_list = self.room.npc_ordered_list
+                else:
+                    target_list = [target]
+                new_state,_ = user_select_option(
+                    "What is the new status? ",
+                    "no context provided",
+                    ["idle", "manual", "auto"])
+                for actor_name in target_list:
+                    self.room.actors[actor_name].state = new_state
+                    print_r(f"[{actor_name} state is now {new_state}]")
+                pass
+            elif option == "Move actor(s) to coordinates":
+                targets_options = ["all_actors", "all_players", "all_npcs"]
+                for actor_name in self.room.actors:
+                    if actor_name in self.players_sorted_list:
+                        targets_options.append(f"{actor_name} : player")
+                    else:
+                        targets_options.append(f"{actor_name} : npc")
+
+                target,_ = user_select_option(
+                    "What actors must change coordinates?",
+                    "no context provided",
+                    targets_options)
+
+                if target == "all_actors":
+                    target_list = self.players_sorted_list+self.room.npc_ordered_list
+                elif target == "all_players":
+                    target_list = self.players_sorted_list
+                elif target == "all_npcs":
+                    target_list = self.room.npc_ordered_list
+                else:
+                    target_list = [target]
+                new_pos = user_ask_coordinates(
+                    "Coordinates of the position? ",
+                    self.room.width,
+                    self.room.height)
+                
+                for actor_name in target_list:
+                    new_pos = self.room._free_pos_nearest(new_pos)
+                    self.room.actors[actor_name].pos = new_pos
+                    print_r(f"[{actor_name} new coords is now {new_pos}]")
+
+            elif option == "Send player(s) to gate" :
+                gate_list = [f"{gate.name}: {gate.description}" for gate in self.room.gates.values()]
+                target,_ = user_select_option(
+                    "What gate?",
+                    "no context provided",
+                    gate_list)
+                target_gate = target.split(':')[0]
+                for actor_name,actor in self.room.actors.items():
+                    if actor_name in self.players_sorted_list:
+                        self.gates.new_traveler(actor,target_gate)
+                    
+            else:
+                raise RuntimeError(f"End of turn action {option} not understood...")
+        if continue_game is None:
+            raise RuntimeError("GameMaster dialog ended unexpectedly...")
+        return continue_game
+                
+
+        
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
@@ -428,7 +546,7 @@ class GameEngine:
     def action_move_to_direction(self, actor:Actor, remaining_moves:float)->Tuple[str,int]:
         
 
-        npc_bool = actor.character.is_npc()
+        npc_bool = actor.state == "auto"
         
         dir, _ = user_select_option(
             "In what direction ar you moving?",

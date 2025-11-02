@@ -117,7 +117,7 @@ class Gate:
             destination_room=self.room1
             destination_pos=self.pos1
             objective=self.player_objective_from_1
-        elif room == self.room0:
+        elif room == self.room1:
             destination_room=self.room0
             destination_pos=self.pos0
             objective=self.player_objective_from_0

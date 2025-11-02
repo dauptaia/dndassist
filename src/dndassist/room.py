@@ -83,6 +83,7 @@ class Actor:
     sprite: str = None
     last_action: str = None
     last_outcome: str = None
+    state: str = "idle" # one of "idle", "manual" (manual input),  "auto" (auto played by a LLM)
     aggro: str = None
     dialog: Dialog = None
     objectives: List[str] = field(
@@ -147,13 +148,16 @@ class Actor:
         char =  Character.load(wkdir, d["character"])
         char.name = d["name"] #impose actor name in character description
         if "dialog" in d:
+            dname = d["dialog"]
             d["dialog"] = Dialog.from_yaml(wkdir,d["dialog"])
+            d["dialog"].name=dname
         d["character"] = char 
         return cls(**d)
     
     def to_dict_with_character_data(self):
         data = asdict(self)
-        
+        if self.dialog is not None:
+            data["dialog"]=self.dialog.name
         return data
 
     @classmethod
@@ -237,6 +241,7 @@ class RoomMap:
     height: int
     unit_m: float = 1.5
     elevation: Optional[Dict[Tuple[int, int], int]] = None
+    npc_ordered_list: List[str] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
     gates: Dict[str, RoomGate] = field(default_factory=dict)
@@ -272,46 +277,46 @@ class RoomMap:
         for loot in self.loots.values():
             loot.pos = self._free_pos_nearest(loot.pos)
 
-    def add_actor(
-        self,
-        wkdir:str,
-        name: str,
-        pos: Tuple[int, int],
-        symbol="?",
-        objectives: List[str] = None,
-    ):
-        """add an actor in the room.
+    # def add_actor(
+    #     self,
+    #     wkdir:str,
+    #     name: str,
+    #     pos: Tuple[int, int],
+    #     symbol="?",
+    #     objectives: List[str] = None,
+    # ):
+    #     """add an actor in the room.
 
-        Actors are identified by their unique names, handled outside the room concept.
-        - If name already present, the addition is refused
-        - If position is occupied by object or actor, the addition is refused
-        """
+    #     Actors are identified by their unique names, handled outside the room concept.
+    #     - If name already present, the addition is refused
+    #     - If position is occupied by object or actor, the addition is refused
+    #     """
 
-        if name in self.actors:
-            print(f"Actor {name} is already in the room")
-        else:
-            free_pos = self._free_pos_nearest(pos)
+    #     if name in self.actors:
+    #         print(f"Actor {name} is already in the room")
+    #     else:
+    #         free_pos = self._free_pos_nearest(pos)
 
-            facing = "North"
-            if free_pos[1] < 0.33 * self.height:  # in N
-                facing = "South"
-            elif free_pos[1] > 0.66 * self.height:  # in S
-                facing = "North"
-            if free_pos[0] < 0.33 * self.width:  # W
-                facing += "East"
-            elif free_pos[0] > 0.66 * self.width:  # E
-                facing += "West"
+    #         facing = "North"
+    #         if free_pos[1] < 0.33 * self.height:  # in N
+    #             facing = "South"
+    #         elif free_pos[1] > 0.66 * self.height:  # in S
+    #             facing = "North"
+    #         if free_pos[0] < 0.33 * self.width:  # W
+    #             facing += "East"
+    #         elif free_pos[0] > 0.66 * self.width:  # E
+    #             facing += "West"
 
-            self.actors[name] = Actor.from_dict({
-                "name":name,
-                "symbol": symbol,
-                "pos": free_pos,
-                "facing": facing,
-                "character":name+".yaml",
-                "objectives":objectives
-            }, wkdir)
-            self.actors[name].last_action = f"Actor {name} just arrived in {self.name}"
-            print(f"Actor {name} arrived in room {self.name}")
+    #         self.actors[name] = Actor.from_dict({
+    #             "name":name,
+    #             "symbol": symbol,
+    #             "pos": free_pos,
+    #             "facing": facing,
+    #             "character":name+".yaml",
+    #             "objectives":objectives
+    #         }, wkdir)
+    #         self.actors[name].last_action = f"Actor {name} just arrived in {self.name}"
+    #         print(f"Actor {name} arrived in room {self.name}")
 
     # def del_actor(self, name: str):
     #     """remove an actor in the room"""
@@ -875,25 +880,30 @@ class RoomMap:
     # -------------------------------------------
 
     @classmethod
-    def load(cls, wkdir: str, yaml_path: str):
+    def load(cls, wkdir: str, room_name: str):
         """Load a room map and apply a theme to it."""
 
-        room_path = os.path.join(wkdir, "Rooms", yaml_path)
+        room_path = os.path.join(wkdir, "Rooms", room_name)
         with open(room_path, "r", encoding="utf-8") as fin:
             data = yaml.safe_load(fin)
 
-        name = data["name"]
+        name = room_name.strip(".yaml")
         theme_path = data["theme"]
         theme_path = os.path.join(wkdir, "Rooms", "Themes", theme_path)
         theme = Theme.load(theme_path)
         actors = {}
+        
+        npc_ordered_list = []
         for a_name, a_dict in data["actors"].items():
             a_dict["name"] = a_name
+            npc_ordered_list.append(a_name)
+            a_dict["state"] = "idle"
             actors[a_name] = Actor.from_dict(a_dict, wkdir)
         # loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
         tile_specs = theme.tiles
         tiles, width, height = from_ascii_map(data["ascii_map"], tile_specs)
 
+        npc_ordered_list =sorted(npc_ordered_list)
         return cls(
             name=name,
             wkdir=wkdir,
@@ -904,6 +914,7 @@ class RoomMap:
             tiles=tiles,
             theme=theme,
             actors=actors,
+            npc_ordered_list=npc_ordered_list
             # loots=loots,
         )
 

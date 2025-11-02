@@ -10,6 +10,42 @@ LLM_MODEL = "llama3:latest"
 # from langchain_ollama import OllamaLLM
 # MY_LLM = OllamaLLM(model=LLM_MODEL, temperature=LLM_TEMPERATURE, system=SYSTEM_PROMPT)
 
+
+def user_ask_coordinates(title: str, width:int, height:int ) ->Tuple[int, int]:
+    """Dialog with the user to select a coordinate"""
+    term_width = shutil.get_terminal_size((100, 20)).columns
+    print_l(title)
+    print_l(f"Enter coordinates 'x,y' (max. {width},{height})")
+    
+    select_option = True
+    while select_option:
+        pos = input(" "*int(0.2*term_width) +"?")
+        if "," not in pos:
+            continue
+        x = pos.split(",")[0]
+        y = pos.split(",")[1]
+        
+        try:
+            x = int(x)
+        except ValueError:
+            print_l(f". enter a valid integer for x (not {x})")
+            continue
+        try:
+            y = int(y)
+        except ValueError:
+            print_l(f". enter a valid integer for y (not {x})")
+            continue
+        x=max(min(width,x),0)
+        y=max(min(height,y),0)
+
+        
+        select_option = False
+    
+    pos = (x,y)
+    print_l(f"Selection: __{x},{y}__")
+
+    return pos
+
 def user_select_option(title: str, context:str , options: List[str], npc:bool=False) ->Tuple[str, str]:
     """Dialog with the user to select an option"""
 
@@ -41,6 +77,8 @@ def user_select_option(title: str, context:str , options: List[str], npc:bool=Fa
             continue
         action = options[act-1]
         select_option = False
+
+    print_l(f"Selection: __{action}__")
 
     return action,"Manual input"
 

@@ -12,6 +12,7 @@ class DialogNode:
 
 class Dialog:
     def __init__(self, npc: str, start: str, nodes: dict):
+        self.name=None
         self.npc = npc
         self.start = start
         self.nodes = nodes

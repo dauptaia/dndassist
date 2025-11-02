@@ -45,289 +45,20 @@ actors:
       wkdir: ./
       xp: 850
     dialog: null
-    facing: NorthEast
-    last_action: move in direction
-    last_outcome: '
-
-      lana moved North over 34m'
+    facing: North
+    last_action: round finished
+    last_outcome: ''
     name: lana
     objectives:
     - Quit the village map using the path to the forest
     pos:
     - 13
-    - 0
+    - 15
     sprite: liora.png
+    state: manual
     symbol: L
-  logger1:
-    aggro: null
-    character:
-      alignment: Chaotic Good
-      attributes:
-        charisma: 8
-        constitution: 14
-        dexterity: 10
-        intelligence: 8
-        strength: 14
-        wisdom: 8
-      available_actions: []
-      char_class: null
-      current_state:
-        conditions: []
-        current_hp: 25
-      description: A rude , well built logger
-      equipment:
-      - Handaxe
-      - Leather Armor
-      - Dagger
-      equipped:
-        armor: Leather Armor
-        main_hand: Handaxe
-        off_hand: Dagger
-      faction: loggers
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 50
-      max_hp: 24
-      max_speed: 25
-      name: logger1
-      notes: Prefers close combat in forests.
-      proficiency_bonus: 2
-      race: Human
-      spells: null
-      sprite: logger.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 400
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: logger1
-    objectives: []
-    pos:
-    - 19
-    - 19
-    sprite: logger.png
-    symbol: L
-  logger2:
-    aggro: null
-    character:
-      alignment: Chaotic Good
-      attributes:
-        charisma: 8
-        constitution: 14
-        dexterity: 10
-        intelligence: 8
-        strength: 14
-        wisdom: 8
-      available_actions: []
-      char_class: null
-      current_state:
-        conditions: []
-        current_hp: 25
-      description: A rude , well built logger
-      equipment:
-      - Handaxe
-      - Leather Armor
-      - Dagger
-      equipped:
-        armor: Leather Armor
-        main_hand: Handaxe
-        off_hand: Dagger
-      faction: loggers
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 50
-      max_hp: 24
-      max_speed: 25
-      name: logger2
-      notes: Prefers close combat in forests.
-      proficiency_bonus: 2
-      race: Human
-      spells: null
-      sprite: logger.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 400
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: logger2
-    objectives: []
-    pos:
-    - 19
-    - 18
-    sprite: logger.png
-    symbol: L
-  logger3:
-    aggro: null
-    character:
-      alignment: Chaotic Good
-      attributes:
-        charisma: 8
-        constitution: 14
-        dexterity: 10
-        intelligence: 8
-        strength: 14
-        wisdom: 8
-      available_actions: []
-      char_class: null
-      current_state:
-        conditions: []
-        current_hp: 25
-      description: A rude , well built logger
-      equipment:
-      - Handaxe
-      - Leather Armor
-      - Dagger
-      equipped:
-        armor: Leather Armor
-        main_hand: Handaxe
-        off_hand: Dagger
-      faction: loggers
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 50
-      max_hp: 24
-      max_speed: 25
-      name: logger3
-      notes: Prefers close combat in forests.
-      proficiency_bonus: 2
-      race: Human
-      spells: null
-      sprite: logger.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 400
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: logger3
-    objectives: []
-    pos:
-    - 19
-    - 17
-    sprite: logger.png
-    symbol: L
-  logger4:
-    aggro: null
-    character:
-      alignment: Chaotic Good
-      attributes:
-        charisma: 8
-        constitution: 14
-        dexterity: 10
-        intelligence: 8
-        strength: 14
-        wisdom: 8
-      available_actions: []
-      char_class: null
-      current_state:
-        conditions: []
-        current_hp: 25
-      description: A rude , well built logger
-      equipment:
-      - Handaxe
-      - Leather Armor
-      - Dagger
-      equipped:
-        armor: Leather Armor
-        main_hand: Handaxe
-        off_hand: Dagger
-      faction: loggers
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 50
-      max_hp: 24
-      max_speed: 25
-      name: logger4
-      notes: Prefers close combat in forests.
-      proficiency_bonus: 2
-      race: Human
-      spells: null
-      sprite: logger.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 400
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: logger4
-    objectives: []
-    pos:
-    - 18
-    - 17
-    sprite: logger.png
-    symbol: L
-  logger_chief:
-    aggro: null
-    character:
-      alignment: Chaotic Good
-      attributes:
-        charisma: 12
-        constitution: 16
-        dexterity: 12
-        intelligence: 10
-        strength: 16
-        wisdom: 12
-      available_actions: []
-      char_class: null
-      current_state:
-        conditions: []
-        current_hp: 25
-      description: A rude , well built Chief logger
-      equipment:
-      - Handaxe
-      - Leather Armor
-      - Dagger
-      equipped:
-        armor: Leather Armor
-        main_hand: Handaxe
-        off_hand: Dagger
-      faction: loggers
-      gender: male
-      gold: 0
-      level: 2
-      max_cargo: 50
-      max_hp: 24
-      max_speed: 25
-      name: logger_chief
-      notes: Prefers close combat in forests.
-      proficiency_bonus: 2
-      race: Human
-      spells: null
-      sprite: logger.png
-      weapon_mastery:
-        martial: null
-        simple: proficient
-      wkdir: ./
-      xp: 800
-    dialog: null
-    facing: North
-    last_action: null
-    last_outcome: null
-    name: logger_chief
-    objectives: []
-    pos:
-    - 18
-    - 19
-    sprite: logger_chief.png
-    symbol: C
+    xp_accumulated: 0
+    xp_to_gain: 10
   neila:
     aggro: null
     character:
@@ -382,13 +113,128 @@ actors:
     - Quit the village map using the path to the forest
     pos:
     - 14
-    - 7
+    - 15
     sprite: liora.png
+    state: manual
     symbol: N
-loots: {}
-now: 2025-11-01 08:04:10.484885
+    xp_accumulated: 0
+    xp_to_gain: 10
+  thomas:
+    aggro: null
+    character:
+      alignment: Farming
+      attributes:
+        charisma: 6
+        constitution: 12
+        dexterity: 14
+        intelligence: 8
+        strength: 14
+        wisdom: 10
+      available_actions: []
+      char_class: Countryman
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: A usual hard working country man.
+      equipment:
+      - Sickle
+      - Leather Armor
+      equipped:
+        armor: Leather Armor
+        main_hand: Sickle
+        off_hand: None
+      faction: neutral
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 30
+      max_hp: 10
+      max_speed: 10
+      name: thomas
+      notes: Likes apples, peace and good harvests.
+      proficiency_bonus: 0
+      race: Human
+      spells: []
+      sprite: villager.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 100
+    dialog: null
+    facing: North
+    last_action: round finished
+    last_outcome: ''
+    name: thomas
+    objectives: []
+    pos:
+    - 13
+    - 41
+    sprite: villager.png
+    state: manual
+    symbol: V
+    xp_accumulated: 0
+    xp_to_gain: 10
+  village_elder:
+    aggro: null
+    character:
+      alignment: Farming
+      attributes:
+        charisma: 14
+        constitution: 11
+        dexterity: 12
+        intelligence: 10
+        strength: 10
+        wisdom: 14
+      available_actions: []
+      char_class: Countryman
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: An old but energetic country man, head of the village
+      equipment:
+      - Sickle
+      - Leather Armor
+      equipped:
+        armor: Leather Armor
+        main_hand: Sickle
+        off_hand: None
+      faction: neutral
+      gender: male
+      gold: 0
+      level: 2
+      max_cargo: 20
+      max_hp: 10
+      max_speed: 10
+      name: village_elder
+      notes: Likes apples, peace and good harvests.
+      proficiency_bonus: 0
+      race: Human
+      spells: []
+      sprite: village_elder.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 100
+    dialog: dialog_guard.yaml
+    facing: North
+    last_action: round finished
+    last_outcome: ''
+    name: village_elder
+    objectives: []
+    pos:
+    - 20
+    - 26
+    sprite: village_elder.png
+    state: manual
+    symbol: E
+    xp_accumulated: 0
+    xp_to_gain: 10
+kills: []
+now: 2025-11-02 22:36:22.047939
 players_sorted_list:
 - lana
 - neila
-room: forest_arena
+room: village_start
 round_counter: 2
