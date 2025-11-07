@@ -224,7 +224,7 @@ class GameEngine:
                     "What action will you do?",
                     actor.character.situation()
                     + "\n"  # what is not in the room
-                    + self.room.describe_view_los(actor.name)
+                    + self.room.look_around_report(actor.name)
                     + "\n"
                     + actor.situation(),  # what is in view
                     actions_avail,

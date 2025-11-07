@@ -4,7 +4,7 @@ from typing import Dict, Tuple, List, Optional
 import textwrap, math, yaml, json
 import heapq
 import math
-import numpy
+import numpy as np
 import textwrap
 from collections import defaultdict
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ import matplotlib.patches as patches
 
 from dndassist.themes import Theme
 from dndassist.character import Character
-from dndassist.matrix_utils import get_crown_pos
+from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_transparency,return_relative_pos
 from dndassist.dialog import Dialog
 
 from dndassist.storyprint import print_l, print_c, print_r, print_color
@@ -56,9 +56,12 @@ def _angle_to_vector(angle_deg: float):
 @dataclass
 class Tile:
     symbol: str
-    traversable: bool
-    difficulty: 1
-    blocks_view: bool
+    difficulty: int =  1
+    blocks_view: bool = False # shall be removed
+    elevation: float = 0
+    opacity: float =  0.01 #  1% of opacity per m
+    obstacle_height: float =  0
+    climb_height: float =  0
     description: str = ""
 
     def to_dict(self):
@@ -78,6 +81,7 @@ class Actor:
     symbol: str
     pos: Tuple[int, int]
     facing: str = "North"
+    height: float = 1.7 # height of the creature, standing
     xp_to_gain: int = 10
     xp_accumulated: int = 0
     sprite: str = None
@@ -179,6 +183,8 @@ class Loot:
     sprite: str
     index: int
     pos: Tuple[int, int]
+    height: float = 0.5 # height, 0.5m
+    
 
     def __repr__(self):
         out = f"{self.name} ({self.symbol}), pos: {self.pos}"
@@ -201,10 +207,11 @@ class RoomGate:
     name: str
     # symbol: str
     # sprite: str
-    # index: int
+    # index: intheifgh
     pos: Tuple[int, int]
     description: str
-
+    height: float = 3
+    
     def __repr__(self):
         out = f"{self.name} ,pos: {self.pos}"
         return out
@@ -239,8 +246,8 @@ class RoomMap:
     theme: Theme
     width: int
     height: int
+    elevation: np.ndarray
     unit_m: float = 1.5
-    elevation: Optional[Dict[Tuple[int, int], int]] = None
     npc_ordered_list: List[str] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
@@ -258,9 +265,6 @@ class RoomMap:
         """Turn a tile into a  gate"""
         self.tiles[pos] = Tile(
             symbol="G",
-            traversable=True,
-            difficulty=1,
-            blocks_view=False,
             description=name + ":" + description,
         )
         self.gates[name]= RoomGate(
@@ -276,54 +280,6 @@ class RoomMap:
             actor.pos = self._free_pos_nearest(actor.pos)
         for loot in self.loots.values():
             loot.pos = self._free_pos_nearest(loot.pos)
-
-    # def add_actor(
-    #     self,
-    #     wkdir:str,
-    #     name: str,
-    #     pos: Tuple[int, int],
-    #     symbol="?",
-    #     objectives: List[str] = None,
-    # ):
-    #     """add an actor in the room.
-
-    #     Actors are identified by their unique names, handled outside the room concept.
-    #     - If name already present, the addition is refused
-    #     - If position is occupied by object or actor, the addition is refused
-    #     """
-
-    #     if name in self.actors:
-    #         print(f"Actor {name} is already in the room")
-    #     else:
-    #         free_pos = self._free_pos_nearest(pos)
-
-    #         facing = "North"
-    #         if free_pos[1] < 0.33 * self.height:  # in N
-    #             facing = "South"
-    #         elif free_pos[1] > 0.66 * self.height:  # in S
-    #             facing = "North"
-    #         if free_pos[0] < 0.33 * self.width:  # W
-    #             facing += "East"
-    #         elif free_pos[0] > 0.66 * self.width:  # E
-    #             facing += "West"
-
-    #         self.actors[name] = Actor.from_dict({
-    #             "name":name,
-    #             "symbol": symbol,
-    #             "pos": free_pos,
-    #             "facing": facing,
-    #             "character":name+".yaml",
-    #             "objectives":objectives
-    #         }, wkdir)
-    #         self.actors[name].last_action = f"Actor {name} just arrived in {self.name}"
-    #         print(f"Actor {name} arrived in room {self.name}")
-
-    # def del_actor(self, name: str):
-    #     """remove an actor in the room"""
-    #     if name in self.actors:
-    #         del self.actors[name]
-    #     else:
-    #         print(f"Actor {name} is not in the room")
 
     def _free_pos_nearest(self, pos: Tuple[int, int], max_crown=3) -> Tuple[int, int]:
         """Return the free position nearest of pos,
@@ -522,16 +478,6 @@ class RoomMap:
                 ]
                 for y in range(self.height)
             ]
-        elif mode == "traversable":
-            grid = [
-                [
-                    str(self.tiles.get((x, y), Tile("/", True, False, "")).traversable)[
-                        0
-                    ]
-                    for x in range(self.width)
-                ]
-                for y in range(self.height)
-            ]
         else:
             raise ValueError(f"render_acii {mode} not implemented...")
 
@@ -632,39 +578,49 @@ class RoomMap:
         situation = f"{actor_name} is currently at the {locate} of the map, looking to the {actor.facing}"
         return situation
 
-    def look_around(self, actor_name: str):
+   
+
+    def visible_actors_loots_gates(self, pos_0, view_height):
+        noe = compute_nap_of_earth(self.elevation,pos_0,h0= view_height, dx=self.unit_m)
+        visible_actors=[]
+        for actor in self.actors.values():
+            # If 75% of actor heigh is hidden by nap of earth, item is nit visible
+            if noe[*actor.pos] < actor.height * 0.75:
+                visible_actors.append(actor.name)
+        
+        visible_loots=[]
+        for loot in self.loots.values():
+            if noe[*loot.pos] < loot.height * 0.75:
+                visible_loots.append(loot.name)
+        visible_gates=[]
+        
+        for gate in self.gates.values():
+            if noe[*gate.pos] < gate.height * 0.75:
+                visible_gates.append(gate.name)
+        
+        return visible_actors,visible_loots,visible_gates
+        
+                
+
+    def look_around_report(self, actor_name: str)->str:
         actor = self.actors[actor_name]
+        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height)
+        report =[]
+        for other_name in visible_actors:
+            other = self.actors[other_name]
+            dist,dir=return_relative_pos(actor.pos,other.pos, self.unit_m)
+            report.append(f"Actor {other_name} is {dist}m {dir}")
+        for other_name in visible_loots:
+            other = self.loots[other_name]
+            dist,dir=return_relative_pos(actor.pos,other.pos, self.unit_m)
+            report.append(f"Object {other_name} is {dist}m {dir}")
+        for other_name in visible_gates:
+            other = self.gates[other_name]
+            dist,dir=return_relative_pos(actor.pos,other.pos, self.unit_m)
+            report.append(f"Gate {other_name} is {dist}m {dir}")
+        return "\n".join(report)
 
-        report = self.actor_situation(actor_name)
-        facing_ = actor.facing
 
-        actor.facing = "North"
-        report += self.describe_view_los(actor.name)
-        actor.facing = "East"
-        report += self.describe_view_los(actor.name)
-        actor.facing = "South"
-        report += self.describe_view_los(actor.name)
-        actor.facing = "West"
-        report += self.describe_view_los(actor.name)
-        actor.facing = facing_
-        return report
-
-    # -------------------------------------------
-    def describe_view_los(self, actor_name: str) -> str:
-        """
-        True LoS description using multiple rays per sector.
-        Groups visible items into (close, mid, far) x (left, front, right).
-        Returns a multi-line text describing what's visible.
-        """
-        if actor_name not in self.actors:
-            return f"No actor named {actor_name}."
-        items_by_zone, _, _, _ = compute_los(
-            actor_name, self.actors, self.loots, self.gates, self.tiles, self.width, self.height
-        )
-        report_lines = assemble_description(items_by_zone, self.unit_m) + [
-            self.actor_situation(actor_name)
-        ]
-        return "\n".join(report_lines)
 
     def visible_actors_n_loots_n_gates(
         self, actor_name: str
@@ -673,17 +629,38 @@ class RoomMap:
         True LoS description using multiple rays per sector.
         Returns a list of (visible actors distance in m)
         """
-        _, _visible_actors, _visible_loots, _visible_gates = compute_los(
-            actor_name, self.actors, self.loots, self.gates, self.tiles, self.width, self.height
-        )
+        actor = self.actors[actor_name]
+        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height)
+        _visible_actors =[]
+        for other_name in visible_actors:
+            other = self.actors[other_name]
+            dist = math.hypot(
+                (actor.pos[0]-other.pos[0])*self.unit_m,
+                (actor.pos[1]-other.pos[1])*self.unit_m,
+                actor.height-other.height
+            )
+            _visible_actors.append((other_name,round(dist)))
 
-        _visible_actors = [
-            (actor, self.unit_to_m(dist)) for actor, dist in _visible_actors
-        ]
-        _visible_loots = [(loot, self.unit_to_m(dist)) for loot, dist in _visible_loots]
-
-        _visible_gates= [(gate, self.unit_to_m(dist)) for gate, dist in _visible_gates]
-
+        _visible_loots =[]
+        for other_name in visible_loots:
+            other = self.loots[other_name]
+            dist = math.hypot(
+                (actor.pos[0]-other.pos[0])*self.unit_m,
+                (actor.pos[1]-other.pos[1])*self.unit_m,
+                actor.height-other.height
+            )
+            _visible_loots.append((other_name,round(dist)))
+        
+        _visible_gates =[]
+        for other_name in visible_gates:
+            other = self.gates[other_name]
+            dist = math.hypot(
+                (actor.pos[0]-other.pos[0])*self.unit_m,
+                (actor.pos[1]-other.pos[1])*self.unit_m,
+                actor.height-other.height
+            )
+            _visible_gates.append((other_name,round(dist)))
+        
         return _visible_actors, _visible_loots, _visible_gates
 
     def _neighbors(self, x: int, y: int) -> List[Tuple[int, int, float]]:
@@ -900,10 +877,16 @@ class RoomMap:
             a_dict["state"] = "idle"
             actors[a_name] = Actor.from_dict(a_dict, wkdir)
         # loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
-        tile_specs = theme.tiles
-        tiles, width, height = from_ascii_map(data["ascii_map"], tile_specs)
+        tiles, width, height = from_ascii_map(data["ascii_map"], theme.tiles)
 
         npc_ordered_list =sorted(npc_ordered_list)
+
+        elevation = np.full((width, height),0.)
+        for x in range(width):
+            for y in range(height):
+                elevation[x,y] = tiles[x,y].elevation +tiles[x,y].obstacle_height
+
+
         return cls(
             name=name,
             wkdir=wkdir,
@@ -913,6 +896,7 @@ class RoomMap:
             height=height,
             tiles=tiles,
             theme=theme,
+            elevation=elevation,
             actors=actors,
             npc_ordered_list=npc_ordered_list
             # loots=loots,
@@ -928,7 +912,7 @@ class RoomMap:
         }
         with open(yaml_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
-
+    
 
 def from_ascii_map(ascii_map: str, tile_specs: dict):
     if isinstance(ascii_map, list):
@@ -943,6 +927,7 @@ def from_ascii_map(ascii_map: str, tile_specs: dict):
     return tiles, width, height
 
 
+
 def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
     tile_spec = tile_specs.get(symbol)
 
@@ -953,191 +938,193 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
     return Tile(
         symbol=symbol,
         difficulty=tile_spec.move_difficulty,
-        traversable=tile_spec.traversable,
-        blocks_view=tile_spec.blocks_view,
-        description=tile_spec.short_description,
+        description=tile_spec.description,
+        opacity=tile_spec.opacity,
+        obstacle_height=tile_spec.obstacle_height,
+        climb_height=tile_spec.climb_height
     )
 
 
-def compute_los(
-    actor_name: str,
-    actors: Dict[str, Actor],
-    loots: Dict[str, Loot],
-    gates: Dict[str, RoomGate],
-    tiles: Dict[Tuple[int, int], Tile],
-    width: int,
-    height: int,
-) -> Tuple[
-    List[list[List[Tuple[str, str]]]],
-    List[Tuple[str, int]],
-    List[Tuple[str, int]],
-    List[Tuple[str, int]],
-]:
-    actor = actors[actor_name]
-    px, py = actor.pos
 
-    f_angle = FACING_ANGLE[actor.facing]
+# def compute_los(
+#     actor_name: str,
+#     actors: Dict[str, Actor],
+#     loots: Dict[str, Loot],
+#     gates: Dict[str, RoomGate],
+#     tiles: Dict[Tuple[int, int], Tile],
+#     width: int,
+#     height: int,
+# ) -> Tuple[
+#     List[list[List[Tuple[str, str]]]],
+#     List[Tuple[str, int]],
+#     List[Tuple[str, int]],
+#     List[Tuple[str, int]],
+# ]:
+#     actor = actors[actor_name]
+#     px, py = actor.pos
 
-    # sector angle ranges relative to facing
-    # front: -30..+30 ; left: -90..-30 ; right: +30..+90 (deg)
-    sector_ranges = {"front": (-20, 20), "left": (-60, -20), "right": (20, 60)}
+#     f_angle = FACING_ANGLE[actor.facing]
 
-    # We'll gather nearest distance (in units) for each unique object name under each sector.
-    # data structure: items_by_zone[band][sector] -> dict name -> nearest_distance_units
-    items_by_zone = {
-        "close": {"left": {}, "front": {}, "right": {}},
-        "mid": {"left": {}, "front": {}, "right": {}},
-        "far": {"left": {}, "front": {}, "right": {}},
-    }
+#     # sector angle ranges relative to facing
+#     # front: -30..+30 ; left: -90..-30 ; right: +30..+90 (deg)
+#     sector_ranges = {"front": (-20, 20), "left": (-60, -20), "right": (20, 60)}
 
-    seen_positions = (
-        set()
-    )  # optional: avoid double counting same tile across rays for tile-only items
+#     # We'll gather nearest distance (in units) for each unique object name under each sector.
+#     # data structure: items_by_zone[band][sector] -> dict name -> nearest_distance_units
+#     items_by_zone = {
+#         "close": {"left": {}, "front": {}, "right": {}},
+#         "mid": {"left": {}, "front": {}, "right": {}},
+#         "far": {"left": {}, "front": {}, "right": {}},
+#     }
 
-    # Helper to register found object
-    def register(sector, dist_u, label):
-        # determine band
-        u = dist_u
-        if u <= CLOSE_MAX_U:
-            band = "close"
-        elif MID_MIN_U <= u <= MID_MAX_U:
-            band = "mid"
-        elif u >= FAR_MIN_U:
-            band = "far"
-        else:
-            # between close max and mid min (rare if thresholds overlap); treat as mid
-            band = "mid"
-        existing = items_by_zone[band][sector].get(label)
-        if existing is None or dist_u < existing:
-            items_by_zone[band][sector][label] = dist_u
+#     seen_positions = (
+#         set()
+#     )  # optional: avoid double counting same tile across rays for tile-only items
 
-    # Build list of ray angles to cast (for all three sectors)
-    rays = []
-    for sector_name, (a_min, a_max) in sector_ranges.items():
-        # cast rays from a_min to a_max inclusive with step RAY_STEP_DEG
-        a = a_min
-        while a <= a_max:
-            rays.append((sector_name, (f_angle + a) % 360))
-            a += RAY_STEP_DEG
+#     # Helper to register found object
+#     def register(sector, dist_u, label):
+#         # determine band
+#         u = dist_u
+#         if u <= CLOSE_MAX_U:
+#             band = "close"
+#         elif MID_MIN_U <= u <= MID_MAX_U:
+#             band = "mid"
+#         elif u >= FAR_MIN_U:
+#             band = "far"
+#         else:
+#             # between close max and mid min (rare if thresholds overlap); treat as mid
+#             band = "mid"
+#         existing = items_by_zone[band][sector].get(label)
+#         if existing is None or dist_u < existing:
+#             items_by_zone[band][sector][label] = dist_u
 
-    # For actors and loots, build quick lookup by pos
-    pos_to_actors = {
-        a.pos: (k, a) for k, a in actors.items()
-    }  # key includes Player too
-    pos_to_loots = {l.pos: (k, l) for k, l in loots.items()}
-    pos_to_gates = {g.pos: (k, g) for k, g in gates.items()}
+#     # Build list of ray angles to cast (for all three sectors)
+#     rays = []
+#     for sector_name, (a_min, a_max) in sector_ranges.items():
+#         # cast rays from a_min to a_max inclusive with step RAY_STEP_DEG
+#         a = a_min
+#         while a <= a_max:
+#             rays.append((sector_name, (f_angle + a) % 360))
+#             a += RAY_STEP_DEG
 
-
-    visible_actors = []
-    visible_loots = []
-    visible_gates = []
-
-    # Cast each ray
-    for sector_name, ray_angle in rays:
-        dx_unit, dy_unit = _angle_to_vector(ray_angle)  # per-unit vector in map units
-        s = RAY_STEP_UNIT
-        blocked = False
-        visited_tiles = set()
-        while s <= MAX_UNITS and not blocked:
-            tx = px + dx_unit * s
-            ty = py + dy_unit * s
-            ix = int(round(tx))
-            iy = int(round(ty))
-            tile_coord = (ix, iy)
-
-            # skip if same tile already processed along this ray
-            if tile_coord in visited_tiles:
-                s += RAY_STEP_UNIT
-                continue
-            visited_tiles.add(tile_coord)
-
-            # out of bounds ?
-            if ix < 0 or iy < 0 or ix >= width or iy >= height:
-                break
-
-            tile = tiles.get(tile_coord)
-            # check for actors (exclude the observer)
-            if tile_coord in pos_to_actors:
-                akey, ak = pos_to_actors[tile_coord]
-                if akey != actor_name:
-                    dist_units = math.hypot((ak.pos[0] - px), (ak.pos[1] - py))
-                    register(sector_name, dist_units, (ak.name.lower(), "actor"))
-                    if (akey, dist_units) not in visible_actors:
-                        visible_actors.append((akey, dist_units))
-            # check for loots
-            if tile_coord in pos_to_loots:
-                lkey, lo = pos_to_loots[tile_coord]
-                dist_units = math.hypot((lo.pos[0] - px), (lo.pos[1] - py))
-                register(sector_name, dist_units, (lo.name.lower(), "loot"))
-                if (lkey, dist_units) not in visible_loots:
-                    visible_loots.append((lkey, dist_units))
-            # check for gates
-            if tile_coord in pos_to_gates:
-                gkey, go = pos_to_gates[tile_coord]
-                dist_units = math.hypot((go.pos[0] - px), (go.pos[1] - py))
-                desc=  gkey +" : "+ go.description.lower()
-                register(sector_name, dist_units, (desc, "gate"))
-                if (desc, dist_units) not in visible_gates:
-                    visible_gates.append((desc, dist_units))
-
-            # check tile itself (non-floor items)
-            if tile and tile.symbol not in [" "]:
-                # avoid duplicates if we've already registered this tile by its coordinate earlier rays
-                if tile_coord not in seen_positions:
-                    # label tile descriptively
-                    label = tile.description.lower()
-                    dist_units = math.hypot((ix - px), (iy - py))
-                    register(sector_name, dist_units, (label, label))
-                    seen_positions.add(tile_coord)
-
-            # if tile blocks view, terminate this ray
-            if tile and tile.blocks_view:
-                blocked = True
-                break
-
-            s += RAY_STEP_UNIT
-    return items_by_zone, visible_actors, visible_loots, visible_gates
+#     # For actors and loots, build quick lookup by pos
+#     pos_to_actors = {
+#         a.pos: (k, a) for k, a in actors.items()
+#     }  # key includes Player too
+#     pos_to_loots = {l.pos: (k, l) for k, l in loots.items()}
+#     pos_to_gates = {g.pos: (k, g) for k, g in gates.items()}
 
 
-def assemble_description(
-    items_by_zone: List[list[List[Tuple[str, str]]]], unit_to_m: float
-) -> List[str]:
-    # Now format the textual report using grouped data
-    report_lines = []
-    for band in ("close", "mid", "far"):
-        band_report = []
-        for sector in ("left", "front", "right"):
-            items_seen = items_by_zone[band][sector]
-            if not items_seen:
-                continue
-            # if more than PLURAL_THRESHOLD items, pluralize and don't show distances
-            # --- Group items by category ---
-            grouped = {}
-            for (
-                name,
-                category,
-            ), dist_u in items_seen.items():  # (name, distance, category)
-                grouped.setdefault(category, []).append((name, dist_u))
+#     visible_actors = []
+#     visible_loots = []
+#     visible_gates = []
 
-            # --- Construct sentences per category ---
-            parts = []
-            for category, entries in grouped.items():
-                entries.sort(key=lambda e: e[1])  # sort by distance ascending
-                if len(entries) > 3:
-                    parts.append(f"several {category}s")
-                else:
-                    for name, dist_u in entries:
-                        parts.append(f"{name} ({round(unit_to_m*dist_u)}m)")
+#     # Cast each ray
+#     for sector_name, ray_angle in rays:
+#         dx_unit, dy_unit = _angle_to_vector(ray_angle)  # per-unit vector in map units
+#         s = RAY_STEP_UNIT
+#         blocked = False
+#         visited_tiles = set()
+#         while s <= MAX_UNITS and not blocked:
+#             tx = px + dx_unit * s
+#             ty = py + dy_unit * s
+#             ix = int(round(tx))
+#             iy = int(round(ty))
+#             tile_coord = (ix, iy)
 
-            # Combine into a single readable sentence
-            if parts:
-                joined = ", ".join(parts)
-                band_report.append(f" {sector}, There is {joined}")
-        if band_report:
-            report_lines.append(band.capitalize() + ":")
-            report_lines.extend(band_report)
+#             # skip if same tile already processed along this ray
+#             if tile_coord in visited_tiles:
+#                 s += RAY_STEP_UNIT
+#                 continue
+#             visited_tiles.add(tile_coord)
 
-    if len(report_lines) == 1:
-        # only the facing line, no visible items found
-        report_lines.append("There is empty floor ahead.")
-    return report_lines
+#             # out of bounds ?
+#             if ix < 0 or iy < 0 or ix >= width or iy >= height:
+#                 break
+
+#             tile = tiles.get(tile_coord)
+#             # check for actors (exclude the observer)
+#             if tile_coord in pos_to_actors:
+#                 akey, ak = pos_to_actors[tile_coord]
+#                 if akey != actor_name:
+#                     dist_units = math.hypot((ak.pos[0] - px), (ak.pos[1] - py))
+#                     register(sector_name, dist_units, (ak.name.lower(), "actor"))
+#                     if (akey, dist_units) not in visible_actors:
+#                         visible_actors.append((akey, dist_units))
+#             # check for loots
+#             if tile_coord in pos_to_loots:
+#                 lkey, lo = pos_to_loots[tile_coord]
+#                 dist_units = math.hypot((lo.pos[0] - px), (lo.pos[1] - py))
+#                 register(sector_name, dist_units, (lo.name.lower(), "loot"))
+#                 if (lkey, dist_units) not in visible_loots:
+#                     visible_loots.append((lkey, dist_units))
+#             # check for gates
+#             if tile_coord in pos_to_gates:
+#                 gkey, go = pos_to_gates[tile_coord]
+#                 dist_units = math.hypot((go.pos[0] - px), (go.pos[1] - py))
+#                 desc=  gkey +" : "+ go.description.lower()
+#                 register(sector_name, dist_units, (desc, "gate"))
+#                 if (desc, dist_units) not in visible_gates:
+#                     visible_gates.append((desc, dist_units))
+
+#             # check tile itself (non-floor items)
+#             if tile and tile.symbol not in [" "]:
+#                 # avoid duplicates if we've already registered this tile by its coordinate earlier rays
+#                 if tile_coord not in seen_positions:
+#                     # label tile descriptively
+#                     label = tile.description.lower()
+#                     dist_units = math.hypot((ix - px), (iy - py))
+#                     register(sector_name, dist_units, (label, label))
+#                     seen_positions.add(tile_coord)
+
+#             # if tile blocks view, terminate this ray
+#             if tile and tile.blocks_view:
+#                 blocked = True
+#                 break
+
+#             s += RAY_STEP_UNIT
+#     return items_by_zone, visible_actors, visible_loots, visible_gates
+
+
+# def assemble_description(
+#     items_by_zone: List[list[List[Tuple[str, str]]]], unit_to_m: float
+# ) -> List[str]:
+#     # Now format the textual report using grouped data
+#     report_lines = []
+#     for band in ("close", "mid", "far"):
+#         band_report = []
+#         for sector in ("left", "front", "right"):
+#             items_seen = items_by_zone[band][sector]
+#             if not items_seen:
+#                 continue
+#             # if more than PLURAL_THRESHOLD items, pluralize and don't show distances
+#             # --- Group items by category ---
+#             grouped = {}
+#             for (
+#                 name,
+#                 category,
+#             ), dist_u in items_seen.items():  # (name, distance, category)
+#                 grouped.setdefault(category, []).append((name, dist_u))
+
+#             # --- Construct sentences per category ---
+#             parts = []
+#             for category, entries in grouped.items():
+#                 entries.sort(key=lambda e: e[1])  # sort by distance ascending
+#                 if len(entries) > 3:
+#                     parts.append(f"several {category}s")
+#                 else:
+#                     for name, dist_u in entries:
+#                         parts.append(f"{name} ({round(unit_to_m*dist_u)}m)")
+
+#             # Combine into a single readable sentence
+#             if parts:
+#                 joined = ", ".join(parts)
+#                 band_report.append(f" {sector}, There is {joined}")
+#         if band_report:
+#             report_lines.append(band.capitalize() + ":")
+#             report_lines.extend(band_report)
+
+#     if len(report_lines) == 1:
+#         # only the facing line, no visible items found
+#         report_lines.append("There is empty floor ahead.")
+#     return report_lines
