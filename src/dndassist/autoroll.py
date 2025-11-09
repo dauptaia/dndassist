@@ -1,6 +1,6 @@
 from typing import Tuple
 from random import randint
-from dndassist.storyprint import print_r, print_l
+from dndassist.storyprint import story_print
 
 def scan_dice(dice: str) -> Tuple[int, int, int]:
     """return the scan of a dice
@@ -64,8 +64,8 @@ def rolldice(dice: str, autoroll=False, advantage: int = 0) -> Tuple[int, float]
     normed = (result - min_) / (max_ - min_)
     result += mod
     if autoroll:
-        print_r(f".  Result of {dice}: __{result}__")
+        story_print(f".  Result of {dice}: __{result}__", color="green", justify="right")
     else:
-        print_l(f".  Result of {dice}: __{result}__")
+        story_print(f".  Result of {dice}: __{result}__", color="grey", justify="left")
     
     return result, normed

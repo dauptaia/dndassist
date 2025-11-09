@@ -9,8 +9,11 @@ import random
 
 from dndassist.autoroll import rolldice
 from dndassist.equipment import weapon_catg, Weapon, equipment_weight
-from dndassist.storyprint import print_r,print_c_red
+from dndassist.storyprint import story_print
 
+
+def print_r(text):
+    story_print(text, color="green", justify="right")
 
 @dataclass
 class Character:
@@ -150,7 +153,7 @@ class Character:
         # Insta-kill
         if self.current_state["current_hp"] <= self.max_hp:
             self.current_state["conditions"].append("dead")
-            print_c_red(f"Character __{self.name}__ is dead...")
+            story_print(f"Character __{self.name}__ is dead...", color="red")
             return True
 
         # For NPC
@@ -158,7 +161,7 @@ class Character:
             if self.current_state["current_hp"] > 0:
                 return False
             else:
-                print_c_red(f"Character __{self.name}__ is dead...")
+                story_print(f"Character __{self.name}__ is dead...", color="red")
                 self.current_state["conditions"].append("dead")
                 return True
         # For players
@@ -167,7 +170,7 @@ class Character:
             return False
         else:
             self.current_state["current_hp"] = 0
-            print_c_red(f"Character __{self.name}__ is in the hands of fate...")
+            story_print(f"Character __{self.name}__ is in the hands of fate...", color="red")
             success = 0
             fails = 0
             while 1:
@@ -187,7 +190,7 @@ class Character:
                     return False
                 if fails == 3:
                     self.current_state["conditions"].append("dead")
-                    print_c_red(f"Character __{self.name}__ is dead...")
+                    story_print(f"Character __{self.name}__ is dead...", color="red")
                     return True
 
     def drop_loot(self):

@@ -46,6 +46,7 @@ actors:
       xp: 850
     dialog: null
     facing: North
+    height: 1.7
     last_action: round finished
     last_outcome: ''
     name: lana
@@ -106,6 +107,7 @@ actors:
       xp: 850
     dialog: null
     facing: North
+    height: 1.7
     last_action: round finished
     last_outcome: ''
     name: neila
@@ -163,6 +165,7 @@ actors:
       xp: 100
     dialog: null
     facing: North
+    height: 1.7
     last_action: null
     last_outcome: null
     name: thomas
@@ -219,6 +222,7 @@ actors:
       xp: 100
     dialog: dialog_guard.yaml
     facing: North
+    height: 1.7
     last_action: null
     last_outcome: null
     name: village_elder
@@ -232,7 +236,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-02 22:35:58.047939
+now: 2025-11-09 22:59:01.662039
 players_sorted_list:
 - lana
 - neila

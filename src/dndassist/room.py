@@ -15,7 +15,7 @@ from dndassist.character import Character
 from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_transparency,return_relative_pos
 from dndassist.dialog import Dialog
 
-from dndassist.storyprint import print_l, print_c, print_r, print_color
+from dndassist.storyprint import story_print, print_3cols
 
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
@@ -110,7 +110,7 @@ class Actor:
     #     self.pos = (x + dx, y + dy)
 
     def __repr__(self):
-        out = f"{self.name} ({self.symbol}), pos: {self.pos}, facing {self.facing}"
+        out = f"{self.name} ({self.symbol}), pos: {self.pos}"
         return out
 
     def situation(self):
@@ -247,6 +247,7 @@ class RoomMap:
     width: int
     height: int
     elevation: np.ndarray
+    opacity: np.ndarray
     unit_m: float = 1.5
     npc_ordered_list: List[str] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
@@ -468,87 +469,119 @@ class RoomMap:
             plt.show()
 
     def render_ascii(
-        self, mode="symbol", spaced: bool = True, path: List[Tuple[int, int]] = None
+        self, for_save: bool = False, path: List[Tuple[int, int]]=None, actor_name:str=None
     ) -> str:
-        if mode == "symbol":
-            grid = [
-                [
-                    self.tiles.get((x, y), Tile("/", True, False, "")).symbol
-                    for x in range(self.width)
-                ]
-                for y in range(self.height)
+        
+        grid = [
+            [
+                self.tiles.get((x, y), Tile("/", True, False, "")).symbol
+                for x in range(self.width)
             ]
-        else:
-            raise ValueError(f"render_acii {mode} not implemented...")
+            for y in range(self.height)
+        ]
 
-        # print(f"Size {self.width}x{self.height}")
-
-        if spaced:
-            if path is not None:
-                for x, y in path:
-                    grid[y][x] = "__*__"
-            for loot in self.loots.values():
-                x, y = loot.pos
-                grid[y][x] = "__" + loot.symbol + "__"
-            for actor in self.actors.values():
-                x, y = actor.pos
-                grid[y][x] = "__" + actor.symbol + "__"
-            # add coordinates
-            top = []
-            idx = 0
-            for x in range(self.width):
-                top.append(f"__{str(idx)}__")
-                idx += 1
-                if idx == 10:
-                    idx = 0
-            grid.insert(0, top)
-
-            idx = -1
-            for y in range(self.height + 1):
-                if idx == -1:
-                    grid[y].insert(0, " ")
-                else:
-                    grid[y].insert(0, f"__{str(idx)}__")
-
-                if y == 1:
-                    grid[y].append(
-                        f"   __ ' ' normal ground      '.' special ground __"
-                    )
-                if y == 2:
-                    grid[y].append(f"   __ 'X' void               's' special       __")
-                if y == 3:
-                    grid[y].append(
-                        f"   __ 'O' Tall obsctacle     'O' small obstacle __"
-                    )
-                if y == 4:
-                    grid[y].append(
-                        f"   __ 'G' gate,              'l' loot           __"
-                    )
-                if y == 6:
-                    grid[y].append(f"   __       N                                  __")
-                if y == 7:
-                    grid[y].append(f"   __     W   E     1 unit =  {self.unit_m}m   __")
-                if y == 8:
-                    grid[y].append(
-                        f"   __       S                                   __"
-                    )
-                idx += 1
-                if idx == 10:
-                    idx = 0
-            return "\n".join(" ".join(row) for row in grid)
-        else:
+        # exit with simple output if for_svae
+        if for_save:
             return "\n".join("".join(row) for row in grid)
 
-    def print_map(self, path: List[Tuple[int, int]] = None):
-        map = self.render_ascii(mode="symbol", spaced=True, path=path)
-        print("\n\n")
-        print_color(map, width=self.width * 2, primary="LIGHTRED_EX", secondary="RED")
-        print_color(
-            self.name, width=len(self.name), primary="LIGHTRED_EX", secondary="RED"
-        )
-        print_c(self.description)
-        print("\n")
+        # Change ground into visible symbol
+        for y in range(self.height):
+            for x in range(self.width):
+                if grid[y][x] == ".":
+                    grid[y][x] = ":"
+                elif grid[y][x] == " ":
+                    grid[y][x] = "."
+        
+        
 
+        # add path
+        if path is not None:
+            for x, y in path:
+                grid[y][x] = "__*__"
+        
+
+
+        # add loots
+        for loot in self.loots.values():
+                x, y = loot.pos
+                grid[y][x] = "__" + loot.symbol + "__"
+        
+        # add actors
+        for actor in self.actors.values():
+            x, y = actor.pos
+            grid[y][x] = "__" + actor.symbol + "__"
+        
+        # make obstructed tiles invisible
+        if actor_name is not None:
+            actor = self.actors[actor_name]
+            noe = compute_nap_of_earth(self.elevation,actor.pos,h0= actor.height, dx=self.unit_m)
+            fog_of_war = compute_transparency(self.opacity,actor.pos, dx=self.unit_m)
+            for y in range(self.height):
+                for x in range(self.width):
+                    if noe[x,y] > 0:
+                        grid[y][x] = " "
+                    if fog_of_war[x,y] < 0.5:
+                        grid[y][x] = " "
+        # add coordinates
+        tip = ["."]
+        top = ["."]
+        idx = -1
+        tens = 0
+        for x in range(self.width):
+            idx += 1
+            if idx == 10:
+                idx = 0
+                tens +=1
+                top.append(f"__{str(idx)}__")
+                tip.append(f"__{str(tens)}__")
+            else:    
+                top.append(f"__{str(idx)}__")
+                tip.append(" ")
+            
+        grid.insert(0, top)
+        grid.insert(0, tip)
+        
+
+        idx = -2
+        for y in range(self.height + 1):
+            if idx <= -1:
+                grid[y].insert(0, " ")
+                grid[y].append(" .")
+            else:
+                grid[y].insert(0, f"__{idx: 2d}__")
+                grid[y].append(f"__{idx: 2d}__")
+            idx += 1
+            # if idx == 10:
+            #     idx = 0
+        return "\n".join(" ".join(row) for row in grid)
+        
+    def print_map(self, actor_name:str=None, path: List[Tuple[int, int]] = None):
+        map = self.render_ascii(path=path, actor_name=actor_name)
+
+        left = ["\n\nActors:"]
+        for actor in self.actors.values():
+            left.append(f" {actor.name} : __{actor.symbol}__")
+        left.append("\n\nLoots:")
+        for loot in self.loots.values():
+            left.append(f" {loot.name} : __{loot.symbol}__")
+        left = "\n".join(left)
+
+        right =[f"\n Map: {self.name}\n"]
+        for sym, tile_spec in self.theme.tiles.items():
+            #sym = tile_spec.symbol
+            if sym == ".":
+                sym = ":"
+            if sym == " ":
+                sym = "."
+                
+            right.append(f"{sym} : {tile_spec.description}")
+
+        right = "\n".join(right)
+    
+        center = map 
+        print_3cols(left,center, right)
+
+        
     def actor_situation(self, actor_name: str):
         actor = self.actors[actor_name]
         x, y = actor.pos
@@ -575,10 +608,11 @@ class RoomMap:
             locate = "center"
         else:
             locate = ",".join([map_locate_x, map_locate_y]).strip(",")
-        situation = f"{actor_name} is currently at the {locate} of the map, looking to the {actor.facing}"
+        situation = f"{actor_name} is currently at the {locate} of the map"
         return situation
 
-   
+    
+
 
     def visible_actors_loots_gates(self, pos_0, view_height):
         noe = compute_nap_of_earth(self.elevation,pos_0,h0= view_height, dx=self.unit_m)
@@ -731,23 +765,27 @@ class RoomMap:
         # print(f"Inital pos: {x0},{y0}")
         # print(f"Aiming pos: {x0+dx},{y0+dy}")
         actor.pos = path[-1]
+        
+        self.print_map(path=path, actor_name=actor_name)
+        story_print(f"final pos {actor.pos}", color="green", justify="right")
+        
 
-        new_facing = ""
-        try:
-            prev_pos = path[-2]
-            if actor.pos[1] > prev_pos[1]:
-                new_facing += "South"
-            if actor.pos[1] < prev_pos[1]:
-                new_facing += "North"
-            if actor.pos[0] > prev_pos[0]:
-                new_facing += "East"
-            if actor.pos[0] < prev_pos[0]:
-                new_facing += "West"
-        except IndexError:
-            pass
+        # new_facing = ""
+        # try:
+        #     prev_pos = path[-2]
+        #     if actor.pos[1] > prev_pos[1]:
+        #         new_facing += "South"
+        #     if actor.pos[1] < prev_pos[1]:
+        #         new_facing += "North"
+        #     if actor.pos[0] > prev_pos[0]:
+        #         new_facing += "East"
+        #     if actor.pos[0] < prev_pos[0]:
+        #         new_facing += "West"
+        # except IndexError:
+        #     pass
 
-        if new_facing != "":
-            actor.facing = new_facing
+        # if new_facing != "":
+        #     actor.facing = new_facing
 
         # xf, yf = actor.pos
         # print(f"final pos: {xf},{yf}")
@@ -780,7 +818,8 @@ class RoomMap:
 
         path, used_dist = self.move_to(x0, y0, x1, y1, max_distance_m=distance_m)
         actor.pos = path[-1]
-        print(f"final pos {actor.pos}")
+        self.print_map(path=path, actor_name=actor_name)
+        story_print(f"final pos {actor.pos}", color="green", justify="right")
         return used_dist
 
     def move_to(
@@ -849,7 +888,7 @@ class RoomMap:
         path.reverse()
 
         # remove last path item, because you stop juste before destination.
-        self.print_map(path=path)
+       
         return path, int(round(g_score[path[-1]]))
 
     # -------------------------------------------
@@ -885,7 +924,10 @@ class RoomMap:
         for x in range(width):
             for y in range(height):
                 elevation[x,y] = tiles[x,y].elevation +tiles[x,y].obstacle_height
-
+        opacity = np.full((width, height),0.)
+        for x in range(width):
+            for y in range(height):
+                opacity[x,y] = tiles[x,y].opacity
 
         return cls(
             name=name,
@@ -897,6 +939,7 @@ class RoomMap:
             tiles=tiles,
             theme=theme,
             elevation=elevation,
+            opacity=opacity,
             actors=actors,
             npc_ordered_list=npc_ordered_list
             # loots=loots,

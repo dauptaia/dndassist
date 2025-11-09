@@ -1,6 +1,6 @@
 name: "Village"
 default_color: "#3B7A57"    # global background tint for rendering
-default_opacity: 0.01    # global opacity (0.01 for a 30m fog of war)
+default_opacity: 0.02   # global opacity (0.01 for a 30m fog of war)
 default_lighting: 0.8    # 0.0 = dark, 1.0 = bright daylight
 
 tiles:
@@ -23,7 +23,7 @@ tiles:
 
   "o":  # obstacle (low)
     name: "bush"
-    description: "A dense bush with brambles that can be crossed with effort."
+    description: "A bush with berries"
     move_difficulty: 4
     opacity: 0.1
     color: "#3E7E3E"
@@ -31,7 +31,7 @@ tiles:
 
   "W":  # Wall
     name: "wall"
-    description: "A massive wall"
+    description: "A solid stone wall"
     move_difficulty: 999
     obstacle_height: 999
     climb_height: 999
@@ -41,6 +41,6 @@ tiles:
   ".":  
     name: "culture"
     description: "A small cultivated patch"
-    move_difficulty: 1
+    move_difficulty: 2
     color: "#885C35"
     sprite: "culture.png"

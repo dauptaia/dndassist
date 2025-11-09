@@ -4,7 +4,11 @@ from dndassist.autoroll import rolldice
 from dndassist.character import Character
 
 from dndassist.equipment import Armor, Weapon, Shield
-from dndassist.storyprint import print_r
+from dndassist.storyprint import story_print
+
+
+def print_r(text):
+    story_print(text, color="green", justify="right")
 
 def attack(
     attacker: Character,

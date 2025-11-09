@@ -2,7 +2,7 @@ import subprocess
 import shutil
 from typing import Tuple,List
 from random import choice
-from dndassist.storyprint import print_r, print_c, print_l, print_c_blue
+from dndassist.storyprint import story_print
 
 LLM_MODEL = "llama3:latest"
 # LLM_TEMPERATURE=0.0
@@ -14,8 +14,8 @@ LLM_MODEL = "llama3:latest"
 def user_ask_coordinates(title: str, width:int, height:int ) ->Tuple[int, int]:
     """Dialog with the user to select a coordinate"""
     term_width = shutil.get_terminal_size((100, 20)).columns
-    print_l(title)
-    print_l(f"Enter coordinates 'x,y' (max. {width},{height})")
+    story_print(title, color="grey", justify="left")
+    story_print(f"Enter coordinates 'x,y' (max. {width},{height})", color="grey", justify="left")
     
     select_option = True
     while select_option:
@@ -28,12 +28,12 @@ def user_ask_coordinates(title: str, width:int, height:int ) ->Tuple[int, int]:
         try:
             x = int(x)
         except ValueError:
-            print_l(f". enter a valid integer for x (not {x})")
+            story_print(f". enter a valid integer for x (not {x})", color="grey", justify="left")
             continue
         try:
             y = int(y)
         except ValueError:
-            print_l(f". enter a valid integer for y (not {x})")
+            story_print(f". enter a valid integer for y (not {x})", color="grey", justify="left")
             continue
         x=max(min(width,x),0)
         y=max(min(height,y),0)
@@ -42,7 +42,7 @@ def user_ask_coordinates(title: str, width:int, height:int ) ->Tuple[int, int]:
         select_option = False
     
     pos = (x,y)
-    print_l(f"Selection: __{x},{y}__")
+    story_print(f"Selection: __{x},{y}__", color="grey", justify="left")
 
     return pos
 
@@ -52,9 +52,9 @@ def user_select_option(title: str, context:str , options: List[str], npc:bool=Fa
     
     
     term_width = shutil.get_terminal_size((100, 20)).columns
-    print_l(title)
+    story_print(title, color="grey", justify="left")
     for i, option in enumerate(options):
-        print_l(f" {i+1} - {option}")
+        story_print(f" {i+1} - {option}", color="grey", justify="left")
 
     if npc is True:
         return auto_play_ollama(context, title, options)
@@ -67,18 +67,18 @@ def user_select_option(title: str, context:str , options: List[str], npc:bool=Fa
         try:
             act = int(act)
         except ValueError:
-            print_l(". enter a valid option nb.")
+            story_print(". enter a valid option nb.", color="grey", justify="left")
             continue
         if act > len(options):
-            print_l(". enter a valid option nb.")
+            story_print(". enter a valid option nb.", color="grey", justify="left")
             continue
         if act < 1:
-            print_l(". enter a valid option nb.")
+            story_print(". enter a valid option nb.", color="grey", justify="left")
             continue
         action = options[act-1]
         select_option = False
 
-    print_l(f"Selection: __{action}__")
+    story_print(f"Selection: __{action}__", color="grey", justify="left")
 
     return action,"Manual input"
 
@@ -124,10 +124,9 @@ def auto_play_ollama(context:str, title:str, possible_actions:List[str], verbose
       > 3 < move North | Fafnir moves north as fast a possible, to satisfy his objective.'
 """
    
-    print_c_blue(".  LLM running...")
-    #print_c_blue(context)
+    story_print(".  LLM running...", color="blue", justify="left")
     if verbose:
-        print_c(prompt)
+        story_print(prompt, color="blue", justify="left")
     
     cmd = ["ollama", "run", LLM_MODEL]
     try:
@@ -139,7 +138,7 @@ def auto_play_ollama(context:str, title:str, possible_actions:List[str], verbose
         print(f"⚠️ [LLM autoplay error: {e}]\n Switching to random autoplay...")
         return auto_play_random(context, possible_actions)
     
-    print_c_blue("__"+result+"__")
+    story_print("__"+result+"__", color="blue", justify="left")
     
     if ">" in result:
         result = result.split(">")[-1]

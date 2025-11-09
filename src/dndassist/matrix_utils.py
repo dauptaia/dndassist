@@ -217,7 +217,8 @@ def compute_nap_of_earth(elev_map:np.ndarray, pos_0:Tuple[int,int], h0=1., dx=1.
             
             max_angle_map[pos]=max_angle
             noe_map[pos]=noe
-            
+    
+    noe_map[pos_0] = 0
             
 
     return noe_map

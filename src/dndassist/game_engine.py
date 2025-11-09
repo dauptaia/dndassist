@@ -2,12 +2,16 @@ import os
 import yaml
 from typing import List, Dict, Optional, Tuple
 import random
-
+import time
 from dndassist.gates import Gates
 from dndassist.room import RoomMap, Actor, Loot
 from dndassist.autoroll import rolldice, max_dice
 from dndassist.attack import attack
-from dndassist.storyprint import print_l, print_c, print_r, print_color, print_c_red
+from dndassist.storyprint import (
+    story_title,
+    story_print,
+    print_color
+)
 from dndassist.autoplay import (
     user_select_option,user_ask_coordinates
 )
@@ -57,7 +61,8 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 class GameEngine:
     def __init__(self, wkdir: str, reload_from_save:int=None):
-        print_color(banner, width=80, primary="YELLOW")
+        print_color(banner, color="yellow")
+        time.sleep(1)
         self.wkdir=wkdir
         self.adventure_log = []
 
@@ -108,7 +113,7 @@ class GameEngine:
         #     save["loots"][loot_name] = loot.to_dict()
         
         savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{ self.round_counter}.yaml")
-        print_r(f"Saving game at {savefile}")
+        story_print(f"Saving game at __{savefile}__",color="green", justify="right")
         
         with open(savefile,"w") as fout:
             yaml.safe_dump(save, fout)
@@ -116,12 +121,12 @@ class GameEngine:
     def load_game(self, round_counter:int):
         
         savefile = os.path.join(self.wkdir,"Saves",f"Save_dnd_turn_{round_counter}.yaml")
-        print_r(f"Loading game {savefile}")
+        story_print(f"Loading game __{savefile}__", color="green", justify="right")
         try:
             with open(savefile,"r") as fin:
                 save = yaml.safe_load(fin)
         except FileNotFoundError:
-            print_l(f"File {savefile} not found try again!")
+            story_print(f"File __{savefile}__ not found try again!", color="red", justify="left")
             return
         self.gates.load(self.wkdir, "gates.yaml") #just in case
         self.round_counter = save["round_counter"]
@@ -147,13 +152,13 @@ class GameEngine:
             self.room.add_gate(g_name, g_pos, g_desc)
 
         for actor in travelers:
-            print_r(f"Add Actor {actor.name} to {destination_room}")
+            story_print(f"Add Actor {actor.name} to {destination_room}",color="green", justify="right")
             self.room.actors[actor.name]=actor
         
         self.room.spread_actors_loots()
 
-        list_names=" -"+"\n -".join(self.room.actors.keys())
-        print_r(list_names)
+        #list_names=" -"+"\n -".join(self.room.actors.keys())
+        #print_(list_names)
         self.now=out_time
         
     def main_loop(self):
@@ -161,16 +166,16 @@ class GameEngine:
         while running:
             running = self.run_one_round()
         
-        print_r("End of main loop")
+        story_print("End of main loop", color="red")
 
     def run_one_round(self):
         """Run one round (each actor acts once in initiative order)."""
         self.round_counter += 1
 
-        turn_mark = f"\n=== ROUND {self.round_counter} START ==="
+        turn_mark = f"ROUND {self.round_counter} START"
         turn_mark += f"\n   Room {self.room.name}, time {self.now.time()}"
 
-        print_c(turn_mark)
+        story_title(turn_mark, level=1)
 
         self.adventure_log.append(turn_mark)
 
@@ -182,7 +187,7 @@ class GameEngine:
                 if skip_state in actor.character.current_state["conditions"]:
                     skip = True
             if  actor.state == "idle":
-                print_r(f"{actor.name} is idle, skipping this turn")
+                story_print(f"[{actor.name}] is idle, skipping this turn",color="green", justify="right")
                 skip = True
             if skip:
                 continue
@@ -190,9 +195,11 @@ class GameEngine:
             active_actors.append(actor)
         # 2️⃣ Compute initiative for all active actors
         initiative_order = self.compute_initiative(active_actors)
+        
 
         # 3️⃣ Execute each actor's turn in initiative order
         for actor in initiative_order:
+            time.sleep(1)
             # skip is actor is dead or unconcious
             skip = False
             for skip_state in ["dead"]:
@@ -202,24 +209,19 @@ class GameEngine:
                 continue
 
             self.now += timedelta(0, 6)
-            self.room.print_map()
+            self.room.print_map(actor_name=actor.name)
             # ----- build context ---
 
-            actor_context = f"--- __{actor.name}__'s turn ---"
+            actor_context = f"--- __{actor.name}__'s turn {actor.pos}---"
             self.adventure_log.append("\n\n" + actor_context)
             remaining_moves = actor.character.max_distance()
             remaining_actions = 100
             while remaining_moves >= self.room.unit_m and remaining_actions > 0:
-                print_c(actor_context)
-                print_c(f"\n    Remaining moves: {remaining_moves}m")
+                time.sleep(1)
+                story_print(actor_context+f"\n\n    Remaining moves: __{remaining_moves}__m", color="grey",justify="left")
                 actions_avail = self.build_all_actions_available_to_actor(actor)
-                print_l("Actions available:")
-                print_l("\n".join(actions_avail))
-            
-
-
+                story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
                 npc_bool = actor.state == "auto"
-                
                 action, comment = user_select_option(
                     "What action will you do?",
                     actor.character.situation()
@@ -231,8 +233,9 @@ class GameEngine:
                     npc=npc_bool,
                 )
                 actor.last_action = action
-                print_l("__" + action + "__")
-                print_l(comment)
+                story_print("__" + action + "__", color="grey")
+                story_print(comment, color="grey")
+            
                 self.adventure_log.append(action)
                 self.adventure_log.append(comment)
 
@@ -241,14 +244,6 @@ class GameEngine:
                     remaining_moves = 0
                     remaining_actions = 0
                 elif action.startswith("stand watch"):
-                    remaining_actions -= 100
-
-                elif action.startswith("look around"):
-                    self.room.look_around(actor.name)
-                    # renderer = IsometricRenderer(self.room)
-                    # renderer.run()
-                    self.room.draw_map()
-
                     remaining_actions -= 100
                 elif action.startswith("move"):
                     if action.startswith("move to"):
@@ -261,7 +256,7 @@ class GameEngine:
                             actor, remaining_moves
                         )
                     else:
-                        print_c_red(f"Action {action} not understood")
+                        story_print(f"Action {action} not understood", color="red", justify="left")
                         remaining_actions -= 100
                         remaining_moves = 0
 
@@ -292,9 +287,6 @@ class GameEngine:
                     gate_desc = action.split(":")[-1].strip()   
                     self.gates.new_traveler(actor,gate_name)
                     del self.room.actors[actor.name]
-                    # list_names=" -"+"\n -".join(self.room.actors.keys())
-                    # print_r(list_names)
-        
                     outcome = f"actor {actor.name} enters {gate_desc}."
                 
                 else:
@@ -302,31 +294,11 @@ class GameEngine:
 
                 actor.last_outcome = outcome
                 self.adventure_log.append(outcome + "\n")
-                print_l("__" + outcome + "__")
+                story_print("__" + outcome + "__", color="grey")
                 with open(LOGFILE, "w") as fout:
                     fout.write("\n".join(self.adventure_log))
 
-        print_c(f"\n=== ROUND {self.round_counter} END ===")
-
-        print_l(str(self.gates.travelers_sorted_list()))
-        print_l(str(self.players_sorted_list))
-        
-
-            
-        if self.gates.travelers_sorted_list() == self.players_sorted_list:
-            # compute and distribute XP points when leaving the room
-            xp_gained = 0
-            for kill in self.kills:
-                xp_gained+= self.room.actors[kill].xp_to_gain
-            xp_share = xp_gained // len(self.players_sorted_list)
-            for actor in self.gates.travelers_actors():
-                actor.xp_accumulated += xp_share
-                print_l(f"[{actor.name}] has gained {xp_share} XP points!" )
-            self.kills = []
-
-            travelers, destination_room, out_time = self.gates.resolve_gates(self.room.name, self.now)
-            self.change_room(destination_room,travelers,out_time)
-        # This is where mor General controls
+        story_print(f"\n=== ROUND __{self.round_counter}__ END ===")
 
 
         self.save_game()
@@ -335,7 +307,7 @@ class GameEngine:
         continue_game = self.end_of_round_dialog()
        
         if continue_game is False:
-            print_l("Thank you for playing dnd assist...")
+            story_print("Thank you for playing dnd assist...", color="green")
             return False
                 
         # end of round, if a gate is full, players are changing rooms
@@ -355,7 +327,7 @@ class GameEngine:
         xp_share = xp_gained // len(self.players_sorted_list)
         for actor in self.gates.travelers_actors():
             actor.xp_accumulated += xp_share
-            print_l(f"[{actor.name}] has gained {xp_share} XP points!" )
+            story_print(f"__[{actor.name}]__ has gained __{xp_share}__ XP points!" )
         self.kills = []
 
         
@@ -363,10 +335,11 @@ class GameEngine:
         """Game master dialog to fine-tune actions btw rounds"""
         end_of_turn_options= [
             "Continue",
+            "Show full Map",
             "Reload last turn",
             "Change actor(s) status : idle < > manual < > auto",
             "Move actor(s) to coordinates",
-            "Send player(s) to gate",    
+            "Send player(s) to gate",
             "Exit game",
         ]
         continue_game = None
@@ -380,6 +353,8 @@ class GameEngine:
             if option == "Continue":
                 gamemaster_dialog_running = False
                 continue_game = True
+            elif option == "Show full Map":
+                self.room.print_map()
             elif option ==  "Exit game":
                 continue_game = False
                 gamemaster_dialog_running =False
@@ -413,7 +388,7 @@ class GameEngine:
                     ["idle", "manual", "auto"])
                 for actor_name in target_list:
                     self.room.actors[actor_name].state = new_state
-                    print_r(f"[{actor_name} state is now {new_state}]")
+                    story_print(f"[{actor_name}] state is now __{new_state}__", color="green", justify="right")
                 pass
             elif option == "Move actor(s) to coordinates":
                 targets_options = ["all_actors", "all_players", "all_npcs"]
@@ -435,7 +410,8 @@ class GameEngine:
                 elif target == "all_npcs":
                     target_list = self.room.npc_ordered_list
                 else:
-                    target_list = [target]
+                    tname = target.split(":")[0].strip()
+                    target_list = [tname]
                 new_pos = user_ask_coordinates(
                     "Coordinates of the position? ",
                     self.room.width,
@@ -444,7 +420,7 @@ class GameEngine:
                 for actor_name in target_list:
                     new_pos = self.room._free_pos_nearest(new_pos)
                     self.room.actors[actor_name].pos = new_pos
-                    print_r(f"[{actor_name} new coords is now {new_pos}]")
+                    story_print(f"[{actor_name}] new coords is now __{new_pos}__", color="green", justify="right")
 
             elif option == "Send player(s) to gate" :
                 gate_list = [f"{gate.name}: {gate.description}" for gate in self.room.gates.values()]
@@ -468,7 +444,7 @@ class GameEngine:
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
-        actions_avail = ["round finished", "move in direction","look around"]
+        actions_avail = ["round finished", "move in direction"]
                 
         (
                     all_visible_actors,
@@ -631,7 +607,7 @@ class GameEngine:
         """Compute initiative order based on dice rolls and dexterity modifiers."""
         initiatives = []
         for a in active_actors:
-            print_r(f"Initiative roll for __{a.name}__")
+            story_print(f"Initiative roll for [{a.name}]",color="green", justify="right")
             d20, _ = rolldice("1d20", autoroll=True)
             init_value = a.character.attr_mod("dexterity") + d20
             initiatives.append((init_value, random.random(), a))
@@ -640,9 +616,9 @@ class GameEngine:
         initiatives.sort(key=lambda x: (-x[0], x[1]))
 
         ordered = [a for (_, _, a) in initiatives]
-        print_r("Order for this turn:")
+        story_print("Order for this turn:",color="green", justify="right")
         for i, a in enumerate(ordered):
-            print_r(f".  {i}, __{a.name}__")
+            story_print(f".  {i}, __[{a.name}]__",color="green", justify="right")
         return ordered
 
 

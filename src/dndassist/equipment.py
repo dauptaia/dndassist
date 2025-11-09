@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any, List
 import json
 import os
 from importlib_resources import files
-from dndassist.storyprint import print_r
+from dndassist.storyprint import story_print
 
 DATA_PATH = files("dndassist").joinpath(
     "equipment.json"
@@ -25,6 +25,11 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 
 with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
     DATA_CATEGORIES = json.load(f)
+
+
+
+def print_r(text):
+    story_print(text, color="green", justify="right")
 
 
 def equipment_weight(equip_name):
