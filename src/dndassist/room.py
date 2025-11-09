@@ -618,18 +618,16 @@ class RoomMap:
         noe = compute_nap_of_earth(self.elevation,pos_0,h0= view_height, dx=self.unit_m)
         visible_actors=[]
         for actor in self.actors.values():
-            # If 75% of actor heigh is hidden by nap of earth, item is nit visible
-            if noe[*actor.pos] < actor.height * 0.75:
+            if noe[*actor.pos] == 0:#< actor.height * 0.75:
                 visible_actors.append(actor.name)
-        
         visible_loots=[]
         for loot in self.loots.values():
-            if noe[*loot.pos] < loot.height * 0.75:
+            if noe[*loot.pos] == 0:
                 visible_loots.append(loot.name)
         visible_gates=[]
         
         for gate in self.gates.values():
-            if noe[*gate.pos] < gate.height * 0.75:
+            if noe[*gate.pos] == 0:
                 visible_gates.append(gate.name)
         
         return visible_actors,visible_loots,visible_gates
@@ -667,6 +665,8 @@ class RoomMap:
         visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height)
         _visible_actors =[]
         for other_name in visible_actors:
+            if other_name == actor_name:
+                continue
             other = self.actors[other_name]
             dist = math.hypot(
                 (actor.pos[0]-other.pos[0])*self.unit_m,

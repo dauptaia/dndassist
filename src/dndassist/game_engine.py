@@ -220,7 +220,7 @@ class GameEngine:
                 time.sleep(1)
                 story_print(actor_context+f"\n\n    Remaining moves: __{remaining_moves}__m", color="grey",justify="left")
                 actions_avail = self.build_all_actions_available_to_actor(actor)
-                story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
+                #story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
                 npc_bool = actor.state == "auto"
                 action, comment = user_select_option(
                     "What action will you do?",
