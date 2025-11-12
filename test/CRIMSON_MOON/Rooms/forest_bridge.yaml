@@ -44,3 +44,5 @@ ascii_map:
  - "OoOO Oo OOoOOOO ooo    O OOo  O OOo  oo "
  - " o oOO O o o o oO o  o OO oO o    oo Ooo"
  - "o  o o OooO  O o  oOOO O O   oooO  ooo  "
+
+actors: {}

@@ -4,13 +4,13 @@ description: >
   A nice small village, Ap'wen, bordering a sount to north road.
   At the south a wall protect the entrance.
   At the norths, neat cultures and apple trees.
+elevation_smoothing_passes: 20
+elevation_m_per_level: 0.5
 ascii_map:
   - ".O.O.O.O....   ..............."
   - "............   ..............."
   - ".O.O.O.O....   ..............."
-  - "............   ..............."
-  - ".O.O.O.O....   ..............."
-  - "............   ..............."
+  - "............ 9  ..............."
   - ".O.O.O.O....   ..............."
   - "........         ............."
   - "...              o ..........."
@@ -23,9 +23,7 @@ ascii_map:
   - "  ..W       Wo                "
   - "  ..WWWWWWWWW        WWWWWWWWo"
   - "   O    O            W      Wo"
-  - "             O       W      Wo"
   - "                            Wo"
-  - "    O        O       W      Wo"
   - ". WWWWW  WWWWWWWW    W      Wo"
   - ". W   WO W      W    WWWWWWWWo"
   - ".     W  W      W             "
@@ -42,20 +40,20 @@ ascii_map:
   - "W     W OW     W    W       W "
   - "W        W                  W "
   - "W     WO W     W    W       W "
-  - "W     W  W     W    W       W "
   - "WW WWWW OWWWWWWW    WWWWWWWWWO"
   - "                              "
   - " O    O     O   O    O    O   "
   - "WWWWWWWWWWWWW   WWWWWWWWWWWWWW"
   - "oooooooooo  O   O  ooooooooooo"
-  - "ooooooooo       oooooooooooooo"
+  - "oooooooo   0   ooooooooooooooo"
   - "oooooooo       ooooooooooooooo"
+
 actors:
   thomas:
     name: thomas
     pos:
     - 13
-    - 40
+    - 38
     symbol: V
     character: villager.yaml
     sprite: villager.png

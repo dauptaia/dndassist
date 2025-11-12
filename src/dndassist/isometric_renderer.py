@@ -409,7 +409,7 @@ class IsometricRenderer:
                 if spec:
                     return {
                         "title": spec.name,
-                        "body": f"{spec.long_description}\n{x}-{y}",
+                        "body": f"{spec.description}\n{x}-{y}",
                     }
                 else:
                     return {"title": f"Tile '{ch}'", "body": f"Unknown tile\n{x}-{y}"}

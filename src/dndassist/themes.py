@@ -23,7 +23,7 @@ import yaml
 @dataclass
 class Theme:
     name: str
-    base_color: str = "#FFFFFF"
+    base_color: str = "#000000"
     tiles: Dict[str, TileSpec] = field(default_factory=dict)
 
     @classmethod
@@ -42,7 +42,7 @@ class Theme:
             
         return cls(
             name=data["name"],
-            base_color=data.get("base_color", "#FFFFFF"),
+            base_color=data.get("base_color", "#003300"),
             tiles=tiles,
         )
 

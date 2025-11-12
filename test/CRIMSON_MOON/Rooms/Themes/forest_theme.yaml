@@ -8,6 +8,7 @@ tiles:
     name: "grass"
     description: "thick grass"
     move_difficulty: 2
+    color: "darkgreen"
     sprite: "grass.png"
 
   "O":  # obstacle
@@ -32,7 +33,7 @@ tiles:
     name: "cliff"
     description: "a cliff"
     move_difficulty: 999
-    obstacle_height: 999
+    obstacle_height: 4
     climb_height: 999
     color: "#2E5A2E"
     sprite: "wall.png"
@@ -41,13 +42,13 @@ tiles:
     name: "void"
     description: "a ravine"
     move_difficulty: 999
-    color: null
+    color: "black"
     sprite: "void.png"
 
   ".":  # Path
     name: "path"
     description: "a path"
-    color: "#885C35"
+    color: "peru"
     sprite: "earth.png"
   
   "s":  # Bridge

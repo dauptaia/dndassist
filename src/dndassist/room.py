@@ -5,6 +5,7 @@ import textwrap, math, yaml, json
 import heapq
 import math
 import numpy as np
+from matplotlib.colors import to_rgb
 import textwrap
 from collections import defaultdict
 import matplotlib.pyplot as plt
@@ -12,11 +13,11 @@ import matplotlib.patches as patches
 
 from dndassist.themes import Theme
 from dndassist.character import Character
-from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_transparency,return_relative_pos
+from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_transparency,return_relative_pos, build_elevation_map
 from dndassist.dialog import Dialog
 
 from dndassist.storyprint import story_print, print_3cols
-
+from dndassist.tactical3dmap import plot_terrain_with_obstacles
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
 MAX_UNITS = 50  # max scanning distance in units
@@ -58,11 +59,12 @@ class Tile:
     symbol: str
     difficulty: int =  1
     blocks_view: bool = False # shall be removed
-    elevation: float = 0
     opacity: float =  0.01 #  1% of opacity per m
     obstacle_height: float =  0
     climb_height: float =  0
     description: str = ""
+    elevation: float = 0
+    color: str=0
 
     def to_dict(self):
         return asdict(self)
@@ -356,7 +358,7 @@ class RoomMap:
         else:
             zoom = map_max_h / self.height
         # general adusjt
-        zoom = zoom * 0.1
+        zoom = zoom * 0.13
 
         shift_x = 2 * zoom
         shift_y = 3 * zoom
@@ -368,17 +370,24 @@ class RoomMap:
         ax.set_facecolor("white")
 
         # --- Draw Tiles ---
+        max_elev = self.elevation.max()
+
         for (x, y), tile in self.tiles.items():
             if tile.symbol in ("/", "", "X"):  # skip void
                 continue
+            color_idx = int(round(((max_elev-tile.elevation)/max_elev)*5))
+            color_digit = "gfedcba9876543210"[color_idx]
+            print(color_idx)
+            color = "#"+str(color_digit)*6
 
+            #print(tile.elevation, color_digit)
             rect = patches.Rectangle(
                 (shift_x + x * zoom, shift_y + (self.height - y - 1) * zoom),
                 zoom,
                 zoom,
                 linewidth=0.5,
                 edgecolor="black",
-                facecolor="white",
+                facecolor=color,
             )
             ax.add_patch(rect)
             sym = tile.symbol
@@ -494,11 +503,6 @@ class RoomMap:
         
         
 
-        # add path
-        if path is not None:
-            for x, y in path:
-                grid[y][x] = "__*__"
-        
 
 
         # add loots
@@ -522,6 +526,15 @@ class RoomMap:
                         grid[y][x] = " "
                     if fog_of_war[x,y] < 0.5:
                         grid[y][x] = " "
+        
+            # add path
+            if path is not None:
+                for x, y in path:
+                    grid[y][x] = "__*__"
+                x, y = actor.pos
+                grid[y][x] = actor.symbol
+                
+        
         # add coordinates
         tip = ["."]
         top = ["."]
@@ -612,7 +625,52 @@ class RoomMap:
         return situation
 
     
+    def ask_tactical_view(self):
 
+
+        grd_red = np.ones_like(self.elevation)
+        grd_grn = np.ones_like(self.elevation)
+        grd_blu = np.ones_like(self.elevation)
+        grd_alp = np.ones_like(self.elevation)
+        obs_height = np.zeros_like(self.elevation)
+        obs_red = np.ones_like(self.elevation)
+        obs_grn = np.ones_like(self.elevation)
+        obs_blu = np.ones_like(self.elevation)
+        obs_alp = np.ones_like(self.elevation)*0.7
+        
+        for x in range(self.width):
+            for y in range(self.height):
+                obs_height[x,y] += self.tiles[(x,y)].obstacle_height
+                grd_red[x,y],grd_grn[x,y],grd_blu[x,y] = to_rgb(self.tiles[(x,y)].color)
+                if self.tiles[(x,y)].symbol == "X":
+                    grd_alp[x,y]=0
+                    obs_alp[x,y]=0
+                if self.tiles[(x,y)].symbol in [" ", "."]:
+                    obs_alp[x,y]=0                 
+                    
+        annotations =[]
+        for aname,actor in self.actors.items():
+            annotations.append( (
+                *actor.pos,
+                self.elevation[actor.pos],
+                "red",
+                aname,
+                actor.character.description
+            ))
+        plot_terrain_with_obstacles(
+            self.elevation,
+            grd_red,
+            grd_grn,
+            grd_blu,
+            grd_alp,
+            obs_height,
+            grd_red,
+            grd_grn,
+            grd_blu,
+            obs_alp,
+            delta_x=self.unit_m,
+            annotations=annotations
+        )
 
     def visible_actors_loots_gates(self, pos_0, view_height):
         noe = compute_nap_of_earth(self.elevation,pos_0,h0= view_height, dx=self.unit_m)
@@ -856,13 +914,16 @@ class RoomMap:
 
             for nx, ny, mult in self._neighbors(*current):
                 tile = self.tiles[(nx, ny)]
+                prev_tile = self.tiles[current]
                 if tile.difficulty >= 999:  # impassable
                     continue
                 if (nx, ny) in occupied_positions:  # position occupied by an actor
                     continue
 
-                tentative_g = g_score[current] + tile.difficulty * mult
-
+                elev_gap = (tile.elevation - prev_tile.elevation) / mult
+                slope_difficulty = int(round(elev_gap*0))
+                tentative_g = g_score[current] + tile.difficulty * mult + slope_difficulty
+                
                 if max_distance_m is not None and tentative_g > max_distance_m:
                     continue  # skip unreachable within move allowance
 
@@ -916,14 +977,23 @@ class RoomMap:
             a_dict["state"] = "idle"
             actors[a_name] = Actor.from_dict(a_dict, wkdir)
         # loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
-        tiles, width, height = from_ascii_map(data["ascii_map"], theme.tiles)
+        tiles, width, height,elevation_ctrl_pts = from_ascii_map(data["ascii_map"], theme.tiles)
 
         npc_ordered_list =sorted(npc_ordered_list)
 
-        elevation = np.full((width, height),0.)
-        for x in range(width):
-            for y in range(height):
-                elevation[x,y] = tiles[x,y].elevation +tiles[x,y].obstacle_height
+        elevation = build_elevation_map(
+            w=width,
+            h=height,
+            ctrl_pts=elevation_ctrl_pts, 
+            smoothing_passes=data.get("elevation_smoothing_passes",2),
+            dh=data.get("elevation_m_per_level",2)
+        )
+        
+        # for x in range(width):
+        #     for y in range(height):
+        #         tiles[x,y].elevation = elevation[x,y] #store base elevation in tiles for 3d rendering
+        #         elevation[x,y] += tiles[x,y].obstacle_height
+
         opacity = np.full((width, height),0.)
         for x in range(width):
             for y in range(height):
@@ -964,14 +1034,20 @@ def from_ascii_map(ascii_map: str, tile_specs: dict):
     height = len(lines)
     width = max(len(line) for line in lines)
     tiles = {}
+    elevation_ctrl_pts=[]
     for y, line in enumerate(lines):
         for x, char in enumerate(line.ljust(width)):
+            if char in "0123456789":
+                elevation_ctrl_pts.append( ((x,y),int(char)) )
+                char = " "
             tiles[(x, y)] = symbol_to_tile(char, tile_specs)
-    return tiles, width, height
+    return tiles, width, height,elevation_ctrl_pts
 
 
 
 def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
+    
+
     tile_spec = tile_specs.get(symbol)
 
     if tile_spec is None:
@@ -984,7 +1060,8 @@ def symbol_to_tile(symbol: str, tile_specs: dict) -> Tile:
         description=tile_spec.description,
         opacity=tile_spec.opacity,
         obstacle_height=tile_spec.obstacle_height,
-        climb_height=tile_spec.climb_height
+        climb_height=tile_spec.climb_height,
+        color=tile_spec.color
     )
 
 

@@ -52,24 +52,22 @@ def char_to_elev(ch: str) -> float | None:
     else:
         raise ValueError(f"Invalid elevation char: {ch!r}")
 
-def build_elevation_map(elev_ascii: list[list[str]], smoothing_passes: int = 1, dh=0.5) -> np.ndarray:
+def build_elevation_map(h:int, w:int, ctrl_pts: List[Tuple[Tuple[int,int], int]], smoothing_passes: int = 1, dh=0.5) -> np.ndarray:
     """
     Convert ASCII elevation map into numeric elevation grid.
     - Each control tile ('0'-'9','a'-'f') sets an elevation level.
     - Empty tiles inherit the elevation of the nearest control tile.
     - Optional smoothing to soften slopes (control tiles remain fixed).
     """
-    h, w = len(elev_ascii), len(elev_ascii[0])
+    if not(ctrl_pts):
+       return   np.zeros((w, h))
     elevation = np.full((w, h), np.nan)
     fixed_mask = np.zeros((w, h), dtype=bool)
 
     # Step 1: Decode control tiles
-    for y in range(h):
-        for x in range(w):
-            val = char_to_elev(elev_ascii[y][x])
-            if val is not None:
-                elevation[x, y] = val
-                fixed_mask[x, y] = True
+    for (x,y), val in ctrl_pts:
+        elevation[x, y] = val
+        fixed_mask[x, y] = True
 
     # Step 2: Fill free tiles via BFS (nearest control)
     q = deque()
