@@ -20,5 +20,5 @@ room = RoomMap.load(scenario,"village_start.yaml")
 
 #renderer = IsometricRenderer(room)
 #renderer.run()
-room.ask_tactical_view()
+room.ask_tactical_view(actor_name="village_elder")
 #print(room.render_ascii())

@@ -18,6 +18,7 @@ from dndassist.dialog import Dialog
 
 from dndassist.storyprint import story_print, print_3cols
 from dndassist.tactical3dmap import plot_terrain_with_obstacles
+from dndassist.tactical3dmap_plotly import render_tactical_map_plotly
 # constants (tweakable)
 UNIT_M = 1.5  # 1 tile/unit = 1.5 meters (matches your band example)
 MAX_UNITS = 50  # max scanning distance in units
@@ -625,7 +626,8 @@ class RoomMap:
         return situation
 
     
-    def ask_tactical_view(self):
+    def ask_tactical_view(self,actor_name:str=None
+    ):
 
 
         grd_red = np.ones_like(self.elevation)
@@ -636,8 +638,12 @@ class RoomMap:
         obs_red = np.ones_like(self.elevation)
         obs_grn = np.ones_like(self.elevation)
         obs_blu = np.ones_like(self.elevation)
-        obs_alp = np.ones_like(self.elevation)*0.7
+        obs_alp = np.ones_like(self.elevation)*0.9
         
+        
+
+
+
         for x in range(self.width):
             for y in range(self.height):
                 obs_height[x,y] += self.tiles[(x,y)].obstacle_height
@@ -646,18 +652,48 @@ class RoomMap:
                     grd_alp[x,y]=0
                     obs_alp[x,y]=0
                 if self.tiles[(x,y)].symbol in [" ", "."]:
-                    obs_alp[x,y]=0                 
+                    obs_alp[x,y]=0         
+
+        # make obstructed tiles invisible
+        if actor_name is not None:
+            actor = self.actors[actor_name]
+            noe = compute_nap_of_earth(self.elevation,actor.pos,h0= actor.height, dx=self.unit_m)
+            fog_of_war = compute_transparency(self.opacity,actor.pos, dx=self.unit_m)
+            for y in range(self.height):
+                for x in range(self.width):
+                    #if fog_of_war[x,y] < 0.5:
+                    obs_alp[x,y] = min(obs_alp[x,y],fog_of_war[x,y])
+                    grd_alp[x,y]= min(grd_alp[x,y],fog_of_war[x,y]  )
+                    if noe[x,y] > 0:
+                        obs_alp[x,y] = 0
+                        grd_alp[x,y]=0
+                    
                     
         annotations =[]
         for aname,actor in self.actors.items():
             annotations.append( (
                 *actor.pos,
-                self.elevation[actor.pos],
+                self.elevation[actor.pos]+actor.height,
                 "red",
                 aname,
                 actor.character.description
             ))
         plot_terrain_with_obstacles(
+            self.elevation,
+            grd_red,
+            grd_grn,
+            grd_blu,
+            grd_alp,
+            obs_height,
+            grd_red,
+            grd_grn,
+            grd_blu,
+            obs_alp,
+            delta_x=self.unit_m,
+            annotations=annotations
+        )
+
+        render_tactical_map_plotly(
             self.elevation,
             grd_red,
             grd_grn,
@@ -895,6 +931,7 @@ class RoomMap:
         frontier = [(0, start)]  # priority queue (f_score, position)
         came_from: Dict[Tuple[int, int], Optional[Tuple[int, int]]] = {start: None}
         g_score: Dict[Tuple[int, int], float] = {start: 0.0}
+        g_ref_score: Dict[Tuple[int, int], float] = {start: 0.00001}
 
         best_reached = start  # last reachable position if max_distance stops us
 
@@ -902,7 +939,8 @@ class RoomMap:
 
         while frontier:
             _, current = heapq.heappop(frontier)
-
+            prev_tile = self.tiles[current]
+                
             # If max distance exceeded, stop at the farthest reachable tile
             if max_distance_m is not None and g_score[current] > max_distance_m:
                 continue
@@ -914,21 +952,26 @@ class RoomMap:
 
             for nx, ny, mult in self._neighbors(*current):
                 tile = self.tiles[(nx, ny)]
-                prev_tile = self.tiles[current]
                 if tile.difficulty >= 999:  # impassable
                     continue
                 if (nx, ny) in occupied_positions:  # position occupied by an actor
                     continue
 
-                elev_gap = (tile.elevation - prev_tile.elevation) / mult
-                slope_difficulty = int(round(elev_gap*0))
-                tentative_g = g_score[current] + tile.difficulty * mult + slope_difficulty
+                slope_pct = (tile.elevation - prev_tile.elevation) / mult
+                slope_difficulty = slope_pct *10.
+
+                cost_p_meter = max(0.5,  (tile.difficulty + slope_difficulty))
+
+                tentative_g = g_score[current] + cost_p_meter * mult
+                tentative_g_ref = g_ref_score[current] + 1 * mult
                 
                 if max_distance_m is not None and tentative_g > max_distance_m:
                     continue  # skip unreachable within move allowance
 
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
                     g_score[(nx, ny)] = tentative_g
+                    g_ref_score[(nx, ny)] = tentative_g_ref
+
                     f_score = tentative_g + self._heuristic((nx, ny), goal)
                     heapq.heappush(frontier, (f_score, (nx, ny)))
                     came_from[(nx, ny)] = current
@@ -948,9 +991,15 @@ class RoomMap:
             node = came_from[node]
         path.reverse()
 
-        # remove last path item, because you stop juste before destination.
-       
-        return path, int(round(g_score[path[-1]]))
+        used_dist = round(g_score[path[-1]])
+        ideal_dist = round(g_ref_score[path[-1]])
+        
+        if used_dist > ideal_dist:
+            print(f"Path penalty: {ideal_dist}m-> {used_dist}m")
+        if used_dist < ideal_dist:
+            print(f"Path bonus: {ideal_dist}m-> {used_dist}m")
+            
+        return path, used_dist
 
     # -------------------------------------------
     # SAVE / LOAD
@@ -989,10 +1038,9 @@ class RoomMap:
             dh=data.get("elevation_m_per_level",2)
         )
         
-        # for x in range(width):
-        #     for y in range(height):
-        #         tiles[x,y].elevation = elevation[x,y] #store base elevation in tiles for 3d rendering
-        #         elevation[x,y] += tiles[x,y].obstacle_height
+        for x in range(width):
+            for y in range(height):
+                tiles[x,y].elevation = elevation[x,y] + tiles[x,y].obstacle_height
 
         opacity = np.full((width, height),0.)
         for x in range(width):

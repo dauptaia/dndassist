@@ -1,4 +1,65 @@
 actors:
+  lana:
+    aggro: null
+    character:
+      alignment: Chaotic Good
+      attributes:
+        charisma: 10
+        constitution: 11
+        dexterity: 16
+        intelligence: 13
+        strength: 12
+        wisdom: 15
+      available_actions: []
+      char_class: Ranger
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: no particular trait
+      equipment:
+      - Longbow
+      - Leather Armor
+      - Dagger
+      equipped:
+        armor: Leather Armor
+        main_hand: Longbow
+        off_hand: Dagger
+      faction: player
+      gender: female
+      gold: 0
+      level: 3
+      max_cargo: 30
+      max_hp: 24
+      max_speed: 35
+      name: lana
+      notes: Prefers ranged combat.
+      proficiency_bonus: 2
+      race: Elf
+      spells:
+      - "Hunter\u2019s Mark"
+      - Cure Wounds
+      sprite: sprite_liora.png
+      weapon_mastery:
+        martial: expert
+        simple: proficient
+      wkdir: ./
+      xp: 850
+    dialog: null
+    facing: North
+    height: 1.7
+    last_action: round finished
+    last_outcome: ''
+    name: lana
+    objectives:
+    - Quit the village map using the path to the forest
+    pos:
+    - 13
+    - 15
+    sprite: liora.png
+    state: manual
+    symbol: L
+    xp_accumulated: 0
+    xp_to_gain: 10
   neila:
     aggro: null
     character:
@@ -47,14 +108,16 @@ actors:
     dialog: null
     facing: North
     height: 1.7
-    last_action: round finished
-    last_outcome: ''
+    last_action: move in direction
+    last_outcome: '
+
+      neila moved SouthEast over 34m'
     name: neila
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 0
-    - 15
+    - 29
+    - 30
     sprite: liora.png
     state: manual
     symbol: N
@@ -175,7 +238,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-10 12:34:32.116736
+now: 2025-11-13 09:51:35.083367
 players_sorted_list:
 - lana
 - neila

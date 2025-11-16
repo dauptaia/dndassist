@@ -36,6 +36,7 @@ tiles:
     move_difficulty: 999
     obstacle_height: 6
     climb_height: 3
+    opacity: 1
     color: "#999999"
     sprite: "wall.png"
 

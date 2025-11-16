@@ -169,8 +169,9 @@ def compute_transparency(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.
      """
     width,height=fog_map.shape
     trsp_map=np.ones_like(fog_map)
+    trsp_map_last=np.ones_like(fog_map)
 
-    crwn_idx=0
+    crwn_idx=1
     while True:
         crwn_idx+=1
         tiles = get_crown_pos(pos_0,width,height,crwn_idx)
@@ -178,11 +179,12 @@ def compute_transparency(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.
             break
         for pos in tiles:
             pos_m1 = get_upstream_pos(pos_0,pos)
-            x=(pos_m1[0]-pos[0])*dx
-            y=(pos_m1[1]-pos[1])*dx
+            pos_m2 = get_upstream_pos(pos_0,pos_m1)
+            x=(pos_m1[0]-pos_m2[0])*dx
+            y=(pos_m1[1]-pos_m2[1])*dx
             dist = math.hypot(x,y)
-            trsp_map[pos] = trsp_map[pos_m1] * max(1. - fog_map[pos]*dist, 0)
-
+            trsp_map[pos] = 0.5*(trsp_map[pos_m2]+trsp_map[pos_m1]) * max(1. - fog_map[pos_m1]*dist, 0)
+            
     return trsp_map
 
 
