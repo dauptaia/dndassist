@@ -163,13 +163,14 @@ def get_upstream_pos(
 
 
 
-def compute_transparency(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.ndarray:
+def compute_opacity(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.ndarray:
     """Fog map : opacity map in % / m 
         a fog value of 0.5 mean 50% of view los after 1 m" 
-     """
+
+    return a opacity map , zero at the begenning , then vanishing to 1
+    """
     width,height=fog_map.shape
     trsp_map=np.ones_like(fog_map)
-    trsp_map_last=np.ones_like(fog_map)
 
     crwn_idx=1
     while True:
@@ -179,12 +180,11 @@ def compute_transparency(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.
             break
         for pos in tiles:
             pos_m1 = get_upstream_pos(pos_0,pos)
-            pos_m2 = get_upstream_pos(pos_0,pos_m1)
-            x=(pos_m1[0]-pos_m2[0])*dx
-            y=(pos_m1[1]-pos_m2[1])*dx
+            x=(pos[0]-pos_m1[0])*dx
+            y=(pos[1]-pos_m1[1])*dx
             dist = math.hypot(x,y)
-            trsp_map[pos] = 0.5*(trsp_map[pos_m2]+trsp_map[pos_m1]) * max(1. - fog_map[pos_m1]*dist, 0)
-            
+            trsp_map[pos] = trsp_map[pos_m1] * max(1. - fog_map[pos_m1]*dist, 0)
+                
     return trsp_map
 
 

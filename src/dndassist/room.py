@@ -13,7 +13,7 @@ import matplotlib.patches as patches
 
 from dndassist.themes import Theme
 from dndassist.character import Character
-from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_transparency,return_relative_pos, build_elevation_map
+from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_opacity,return_relative_pos, build_elevation_map
 from dndassist.dialog import Dialog
 
 from dndassist.storyprint import story_print, print_3cols
@@ -478,6 +478,26 @@ class RoomMap:
         else:
             plt.show()
 
+    def actor_perception(self,actor_name:str, pos:Tuple[int,int]=None ):
+
+        actor = self.actors[actor_name]
+        if pos is None:
+            pos = actor.pos
+        
+        noe = compute_nap_of_earth(self.elevation,pos,h0= actor.height, dx=self.unit_m)
+        fog_of_war = compute_opacity(self.opacity,pos, dx=self.unit_m)
+
+        p_bonus = 1+ actor.character.attr_mod("wisdom")/10
+        if "perception" in actor.character.proficiencies:
+            p_bonus += actor.character.proficiency_bonus / 10
+
+        #perception =  (1 - np.clip(noe, 0,1) )  *  p_bonus * fog_of_war
+        perception =   (1 - np.clip(noe, 0,1) ) * fog_of_war 
+        
+        perception = perception * p_bonus / 0.5 
+
+        return perception        
+
     def render_ascii(
         self, for_save: bool = False, path: List[Tuple[int, int]]=None, actor_name:str=None
     ) -> str:
@@ -502,9 +522,6 @@ class RoomMap:
                 elif grid[y][x] == " ":
                     grid[y][x] = "."
         
-        
-
-
 
         # add loots
         for loot in self.loots.values():
@@ -518,15 +535,16 @@ class RoomMap:
         
         # make obstructed tiles invisible
         if actor_name is not None:
-            actor = self.actors[actor_name]
-            noe = compute_nap_of_earth(self.elevation,actor.pos,h0= actor.height, dx=self.unit_m)
-            fog_of_war = compute_transparency(self.opacity,actor.pos, dx=self.unit_m)
+            perception = self.actor_perception(actor_name)
+            if path is not None:
+                per2 = self.actor_perception(actor_name,path[0])
+                perception = np.maximum(per2,perception)
+
             for y in range(self.height):
                 for x in range(self.width):
-                    if noe[x,y] > 0:
+                    if perception[x,y] < 1.:
                         grid[y][x] = " "
-                    if fog_of_war[x,y] < 0.5:
-                        grid[y][x] = " "
+                    
         
             # add path
             if path is not None:
@@ -658,7 +676,7 @@ class RoomMap:
         if actor_name is not None:
             actor = self.actors[actor_name]
             noe = compute_nap_of_earth(self.elevation,actor.pos,h0= actor.height, dx=self.unit_m)
-            fog_of_war = compute_transparency(self.opacity,actor.pos, dx=self.unit_m)
+            fog_of_war = compute_opacity(self.opacity,actor.pos, dx=self.unit_m)
             for y in range(self.height):
                 for x in range(self.width):
                     #if fog_of_war[x,y] < 0.5:
@@ -1040,7 +1058,8 @@ class RoomMap:
         
         for x in range(width):
             for y in range(height):
-                tiles[x,y].elevation = elevation[x,y] + tiles[x,y].obstacle_height
+                elevation[x,y] += tiles[x,y].obstacle_height
+                tiles[x,y].elevation = elevation[x,y] #+ tiles[x,y].obstacle_height
 
         opacity = np.full((width, height),0.)
         for x in range(width):

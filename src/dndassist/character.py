@@ -69,6 +69,7 @@ class Character:
 
     # --- Equipment / Magic ---
     equipment: List[str] = field(default_factory=list)
+    proficiencies: List[str] = field(default_factory=list)
     spells: List[str] = field(default_factory=list)
     equipped: Dict[str, Optional[str]] = field(
         default_factory=lambda: {"armor": None, "main_hand": None, "off_hand": None}

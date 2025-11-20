@@ -4,7 +4,7 @@ players:
     name: lana
     pos:
     - 13
-    - 14
+    - 6
     symbol: L
     character: liora.yaml
     sprite: liora.png
@@ -15,7 +15,7 @@ players:
     name: neila
     pos:
     - 14
-    - 14
+    - 6
     symbol: N
     character: liora.yaml
     sprite: liora.png

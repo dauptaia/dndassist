@@ -212,13 +212,12 @@ class GameEngine:
             self.room.print_map(actor_name=actor.name)
             # ----- build context ---
 
-            actor_context = f"--- __{actor.name}__'s turn {actor.pos}---"
-            self.adventure_log.append("\n\n" + actor_context)
+            self.adventure_log.append("\n\n" + f"--- __{actor.name}__'s turn {actor.pos}---")
             remaining_moves = actor.character.max_distance()
             remaining_actions = 100
             while remaining_moves >= self.room.unit_m and remaining_actions > 0:
                 time.sleep(1)
-                story_print(actor_context+f"\n\n    Remaining moves: __{remaining_moves}__m", color="grey",justify="left")
+                story_print(f"--- __{actor.name}__'s turn {actor.pos}---"+f"\n\n    Remaining moves: __{remaining_moves}__m", color="grey",justify="left")
                 actions_avail = self.build_all_actions_available_to_actor(actor)
                 #story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
                 npc_bool = actor.state == "auto"
