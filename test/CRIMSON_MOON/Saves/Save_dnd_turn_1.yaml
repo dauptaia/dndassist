@@ -46,6 +46,7 @@ actors:
         simple: proficient
       wkdir: ./
       xp: 850
+    climbed: 0
     dialog: null
     facing: North
     height: 1.7
@@ -55,8 +56,8 @@ actors:
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 14
-    - 30
+    - 13
+    - 7
     sprite: liora.png
     state: manual
     symbol: L
@@ -109,19 +110,18 @@ actors:
         simple: proficient
       wkdir: ./
       xp: 850
+    climbed: 0
     dialog: null
     facing: North
     height: 1.7
-    last_action: move in direction
-    last_outcome: '
-
-      neila moved SouthWest over 35m'
+    last_action: round finished
+    last_outcome: ''
     name: neila
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 0
-    - 27
+    - 14
+    - 7
     sprite: liora.png
     state: manual
     symbol: N
@@ -170,6 +170,7 @@ actors:
         simple: proficient
       wkdir: ./
       xp: 100
+    climbed: 0
     dialog: null
     facing: North
     height: 1.7
@@ -228,6 +229,7 @@ actors:
         simple: proficient
       wkdir: ./
       xp: 100
+    climbed: 0
     dialog: dialog_guard.yaml
     facing: North
     height: 1.7
@@ -244,7 +246,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-20 23:03:54.834367
+now: 2025-11-27 19:29:25.239353
 players_sorted_list:
 - lana
 - neila

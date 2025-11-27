@@ -34,15 +34,10 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 23:08:57.983688
+   Room village_start, time 19:29:13.239353
 
 
 --- __neila__'s turn (14, 7)---
-move in direction
-Manual input
-
-neila moved South over 33m
-
 round finished
 Manual input
 
@@ -50,7 +45,6 @@ Manual input
 
 
 --- __lana__'s turn (13, 7)---
-move in direction
+round finished
 Manual input
 
-lana moved West over 8m

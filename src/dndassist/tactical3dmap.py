@@ -115,7 +115,7 @@ from textwrap import fill
 
 def plot_terrain_with_obstacles(
     ground_height, ground_r, ground_g, ground_b, ground_a,
-    obst_height, obst_r, obst_g, obst_b, obst_a,
+    obst_height,
     delta_x=1.5,
     annotations=None
 ):
@@ -141,17 +141,17 @@ def plot_terrain_with_obstacles(
 
     # --- Expand ground rasters so surface aligns with histogram ---
     ground_height = expand(ground_height)
-    ground_r = expand(ground_r)
-    ground_g = expand(ground_g)
-    ground_b = expand(ground_b)
-    ground_a = expand(ground_a)
+    ground_rp1 = expand(ground_r)
+    ground_gp1 = expand(ground_g)
+    ground_bp1 = expand(ground_b)
+    ground_ap1 = expand(ground_a)
 
     ny, nx = ground_height.shape
     X = np.arange(nx) * delta_x
     Y = np.arange(ny) * delta_x
     X, Y = np.meshgrid(X, Y)
 
-    ground_colors = np.dstack([ground_r, ground_g, ground_b, ground_a])
+    ground_colors = np.dstack([ground_rp1, ground_gp1, ground_bp1, ground_ap1])
 
     # --- Setup figure ---
     fig = plt.figure(figsize=(10, 7))
@@ -177,7 +177,7 @@ def plot_terrain_with_obstacles(
         oy_vals = oy * delta_x
         dz_vals = obst_height[nz]
         colors = np.array([
-            [obst_r[i, j], obst_g[i, j], obst_b[i, j], obst_a[i, j]]
+            [ground_r[i, j], ground_g[i, j], ground_b[i, j], ground_a[i, j]]
             for i, j in zip(ox, oy)
         ])
         ax.bar3d(

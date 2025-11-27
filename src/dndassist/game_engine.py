@@ -244,6 +244,11 @@ class GameEngine:
                     remaining_actions = 0
                 elif action.startswith("stand watch"):
                     remaining_actions -= 100
+                elif action.startswith("climb"):
+                    remaining_moves -= self.climb_adjacent_tile(actor, action)
+                    if remaining_moves > 0:
+                        self.room.print_map(actor_name=actor.name)
+
                 elif action.startswith("move"):
                     if action.startswith("move to"):
                         outcome, used_dist = self.action_move_to_target(
@@ -318,6 +323,90 @@ class GameEngine:
 
         return True
 
+    def climb_adjacent_tile(self, actor: Actor, action:str)->int:
+        """What happen when climbing up, equal or down
+        actor can lose HP if critical fails
+        return the distance consumed by the motion
+        """
+        pos_to_climb = ""
+        for  char  in action.split(":")[0] :
+            if char.isdigit() or char == ",":
+                pos_to_climb+=char
+        x,y = pos_to_climb.split(',')
+        dest_pos = (int(x),int(y))
+        dest_tile = self.room.tiles[dest_pos]
+        actor_tile = self.room.tiles[actor.pos]
+        climb_gap = int((dest_tile.elevation+dest_tile.climb_height) - (actor_tile.elevation +actor.climbed))
+
+        if climb_gap > 6:
+            story_print(f"Cannot climb up {climb_gap}m.", color="green", justify="right")
+            return 0
+        elif climb_gap < -6:
+            story_print(f"Cannot climb down {climb_gap}m.", color="green", justify="right")
+            return 0
+        elif climb_gap > 0:
+            difficulty = int(climb_gap * 5) # 1m 5 Very Easy, 3m 15 Average, 6m 30 very hard
+            story_print(f" Climb up {climb_gap}m \n Difficulty {difficulty} \n", color="white", justify="left")
+            roll, success,dex_mod = actor.rolldice("1d20", "dexterity")
+            if success == 1.0: #perfect climb
+                story_print(f"Climb perfect!", color="green", justify="right")
+                actor.climbed = dest_tile.climb_height
+                actor.pos = dest_pos
+                return int(climb_gap)
+            elif success == 0.0: #failed climb
+                story_print(f"Climb failed!", color="green", justify="right")
+                roll, _ , _ = actor.rolldice("1d4")
+                actor.character.current_state.current_hp -= roll
+                return int(climb_gap*3)
+            else:
+                if roll + dex_mod >= difficulty:
+                    story_print(f"Climb successful", color="green", justify="right")
+                    actor.climbed = dest_tile.climb_height
+                    actor.pos = dest_pos
+                    return int(climb_gap*3) 
+                else:
+                    story_print(f"Climb failed", color="green", justify="right")
+                    return int(climb_gap*3) 
+        elif climb_gap == 0:
+            difficulty = 5
+            roll, success,dex_mod = actor.rolldice("1d20", "dexterity")
+            if roll + dex_mod >= difficulty:
+                story_print(f"Climb successful", color="green", justify="right")
+                actor.climbed = dest_tile.climb_height
+                actor.pos = dest_pos
+                return self.room.unit_m
+            else:
+                story_print(f"Climb  failed", color="green", justify="right") 
+                return self.room.unit_m
+
+        elif climb_gap < 0:
+            difficulty = int(abs(climb_gap) * 5) # 1m 5 Very Easy, 3m 15 Average, 6m 30 very hard
+            story_print(f" Climb down {climb_gap}m \n Difficulty {difficulty} \n", color="white", justify="left")
+            roll, success,dex_mod = actor.rolldice("1d20", "dexterity")
+            if success == 1.0: #perfect climb
+                story_print(f"Climb down perfect!", color="green", justify="right")
+                actor.climbed = dest_tile.climb_height
+                actor.pos = dest_pos
+                return int(climb_gap)
+            elif success == 0.0: #failed climb
+                story_print(f"Climb down CRITICAL FAIL!", color="green", justify="right")
+                roll, _ = actor.rolldice("1d4")
+                actor.character.current_state.current_hp -= roll
+                actor.climbed = dest_tile.climb_height
+                actor.pos = dest_pos
+                return int(climb_gap*3)
+            else :
+                if roll + dex_mod >= difficulty:
+                    story_print(f"Climb down successful", color="green", justify="right")
+                    actor.climbed = dest_tile.climb_height
+                    actor.pos = dest_pos
+                    return int(climb_gap*3)
+                else:
+                    story_print(f"Climb down failed", color="green", justify="right")
+                    return int(climb_gap*3)
+                
+
+        
     def distribute_xp_points(self):
         """Distribute XP to players"""
         xp_gained = 0
@@ -443,13 +532,28 @@ class GameEngine:
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
-        actions_avail = ["round finished", "move in direction"]
-                
+        actions_avail = ["round finished"]
+        
+        climb_up_dir, climb_up_pos, climb_down_dir , climb_down_pos= self.room.tiles_to_climb(actor.pos)
+        if climb_up_dir:
+            for dir,pos in zip(climb_up_dir,climb_up_pos):
+                actions_avail.append(f"climbUp {dir} {pos} : {self.room.tiles[pos].description}")
+        
+        if actor.climbed > 0:
+            for dir,pos in zip(climb_down_dir,climb_down_pos):
+                actions_avail.append(f"climbDown {dir} {pos} : ground")
+        
+        if actor.climbed == 0:
+            actions_avail.append( "move in direction")
+
         (
                     all_visible_actors,
                     all_visible_loots,
                     all_visible_gates,
                 ) = self.room.visible_actors_n_loots_n_gates(actor.name)
+
+        
+            
 
         proximity_dist = 2*self.room.unit_m
         for other, dist in all_visible_actors:
@@ -460,19 +564,22 @@ class GameEngine:
                 pass
             else:
                 if dist > proximity_dist:
-                    actions_avail.append(f"move to {other} at {dist}m ")
+                    if actor.climbed == 0:
+                        actions_avail.append(f"move to {other} at {dist}m ")
                 else:
                     actions_avail.append(f"talk to {other}")
 
         for other, dist in all_visible_loots:
             if dist > proximity_dist:
-                actions_avail.append(f"move to {other} at {dist}m ")
+                if actor.climbed == 0: 
+                    actions_avail.append(f"move to {other} at {dist}m ")
             else:
                 actions_avail.append(f"pick up {other}")
 
         for other, dist in all_visible_gates:
             if dist > proximity_dist:
-                actions_avail.append(f"move to {other} at {dist}m ")
+                if actor.climbed == 0: 
+                    actions_avail.append(f"move to {other} at {dist}m ")
             else:
                 actions_avail.append(f"quit map {other}")
 

@@ -17,7 +17,7 @@ def _rgba_str(r, g, b, a):
 
 def render_tactical_map_plotly(
     height, R, G, B, A,
-    obstacle_height, oR, oG, oB, oA,
+    obstacle_height,
     annotations,
     delta_x=1.5,
     #elevation_unit=0.5,
@@ -43,10 +43,6 @@ def render_tactical_map_plotly(
     B = _normalize_color_raster(B)
     A = np.asarray(A).astype(float)  # should be 0..1
 
-    oR = _normalize_color_raster(oR)
-    oG = _normalize_color_raster(oG)
-    oB = _normalize_color_raster(oB)
-    oA = np.asarray(oA).astype(float)
 
     # Expand ground so that tiles (nx x ny) align with quads (we want one quad per original tile)
     # We'll compute corner heights by taking H0 and duplicating right/bottom edges
@@ -116,7 +112,10 @@ def render_tactical_map_plotly(
             vy = [cy - w, cy - w, cy + w, cy + w, cy - w, cy - w, cy + w, cy + w]
             vz = [base, base, base, base, base + h_m, base + h_m, base + h_m, base + h_m]
 
-            rr = oR[ix, iy]; gg = oG[ix, iy]; bb = oB[ix, iy]; aa = float(oA[ix, iy])
+            rr = R[ix, iy]
+            gg = G[ix, iy]
+            bb = B[ix, iy]
+            aa = float(A[ix, iy])
             color_str = _rgba_str(rr, gg, bb, aa)
 
             # faces indices for Mesh3d (we'll define triangular faces)

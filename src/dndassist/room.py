@@ -15,7 +15,7 @@ from dndassist.themes import Theme
 from dndassist.character import Character
 from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_opacity,return_relative_pos, build_elevation_map
 from dndassist.dialog import Dialog
-
+from dndassist.autoroll import rolldice
 from dndassist.storyprint import story_print, print_3cols
 from dndassist.tactical3dmap import plot_terrain_with_obstacles
 from dndassist.tactical3dmap_plotly import render_tactical_map_plotly
@@ -61,10 +61,10 @@ class Tile:
     difficulty: int =  1
     blocks_view: bool = False # shall be removed
     opacity: float =  0.01 #  1% of opacity per m
-    obstacle_height: float =  0
-    climb_height: float =  0
+    obstacle_height: float =  0 # the height blocking view (disregarting ground elevation)
+    climb_height: float =  0 # the height you can climb ( disregarding ground elevation)
+    elevation: float = 0 # the height of the ground
     description: str = ""
-    elevation: float = 0
     color: str=0
 
     def to_dict(self):
@@ -93,6 +93,7 @@ class Actor:
     state: str = "idle" # one of "idle", "manual" (manual input),  "auto" (auto played by a LLM)
     aggro: str = None
     dialog: Dialog = None
+    climbed: int = 0 #height climbed , in meters
     objectives: List[str] = field(
         default_factory=list
     )
@@ -175,6 +176,17 @@ class Actor:
         data["character"] = Character(**data["character"])
         return cls(**data)
 
+    def rolldice(self, dice=str, attr=None):
+        """Apply autoroll according to actor state"""
+        mod = 0
+        if attr is not None:
+            mod = self.character.attr_mod(attr)
+        auto = True
+        if self.state == "manual":
+            auto =  False
+        roll, success = rolldice(dice,autoroll=auto)
+        return roll, success, mod
+        
     # def to_dict(self):
     #     return asdict(self)
 
@@ -249,7 +261,9 @@ class RoomMap:
     theme: Theme
     width: int
     height: int
-    elevation: np.ndarray
+    elevation: np.ndarray # the ground level 
+    obstacles_elev: np.ndarray # the ground level + obstacles elev
+    
     opacity: np.ndarray
     unit_m: float = 1.5
     npc_ordered_list: List[str] = None
@@ -371,12 +385,13 @@ class RoomMap:
         ax.set_facecolor("white")
 
         # --- Draw Tiles ---
-        max_elev = self.elevation.max()
+        max_elev = self.obstacles_elev.max()
 
         for (x, y), tile in self.tiles.items():
             if tile.symbol in ("/", "", "X"):  # skip void
                 continue
-            color_idx = int(round(((max_elev-tile.elevation)/max_elev)*5))
+            tile_elev = tile.elevation+tile.obstacle_height
+            color_idx = int(round(((max_elev-tile_elev)/max_elev)*5))
             color_digit = "gfedcba9876543210"[color_idx]
             print(color_idx)
             color = "#"+str(color_digit)*6
@@ -484,7 +499,7 @@ class RoomMap:
         if pos is None:
             pos = actor.pos
         
-        noe = compute_nap_of_earth(self.elevation,pos,h0= actor.height, dx=self.unit_m)
+        noe = compute_nap_of_earth(self.obstacles_elev,pos,h0= actor.height, dx=self.unit_m)
         fog_of_war = compute_opacity(self.opacity,pos, dx=self.unit_m)
 
         p_bonus = 1+ actor.character.attr_mod("wisdom")/10
@@ -652,16 +667,8 @@ class RoomMap:
         grd_grn = np.ones_like(self.elevation)
         grd_blu = np.ones_like(self.elevation)
         grd_alp = np.ones_like(self.elevation)
-        obs_height = np.zeros_like(self.elevation)
-        obs_red = np.ones_like(self.elevation)
-        obs_grn = np.ones_like(self.elevation)
-        obs_blu = np.ones_like(self.elevation)
         obs_alp = np.ones_like(self.elevation)*0.9
         
-        
-
-
-
         for x in range(self.width):
             for y in range(self.height):
                 obs_height[x,y] += self.tiles[(x,y)].obstacle_height
@@ -675,7 +682,7 @@ class RoomMap:
         # make obstructed tiles invisible
         if actor_name is not None:
             actor = self.actors[actor_name]
-            noe = compute_nap_of_earth(self.elevation,actor.pos,h0= actor.height, dx=self.unit_m)
+            noe = compute_nap_of_earth(self.obstacles_elev,actor.pos,h0= actor.height, dx=self.unit_m)
             fog_of_war = compute_opacity(self.opacity,actor.pos, dx=self.unit_m)
             for y in range(self.height):
                 for x in range(self.width):
@@ -703,10 +710,6 @@ class RoomMap:
             grd_blu,
             grd_alp,
             obs_height,
-            grd_red,
-            grd_grn,
-            grd_blu,
-            obs_alp,
             delta_x=self.unit_m,
             annotations=annotations
         )
@@ -718,10 +721,6 @@ class RoomMap:
             grd_blu,
             grd_alp,
             obs_height,
-            grd_red,
-            grd_grn,
-            grd_blu,
-            obs_alp,
             delta_x=self.unit_m,
             annotations=annotations
         )
@@ -764,6 +763,31 @@ class RoomMap:
             report.append(f"Gate {other_name} is {dist}m {dir}")
         return "\n".join(report)
 
+
+    def tiles_to_climb(self,pos:Tuple[int, int]) ->  Tuple[ 
+            List[str], 
+            List[Tuple[int, int]], 
+            List[str], 
+            List[Tuple[int, int]]
+        ]:
+        """
+        return pos tiles that can be climbed 
+        """
+        climbup_dir = []
+        climbdown_dir = []
+        climbup_pos = []
+        climbdown_pos = []
+        dirs = [ "South","SouthEast","East","NorthEast","North","NorthWest","West","SouthWest"]
+        
+        crown_pos = get_crown_pos(pos, self.width,self.height, radius=1)
+        for pos_,dir_ in zip(crown_pos,dirs) :
+            if self.tiles[pos_].climb_height > 0:
+                climbup_dir.append(dir_)
+                climbup_pos.append(pos_)
+            else:
+                climbdown_dir.append(dir_)
+                climbdown_pos.append(pos_)
+        return climbup_dir,climbup_pos,climbdown_dir, climbdown_pos
 
 
     def visible_actors_n_loots_n_gates(
@@ -1013,9 +1037,9 @@ class RoomMap:
         ideal_dist = round(g_ref_score[path[-1]])
         
         if used_dist > ideal_dist:
-            print(f"Path penalty: {ideal_dist}m-> {used_dist}m")
+            story_print(f"Path penalty: {ideal_dist}m-> {used_dist}m",color="green", justify="right")
         if used_dist < ideal_dist:
-            print(f"Path bonus: {ideal_dist}m-> {used_dist}m")
+            story_print(f"Path bonus: {ideal_dist}m-> {used_dist}m",color="green", justify="right")
             
         return path, used_dist
 
@@ -1055,10 +1079,10 @@ class RoomMap:
             smoothing_passes=data.get("elevation_smoothing_passes",2),
             dh=data.get("elevation_m_per_level",2)
         )
-        
+        obstacles_elev = np.zeros_like(elevation)
         for x in range(width):
             for y in range(height):
-                elevation[x,y] += tiles[x,y].obstacle_height
+                obstacles_elev[x,y] = elevation[x,y] + tiles[x,y].obstacle_height
                 tiles[x,y].elevation = elevation[x,y] #+ tiles[x,y].obstacle_height
 
         opacity = np.full((width, height),0.)
@@ -1076,6 +1100,7 @@ class RoomMap:
             tiles=tiles,
             theme=theme,
             elevation=elevation,
+            obstacles_elev= obstacles_elev,
             opacity=opacity,
             actors=actors,
             npc_ordered_list=npc_ordered_list
