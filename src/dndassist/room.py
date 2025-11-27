@@ -65,7 +65,7 @@ class Tile:
     climb_height: float =  0 # the height you can climb ( disregarding ground elevation)
     elevation: float = 0 # the height of the ground
     description: str = ""
-    color: str=0
+    color: str="yellow"
 
     def to_dict(self):
         return asdict(self)
@@ -499,8 +499,20 @@ class RoomMap:
         if pos is None:
             pos = actor.pos
         
-        noe = compute_nap_of_earth(self.obstacles_elev,pos,h0= actor.height, dx=self.unit_m)
-        fog_of_war = compute_opacity(self.opacity,pos, dx=self.unit_m)
+        noe = compute_nap_of_earth(self.obstacles_elev,pos,h0= actor.height+actor.climbed, dx=self.unit_m)
+        fog_of_war = compute_opacity(self.opacity,pos, dx=self.unit_m, view_height=actor.height+actor.climbed)
+       # fog_of_war = np.ones_like(fog_of_war)
+        # reduce fog of war is actor view is higher
+        #print("??", actor.height+actor.climbed)
+        if actor.height+actor.climbed > 4:
+            fog_of_war /= 0.75
+        elif actor.height+actor.climbed > 6:
+            fog_of_war /= 0.66
+        elif actor.height+actor.climbed > 8:
+            fog_of_war /= 0.5
+        else:
+            pass
+            
 
         p_bonus = 1+ actor.character.attr_mod("wisdom")/10
         if "perception" in actor.character.proficiencies:
@@ -516,7 +528,7 @@ class RoomMap:
     def render_ascii(
         self, for_save: bool = False, path: List[Tuple[int, int]]=None, actor_name:str=None
     ) -> str:
-        
+        """Return an ASCII version of the MAP"""
         grid = [
             [
                 self.tiles.get((x, y), Tile("/", True, False, "")).symbol
@@ -662,7 +674,7 @@ class RoomMap:
     def ask_tactical_view(self,actor_name:str=None
     ):
 
-
+        obs_height = np.ones_like(self.elevation)
         grd_red = np.ones_like(self.elevation)
         grd_grn = np.ones_like(self.elevation)
         grd_blu = np.ones_like(self.elevation)
@@ -682,8 +694,8 @@ class RoomMap:
         # make obstructed tiles invisible
         if actor_name is not None:
             actor = self.actors[actor_name]
-            noe = compute_nap_of_earth(self.obstacles_elev,actor.pos,h0= actor.height, dx=self.unit_m)
-            fog_of_war = compute_opacity(self.opacity,actor.pos, dx=self.unit_m)
+            noe = compute_nap_of_earth(self.obstacles_elev,actor.pos,h0= actor.height+actor.climbed, dx=self.unit_m)
+            fog_of_war = compute_opacity(self.opacity,actor.pos, dx=self.unit_m, view_height= actor.height+actor.climbed)
             for y in range(self.height):
                 for x in range(self.width):
                     #if fog_of_war[x,y] < 0.5:
@@ -696,10 +708,13 @@ class RoomMap:
                     
         annotations =[]
         for aname,actor in self.actors.items():
+            color = "red"
+            if actor.name == actor_name:
+                color = "green"
             annotations.append( (
                 *actor.pos,
-                self.elevation[actor.pos]+actor.height,
-                "red",
+                self.elevation[actor.pos]+actor.height+actor.climbed,
+                color,
                 aname,
                 actor.character.description
             ))
@@ -714,19 +729,19 @@ class RoomMap:
             annotations=annotations
         )
 
-        render_tactical_map_plotly(
-            self.elevation,
-            grd_red,
-            grd_grn,
-            grd_blu,
-            grd_alp,
-            obs_height,
-            delta_x=self.unit_m,
-            annotations=annotations
-        )
+        # render_tactical_map_plotly(
+        #     self.elevation,
+        #     grd_red,
+        #     grd_grn,
+        #     grd_blu,
+        #     grd_alp,
+        #     obs_height,
+        #     delta_x=self.unit_m,
+        #     annotations=annotations
+        # )
 
     def visible_actors_loots_gates(self, pos_0, view_height):
-        noe = compute_nap_of_earth(self.elevation,pos_0,h0= view_height, dx=self.unit_m)
+        noe = compute_nap_of_earth(self.obstacles_elev,pos_0,h0= view_height, dx=self.unit_m)
         visible_actors=[]
         for actor in self.actors.values():
             if noe[*actor.pos] == 0:#< actor.height * 0.75:
@@ -747,7 +762,7 @@ class RoomMap:
 
     def look_around_report(self, actor_name: str)->str:
         actor = self.actors[actor_name]
-        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height)
+        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height+actor.climbed)
         report =[]
         for other_name in visible_actors:
             other = self.actors[other_name]
@@ -798,7 +813,7 @@ class RoomMap:
         Returns a list of (visible actors distance in m)
         """
         actor = self.actors[actor_name]
-        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height)
+        visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height+actor.climbed)
         _visible_actors =[]
         for other_name in visible_actors:
             if other_name == actor_name:

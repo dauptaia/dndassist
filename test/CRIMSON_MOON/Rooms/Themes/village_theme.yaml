@@ -34,7 +34,7 @@ tiles:
     name: "wall"
     description: "A solid stone wall"
     move_difficulty: 999
-    obstacle_height: 6
+    obstacle_height: 3
     climb_height: 3
     opacity: 1
     color: "#999999"

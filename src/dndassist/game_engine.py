@@ -217,7 +217,11 @@ class GameEngine:
             remaining_actions = 100
             while remaining_moves >= self.room.unit_m and remaining_actions > 0:
                 time.sleep(1)
-                story_print(f"--- __{actor.name}__'s turn {actor.pos}---"+f"\n\n    Remaining moves: __{remaining_moves}__m", color="grey",justify="left")
+                story_print(f"""
+    --- __{actor.name}__'s turn ---
+    pos: {actor.pos}, view height: {actor.height+actor.climbed} m
+    Remaining moves: __{remaining_moves}__m
+""", color="grey",justify="left")
                 actions_avail = self.build_all_actions_available_to_actor(actor)
                 #story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
                 npc_bool = actor.state == "auto"
@@ -242,6 +246,8 @@ class GameEngine:
                 if action.startswith("round finished"):
                     remaining_moves = 0
                     remaining_actions = 0
+                elif action.startswith("show view"):
+                    self.room.ask_tactical_view(actor_name=actor.name)
                 elif action.startswith("stand watch"):
                     remaining_actions -= 100
                 elif action.startswith("climb"):
@@ -532,7 +538,7 @@ class GameEngine:
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
-        actions_avail = ["round finished"]
+        actions_avail = ["round finished", "show view"]
         
         climb_up_dir, climb_up_pos, climb_down_dir , climb_down_pos= self.room.tiles_to_climb(actor.pos)
         if climb_up_dir:

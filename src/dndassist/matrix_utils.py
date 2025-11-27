@@ -163,7 +163,7 @@ def get_upstream_pos(
 
 
 
-def compute_opacity(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.ndarray:
+def compute_opacity(fog_map:np.ndarray, pos_0:Tuple[int,int], dx:int=1.5, view_height:float=2)->np.ndarray:
     """Fog map : opacity map in % / m 
         a fog value of 0.5 mean 50% of view los after 1 m" 
 
@@ -173,6 +173,15 @@ def compute_opacity(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.ndarr
     trsp_map=np.ones_like(fog_map)
 
     crwn_idx=1
+
+    easyview = 1
+    if view_height > 3:
+        easyview = 0.15
+    elif view_height > 4:
+        easyview = 0.07
+    elif view_height > 6:
+        easyview = 0.0
+
     while True:
         crwn_idx+=1
         tiles = get_crown_pos(pos_0,width,height,crwn_idx)
@@ -183,7 +192,7 @@ def compute_opacity(fog_map:np.ndarray, pos_0:Tuple[int,int], dx=1.5,)->np.ndarr
             x=(pos[0]-pos_m1[0])*dx
             y=(pos[1]-pos_m1[1])*dx
             dist = math.hypot(x,y)
-            trsp_map[pos] = trsp_map[pos_m1] * max(1. - fog_map[pos_m1]*dist, 0)
+            trsp_map[pos] = trsp_map[pos_m1] * max(1. - fog_map[pos_m1]*dist*easyview, 0)
                 
     return trsp_map
 
