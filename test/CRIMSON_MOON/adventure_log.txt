@@ -34,7 +34,7 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 19:54:18.572855
+   Room village_start, time 20:07:39.991390
 
 
 --- __neila__'s turn (15, 7)---

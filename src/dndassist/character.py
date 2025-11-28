@@ -264,10 +264,12 @@ class Character:
         situation  += f"\n faction {self.faction}, alignment {self.alignment}"
         situation  += "\n" +self.description
         situation  += "\n" +self.notes
+        situation  += "\n" +f"Max speed {self.max_speed} m"
+        
         situation  +=f"\n\n hit points  :  {self.current_state['current_hp']}HP/{self.max_hp}HP"
         situation  +=f"\n\n payload     :  {self._count_cargo()}Kg/{self.max_cargo}Kg"
         situation  +=f"\n\n conditions  :  {','.join(self.current_state['conditions'])}"
-        situation  +=f"\n\n money :"
+        situation  +=f"\n\n __Money__ :"
         _list_str =[]
         for k,v in self.money.items():
             if int(v) > 0:
@@ -277,11 +279,20 @@ class Character:
         situation  +=f"\n\n __Attributes__ :"
         for k,v in self.attributes.items():
             situation  +=f"\n {k} : {v} ({self.attr_mod(k)})"
-        
-        situation  +=f"\n\n __Proficiencies__ (bonus {self.proficiency_bonus}):"
-        situation  +="  "+", ".join(self.proficiencies)
-        
+         
         add_info = ""
+        
+        
+        add_info  +=f"\n__Weapon Mastery__ :"
+        for k,v in self.weapon_mastery.items():
+            add_info  +=f"\n {k} : {v}"
+
+        
+        if self.proficiencies:
+            add_info  += f"\n __Proficiencies__ (bonus {self.proficiency_bonus}):"
+            for pr in self.proficiencies:
+                add_info+="\n  - "+pr
+
         if self.equipment:
             add_info  += "\n__Equipment__"
             for eq in self.equipment:
