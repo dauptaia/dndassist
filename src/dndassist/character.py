@@ -44,6 +44,17 @@ class Character:
     wkdir:str = None
 
     # --- Attributes ---
+    money: Dict[str, int] = field(
+        default_factory=lambda: {
+            "cp": 0,
+            "sp": 0,
+            "pp": 0,
+            "gp": 0,
+        }
+    )
+
+
+    # --- Attributes ---
     attributes: Dict[str, int] = field(
         default_factory=lambda: {
             "strength": 10,

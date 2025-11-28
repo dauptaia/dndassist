@@ -31,6 +31,11 @@ actors:
       max_cargo: 30
       max_hp: 24
       max_speed: 35
+      money:
+        cp: 0
+        gp: 0
+        pp: 0
+        sp: 0
       name: lana
       notes: Prefers ranged combat.
       proficiencies:
@@ -47,16 +52,16 @@ actors:
       wkdir: ./
       xp: 850
     climbed: 0
-    dialog: null
     facing: North
     height: 1.7
-    last_action: round finished
-    last_outcome: ''
+    interaction: null
+    last_action: talk to village_elder
+    last_outcome: '[lana] cannot give money | 3 cp to [village_elder]'
     name: lana
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 13
+    - 14
     - 7
     sprite: liora.png
     state: manual
@@ -84,6 +89,7 @@ actors:
       - Longbow
       - Leather Armor
       - Dagger
+      - bottle of beer
       equipped:
         armor: Leather Armor
         main_hand: Longbow
@@ -95,6 +101,8 @@ actors:
       max_cargo: 30
       max_hp: 24
       max_speed: 35
+      money:
+        cp: 7
       name: neila
       notes: Prefers ranged combat.
       proficiencies:
@@ -111,16 +119,18 @@ actors:
       wkdir: ./
       xp: 850
     climbed: 0
-    dialog: null
     facing: North
     height: 1.7
-    last_action: round finished
-    last_outcome: ''
+    interaction: null
+    last_action: talk to village_elder
+    last_outcome: '[neila] gave money | 3 cp to [village_elder]
+
+      [village_elder] gave bottle of beer to [neila]'
     name: neila
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 14
+    - 15
     - 7
     sprite: liora.png
     state: manual
@@ -158,6 +168,11 @@ actors:
       max_cargo: 30
       max_hp: 10
       max_speed: 10
+      money:
+        cp: 0
+        gp: 0
+        pp: 0
+        sp: 0
       name: thomas
       notes: Likes apples, peace and good harvests.
       proficiencies: []
@@ -171,9 +186,9 @@ actors:
       wkdir: ./
       xp: 100
     climbed: 0
-    dialog: null
     facing: North
     height: 1.7
+    interaction: null
     last_action: null
     last_outcome: null
     name: thomas
@@ -204,8 +219,9 @@ actors:
         current_hp: 10
       description: An old but energetic country man, head of the village
       equipment:
-      - Sickle
-      - Leather Armor
+      - bottle of beer
+      - map
+      - money | 3 cp
       equipped:
         armor: Leather Armor
         main_hand: Sickle
@@ -217,6 +233,10 @@ actors:
       max_cargo: 20
       max_hp: 10
       max_speed: 10
+      money:
+        cp: 22
+        gp: 0
+        sp: 0
       name: village_elder
       notes: Likes apples, peace and good harvests.
       proficiencies: []
@@ -230,23 +250,35 @@ actors:
       wkdir: ./
       xp: 100
     climbed: 0
-    dialog: dialog_guard.yaml
     facing: North
     height: 1.7
+    interaction:
+      paths:
+      - cost: money | 3 cp
+        name: booze!
+        reward: equipment | bottle of beer
+      - cost: equipment | dagger
+        name: info on quest2
+        reward: information | life is short
+      - cost: equipment | dagger
+        name: map of the region
+        reward: equipment | map
+      smalltalk:
+      - what strangers like ya'r doin' here. No business with ya!
     last_action: null
     last_outcome: null
     name: village_elder
     objectives: []
     pos:
-    - 20
-    - 26
+    - 13
+    - 7
     sprite: village_elder.png
     state: idle
     symbol: E
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-27 19:29:25.239353
+now: 2025-11-28 16:46:01.321550
 players_sorted_list:
 - lana
 - neila

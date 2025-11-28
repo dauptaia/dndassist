@@ -61,9 +61,28 @@ actors:
   village_elder:
     name: village_elder
     pos:
-    - 20
-    - 25
+    - 13
+    - 6
     symbol: E
     character: village_elder.yaml
     sprite: village_elder.png
-    dialog: dialog_guard.yaml
+    override_equipment:
+      - bottle of beer
+      - map
+    override_money: 
+      cp : 22
+      gp : 0
+      sp : 0
+    interaction:
+      smalltalk: 
+      - what strangers like ya'r doin' here. No business with ya!
+      paths:
+      - cost : money | 3 cp
+        name: booze!
+        reward: equipment | bottle of beer
+      - cost : equipment | dagger
+        name: info on quest2 
+        reward : information | life is short
+      - cost : equipment | dagger
+        name: map of the region
+        reward: equipment | map

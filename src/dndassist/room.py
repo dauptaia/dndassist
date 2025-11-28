@@ -15,6 +15,8 @@ from dndassist.themes import Theme
 from dndassist.character import Character
 from dndassist.matrix_utils import get_crown_pos, compute_nap_of_earth, compute_opacity,return_relative_pos, build_elevation_map
 from dndassist.dialog import Dialog
+from dndassist.interaction import Interaction
+
 from dndassist.autoroll import rolldice
 from dndassist.storyprint import story_print, print_3cols
 from dndassist.tactical3dmap import plot_terrain_with_obstacles
@@ -92,7 +94,7 @@ class Actor:
     last_outcome: str = None
     state: str = "idle" # one of "idle", "manual" (manual input),  "auto" (auto played by a LLM)
     aggro: str = None
-    dialog: Dialog = None
+    interaction: Interaction= None
     climbed: int = 0 #height climbed , in meters
     objectives: List[str] = field(
         default_factory=list
@@ -148,24 +150,32 @@ class Actor:
         return situation
 
     @classmethod
-    def from_dict(cls, d, wkdir):
+    def from_dict(cls, d:dict, wkdir:str):
         d["pos"] = tuple(
             d["pos"]
         )  # when read from safe yaml , tuple were stored as list
         #transforma character string into character
-        char =  Character.load(wkdir, d["character"])
+        char =  Character.load(wkdir, d.pop("character"))
         char.name = d["name"] #impose actor name in character description
-        if "dialog" in d:
-            dname = d["dialog"]
-            d["dialog"] = Dialog.from_yaml(wkdir,d["dialog"])
-            d["dialog"].name=dname
+        # if "dialog" in d:
+        #     dname = d["dialog"]
+        #     d["dialog"] = Dialog.from_yaml(wkdir,d["dialog"])
+        #     d["dialog"].name=dname
+        if "interaction" in d:
+            data = d.pop("interaction")
+            d["interaction"] = Interaction(**data)
         d["character"] = char 
+        if "override_equipment" in d:
+            d["character"].equipment =d.pop("override_equipment")
+        if "override_money" in d:
+            d["character"].money =  d.pop("override_money")
+        
         return cls(**d)
     
     def to_dict_with_character_data(self):
         data = asdict(self)
-        if self.dialog is not None:
-            data["dialog"]=self.dialog.name
+        if self.interaction is not None:
+            data["interaction"]=self.interaction.to_dict()
         return data
 
     @classmethod
@@ -186,10 +196,81 @@ class Actor:
             auto =  False
         roll, success = rolldice(dice,autoroll=auto)
         return roll, success, mod
-        
-    # def to_dict(self):
-    #     return asdict(self)
 
+    def talk_to(self)-> Tuple[str, str, str]:
+        """Return option through name, cost, and reward"""
+        cost = None
+        reward = None
+        if self.interaction is None:
+            name = f" has nothing to say"
+        else:
+            name,cost,reward = self.interaction.try_talking()
+        return name,cost,reward
+                
+    def give_money(self, money_str : str)-> bool:
+        """money_str must be of shape ' 10 gp' 
+        
+        return False if not available"""
+        nb, piece = money_str.strip().split()
+        nb = int(nb)
+        if self.character.money[piece]> nb:
+            self.character.money[piece] -= nb
+            return True
+        else:
+            story_print(f"[{self.name}] does not have {money_str}")
+            return False
+        
+    def get_money(self, money_str : str):
+        """money_str must be of shape ' 10 gp' """
+        nb, piece = money_str.strip().split()
+        self.character.money[piece] += nb
+    
+    def give_equipment(self, equipment : str)-> bool:
+        """Sum must be of shape ' 10 gp' """
+        new_equipment = []
+        avail = False
+        for equip in self.character.equipment:
+            if equip in equipment:
+                avail = True
+            else:
+               new_equipment.append(equip) 
+        if not avail:
+            story_print(f"[{self.name}] does not have {equipment}")
+        else:
+            self.character.equipment = new_equipment
+        return avail
+    
+    def get_equipment(self, equipment : str):
+        """Sum must be of shape ' 10 gp' """
+        self.character.equipment.append(equipment)
+    
+    def give_something(self, product_str: str):
+        kind, object_ = product_str.strip().split("|")
+        kind= kind.strip()
+        object_ = object_.strip()
+        if kind == "equipment":
+            return self.give_equipment(object_)
+        elif kind == "money":
+            return self.give_money(object_)
+        else:
+            raise NotImplementedError(f"give {kind} is not possible")
+        
+    def get_something(self, product_str: str):
+        kind, object_ = product_str.strip().split("|")
+        kind= kind.strip()
+        object_ = object_.strip()
+        if kind == "equipment":
+            self.get_equipment(object_)
+        elif kind == "money":
+            self.get_money(object_)
+        elif kind == "information":
+            pass
+        else:
+            raise NotImplementedError(f"get {kind} is not possible")
+        return object_
+        
+        
+        
 
 @dataclass
 class Loot:

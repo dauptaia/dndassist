@@ -47,7 +47,10 @@ def user_ask_coordinates(title: str, width:int, height:int ) ->Tuple[int, int]:
     return pos
 
 def user_select_option(title: str, context:str , options: List[str], npc:bool=False) ->Tuple[str, str]:
-    """Dialog with the user to select an option"""
+    """Dialog with the user to select an option
+    
+    return the selected option,
+    and an explanation"""
 
     
     

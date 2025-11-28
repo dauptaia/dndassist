@@ -4,17 +4,11 @@ gender: male
 char_class: Warlock
 level: 3
 xp: 820
-gold: 0
 description: no particular trait
 alignment: Lawful Evil
 notes: Serves a shadowy patron; prefers to manipulate and curse from afar.
 faction: cult_of_shadows
 sprite: sprite_selra.png
-available_actions:
-- cast_spell
-- move
-- talk
-- rest
 max_cargo: 30
 max_hp: 22
 max_speed: 30

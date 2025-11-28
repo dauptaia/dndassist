@@ -19,5 +19,7 @@ players:
     symbol: N
     character: liora.yaml
     sprite: liora.png
+    override_money:
+      cp : 10
     objectives: 
       - Quit the village map using the path to the forest

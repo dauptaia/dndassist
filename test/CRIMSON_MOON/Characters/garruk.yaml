@@ -4,18 +4,11 @@ gender: male
 char_class: Barbarian
 level: 3
 xp: 800
-gold: 0
 description: no particular trait
 alignment: Neutral Evil
 notes: A savage mercenary who revels in close combat and bloodshed.
 faction: bandits
 sprite: sprite_garruk.png
-available_actions:
-- attack
-- dash
-- roar
-- move
-- rest
 max_cargo: 30
 max_hp: 36
 max_speed: 30

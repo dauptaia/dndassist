@@ -286,10 +286,18 @@ class GameEngine:
                 elif action.startswith("talk to"):
                     remaining_actions -= 100
                     npc_actor = self.room.actors[action.split()[2]]
-                    if npc_actor.dialog is None:
-                        outcome = f"{npc_actor.name} has nothing to say to you.."
+                    name, cost_str, reward_str = npc_actor.talk_to()
+                    if cost_str is None:
+                        outcome = f"[{npc_actor.name}] {name})"
                     else:
-                        outcome = npc_actor.dialog.run(actor)
+                        if actor.give_something(cost_str):
+                            npc_actor.get_equipment(cost_str)
+                            reward = actor.get_something(reward_str)
+                            outcome = f"[{actor.name}] gave {cost_str} to [{npc_actor.name}]"
+                            outcome += f"\n[{npc_actor.name}] gave {reward} to [{actor.name}]"
+                        else:
+                            outcome = f"[{actor.name}] cannot give {cost_str} to [{npc_actor.name}]"
+                            
 
                 elif action.startswith("quit map"):
                     remaining_actions -= 100
@@ -538,7 +546,7 @@ class GameEngine:
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
-        actions_avail = ["round finished", "show view"]
+        actions_avail = ["round finished"]
         
         climb_up_dir, climb_up_pos, climb_down_dir , climb_down_pos= self.room.tiles_to_climb(actor.pos)
         if climb_up_dir:
@@ -594,6 +602,7 @@ class GameEngine:
                     self.build_attack_solutions(actor, all_visible_actors)
                 )
         
+        actions_avail.append("show view")
         return actions_avail
 
     def action_pick_up_loot(self, actor:Actor, action:str)->str:
