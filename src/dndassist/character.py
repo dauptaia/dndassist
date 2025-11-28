@@ -24,7 +24,6 @@ class Character:
     gender: str  = "neutral"
     level: int = 1
     xp: int = 0
-    gold: int = 0
     description: str = "no particular trait"
     alignment: Optional[str] = None
     notes: Optional[str] = None
@@ -33,14 +32,11 @@ class Character:
 
     # ---game Engine----
     faction: str = "neutral"  # to simplfy firends and foes
-    available_actions: List[str] = field(
-        default_factory=list
-    )  # lambda: ["attack", "move", "dash", "rest"])
-
     max_cargo: int = 30  # max weight to carry in Kgs
     max_hp: int = 10
     max_speed: int = 30  # max distance in one round (6 seconds) , in meters
     proficiency_bonus: int = 2
+
     wkdir:str = None
 
     # --- Attributes ---
@@ -259,7 +255,45 @@ class Character:
         if self.equipment:
             situation  +=f"\n {possessive} equipment: {','.join(self.equipment)}"
         return situation
-            
+    
+
+    def status_str(self)-> Tuple[str,str]:
+        """return status string for current data on character"""
+
+        situation  = f"__{self.gender} {self.race} {self.char_class}, level {self.level}__"
+        situation  += f"\n faction {self.faction}, alignment {self.alignment}"
+        situation  += "\n" +self.description
+        situation  += "\n" +self.notes
+        situation  +=f"\n\n hit points  :  {self.current_state['current_hp']}HP/{self.max_hp}HP"
+        situation  +=f"\n\n payload     :  {self._count_cargo()}Kg/{self.max_cargo}Kg"
+        situation  +=f"\n\n conditions  :  {','.join(self.current_state['conditions'])}"
+        situation  +=f"\n\n money :"
+        _list_str =[]
+        for k,v in self.money.items():
+            if int(v) > 0:
+                _list_str.append(f"{v} {k}") 
+        situation += ", ".join(_list_str)
+
+        situation  +=f"\n\n __Attributes__ :"
+        for k,v in self.attributes.items():
+            situation  +=f"\n {k} : {v} ({self.attr_mod(k)})"
+        
+        situation  +=f"\n\n __Proficiencies__ (bonus {self.proficiency_bonus}):"
+        situation  +="  "+", ".join(self.proficiencies)
+        
+        add_info = ""
+        if self.equipment:
+            add_info  += "\n__Equipment__"
+            for eq in self.equipment:
+                add_info+="\n  - "+eq
+        if self.spells:
+            add_info  += "\n__Spells__"
+            for sp in self.spells:
+                add_info+="\n  - "+sp
+          
+
+    
+        return situation, add_info
     # ---------- Pretty terminal display ----------
     def __repr__(self):
         """Nicely formatted display of the character in terminal."""

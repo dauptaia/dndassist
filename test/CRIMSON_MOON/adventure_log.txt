@@ -34,18 +34,10 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 16:45:49.321550
-
-
---- __lana__'s turn (14, 7)---
-talk to village_elder
-Manual input
-[lana] cannot give money | 3 cp to [village_elder]
-
+   Room village_start, time 19:54:18.572855
 
 
 --- __neila__'s turn (15, 7)---
-talk to village_elder
+show status
 Manual input
-[neila] gave money | 3 cp to [village_elder]
-[village_elder] gave bottle of beer to [neila]
+

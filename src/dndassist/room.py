@@ -268,9 +268,16 @@ class Actor:
         else:
             raise NotImplementedError(f"get {kind} is not possible")
         return object_
-        
-        
-        
+
+    def status_str(self)-> Tuple[str, str, str]:
+        """return the status of the actor when necessary"""
+        actor_status = f"__[{self.name}]__"
+        actor_status += f"\n\n XP accumulated {self.xp_accumulated}"
+        actor_status += f"\n\n State {self.state}"
+        actor_status += f"\n\n Climbed {self.climbed}"
+        char_stat1 ,char_stat2  = self.character.status_str()
+        return actor_status, char_stat1 ,char_stat2 
+
 
 @dataclass
 class Loot:

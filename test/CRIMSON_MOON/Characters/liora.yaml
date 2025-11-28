@@ -9,7 +9,6 @@ alignment: Chaotic Good
 notes: Prefers ranged combat.
 faction: player
 sprite: sprite_liora.png
-available_actions: []
 max_cargo: 30
 max_hp: 24
 max_speed: 35

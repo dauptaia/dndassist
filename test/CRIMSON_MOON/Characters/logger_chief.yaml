@@ -4,13 +4,11 @@ gender: male
 char_class: null
 level: 2
 xp: 800
-gold: 0
 description: A rude , well built Chief logger
 alignment: Chaotic Good
 notes: Prefers close combat in forests.
 faction: loggers
 sprite: logger.png
-available_actions: []
 max_cargo: 50
 max_hp: 24
 max_speed: 25

@@ -10,7 +10,8 @@ from dndassist.attack import attack
 from dndassist.storyprint import (
     story_title,
     story_print,
-    print_color
+    print_color,
+    print_3cols
 )
 from dndassist.autoplay import (
     user_select_option,user_ask_coordinates
@@ -248,6 +249,9 @@ class GameEngine:
                     remaining_actions = 0
                 elif action.startswith("show view"):
                     self.room.ask_tactical_view(actor_name=actor.name)
+                elif action.startswith("show status"):
+                    str1 , str2, str3 = actor.status_str()
+                    print_3cols(str1 , str2, str3 )
                 elif action.startswith("stand watch"):
                     remaining_actions -= 100
                 elif action.startswith("climb"):
@@ -603,6 +607,8 @@ class GameEngine:
                 )
         
         actions_avail.append("show view")
+        actions_avail.append("show status")
+        
         return actions_avail
 
     def action_pick_up_loot(self, actor:Actor, action:str)->str:
