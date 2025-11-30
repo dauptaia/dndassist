@@ -13,18 +13,18 @@ import os
 from importlib_resources import files
 from dndassist.storyprint import story_print
 
-DATA_PATH = files("dndassist").joinpath(
+EQUIPMENT_PATH = files("dndassist").joinpath(
     "equipment.json"
 )  # os.path.join("data", "weapons.json")
-DATA_CATEGORIES_PATH = files("dndassist").joinpath(
+EQUIPMENT_CATG_PATH = files("dndassist").joinpath(
     "equipment_categories.json"
 )  # os.path.join("data", "weapons.json")
 
-with open(DATA_PATH, "r", encoding="utf-8") as f:
-    DATA_DICTS = json.load(f)
+with open(EQUIPMENT_PATH, "r", encoding="utf-8") as f:
+    EQUIPMENT_DICT = json.load(f)
 
-with open(DATA_CATEGORIES_PATH, "r", encoding="utf-8") as f:
-    DATA_CATEGORIES = json.load(f)
+with open(EQUIPMENT_CATG_PATH, "r", encoding="utf-8") as f:
+    EQUIPMENT_CATG_DICT = json.load(f)
 
 
 
@@ -35,11 +35,11 @@ def print_r(text):
 def equipment_weight(equip_name):
     weight = 0
     for cat in ["Weapon", "Armor", "Shield"]:
-        for equip in DATA_DICTS[cat]:
+        for equip in EQUIPMENT_DICT[cat]:
             if equip["name"] == equip_name:
                 weight = equip["weight"]
-        if equip_name in DATA_DICTS[cat]:
-            weight = DATA_DICTS[cat][equip_name]
+        if equip_name in EQUIPMENT_DICT[cat]:
+            weight = EQUIPMENT_DICT[cat][equip_name]
     if weight == 0:
         print_r(f"{equip_name} not present in equipment ddb.")
     return weight
@@ -47,23 +47,21 @@ def equipment_weight(equip_name):
 def equipment_cost(equip_name):
     weight = 0
     for cat in ["Weapon", "Armor", "Shield"]:
-        for equip in DATA_DICTS[cat]:
+        for equip in EQUIPMENT_DICT[cat]:
             if equip["name"] == equip_name:
                 weight = equip["cost"]
-        if equip_name in DATA_DICTS[cat]:
-            weight = DATA_DICTS[cat][equip_name]
+        if equip_name in EQUIPMENT_DICT[cat]:
+            weight = EQUIPMENT_DICT[cat][equip_name]
     if weight == 0:
         print_r(f"{equip_name} not present in equipment ddb.")
     return weight
 
 
-
-
 def weapon_catg(weapon_name):
-    for cat in DATA_CATEGORIES:
+    for cat in EQUIPMENT_CATG_DICT:
         if "Simple" not in cat and "Martial" not in cat:
             continue
-        if weapon_name in DATA_CATEGORIES[cat]:
+        if weapon_name in EQUIPMENT_CATG_DICT[cat]:
             if "Simple" in cat:
                 return "simple"
             else:
@@ -90,9 +88,7 @@ class Weapon:
     @classmethod
     def _load_all_weapons(cls) -> Dict[str, Dict[str, Any]]:
         """Load all weapon specs into a dict indexed by name (case-insensitive)."""
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return {entry["name"].lower(): entry for entry in data["Weapon"]}
+        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Weapon"]}
 
     @classmethod
     def from_name(cls, name: str) -> "Weapon":
@@ -117,7 +113,7 @@ class Weapon:
         all_weapons = cls._load_all_weapons()
         key = name.lower()
         if key not in all_weapons:
-            raise ValueError(f"Weapon '{name}' not found in {DATA_PATH}")
+            raise ValueError(f"Weapon '{name}' not found in {EQUIPMENT_PATH}")
         return cls(**all_weapons[key])
 
     # ------------------ GAME LOGIC ------------------
@@ -155,9 +151,7 @@ class Armor:
     @classmethod
     def _load_all_armors(cls) -> Dict[str, Dict[str, Any]]:
         """Load all armor specs into a dict indexed by name (case-insensitive)."""
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return {entry["name"].lower(): entry for entry in data["Armor"]}
+        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Armor"]}
 
     @classmethod
     def from_name(cls, name: str) -> "Armor":
@@ -166,7 +160,7 @@ class Armor:
         all_weapons = cls._load_all_armors()
         key = name.lower()
         if key not in all_weapons:
-            raise ValueError(f"Armor '{name}' not found in {DATA_PATH}")
+            raise ValueError(f"Armor '{name}' not found in {EQUIPMENT_PATH}")
         return cls(**all_weapons[key])
 
 
@@ -183,9 +177,7 @@ class Shield:
     @classmethod
     def _load_all_shields(cls) -> Dict[str, Dict[str, Any]]:
         """Load all shield specs into a dict indexed by name (case-insensitive)."""
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return {entry["name"].lower(): entry for entry in data["Shield"]}
+        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Shield"]}
 
     @classmethod
     def from_name(cls, name: str) -> "Shield":
@@ -194,5 +186,5 @@ class Shield:
         all_weapons = cls._load_all_shields()
         key = name.lower()
         if key not in all_weapons:
-            raise ValueError(f"Shield '{name}' not found in { DATA_PATH}")
+            raise ValueError(f"Shield '{name}' not found in {EQUIPMENT_PATH}")
         return cls(**all_weapons[key])

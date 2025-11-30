@@ -6,7 +6,7 @@ import time
 from dndassist.gates import Gates
 from dndassist.room import RoomMap, Actor, Loot
 from dndassist.autoroll import rolldice, max_dice
-from dndassist.attack import attack
+from dndassist.attack import attack, offensive_spell
 from dndassist.storyprint import (
     story_title,
     story_print,
@@ -282,6 +282,10 @@ class GameEngine:
                 elif action.startswith("attack"):
                     remaining_actions -= 100
                     outcome = self.action_attack(actor, action)
+
+                elif action.startswith("hex"):
+                    remaining_actions -= 100
+                    outcome = self.action_hex(actor, action)
 
                 elif action.startswith("pick up"):
                     remaining_actions -= 100
@@ -570,9 +574,6 @@ class GameEngine:
                     all_visible_gates,
                 ) = self.room.visible_actors_n_loots_n_gates(actor.name)
 
-        
-            
-
         proximity_dist = 2*self.room.unit_m
         for other, dist in all_visible_actors:
             if (
@@ -633,7 +634,22 @@ class GameEngine:
         is_dead = defender.character.get_damage(dmg)
         outcome = f"\n{defender_name} took {dmg} hp damage"
         if is_dead:
-            outcome += f"and is dead"
+            outcome += f" and is dead"
+            self.room.add_loot(defender.character.drop_loot(), defender.pos)
+            self.kills.append(defender_name)
+        return outcome
+
+    def action_hex(self, actor, action)->str:
+        """Action handler for Actor attacker hexing Actor defender """
+        
+        defender_name = action.split(" ")[1]
+        weapon_name = action.split(";")[0].split("with")[-1].strip()
+        defender = self.room.actors[defender_name]
+        dmg = offensive_spell(actor.character, weapon_name, defender.character)
+        is_dead = defender.character.get_damage(dmg)
+        outcome = f"\n{defender_name} took {dmg} hp damage"
+        if is_dead:
+            outcome += f" and is dead"
             self.room.add_loot(defender.character.drop_loot(), defender.pos)
             self.kills.append(defender_name)
         return outcome
@@ -727,6 +743,11 @@ class GameEngine:
                 actions_avail.append(
                     f"attack {other} with {weapon} ; damage max {dmg} HP"
                 )
+            spell, dmg = actor_hex_solutions(actor, dist)
+            if spell is not None:
+                actions_avail.append(
+                    f"hex {other} with {spell} ; damage max {dmg} HP"
+                )
         return actions_avail
 
     # ---------- INITIATIVE ----------
@@ -762,9 +783,20 @@ def actor_attack_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
     """return strongest available weapon  in range"""
     max_dmg = 0
     weap = None
-    for weapon, range, damage in actor.character.available_ranges():
+    for weapon, range, damage_dice in actor.character.available_ranges():
         if range >= dist:
-            if max_dice(damage) > max_dmg:
-                weap, max_dmg = weapon, max_dice(damage)
+            if max_dice(damage_dice) > max_dmg:
+                weap, max_dmg = weapon, max_dice(damage_dice)
 
     return weap, max_dmg
+
+def actor_hex_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
+    """return strongest available hex  in range"""
+    max_dmg = 0
+    hex = None
+    for spell, range, damage_dice in actor.character.available_hex_ranges():
+        if range >= dist:
+            if max_dice(damage_dice) > max_dmg:
+                hex, max_dmg = spell, max_dice(damage_dice)
+
+    return hex, max_dmg

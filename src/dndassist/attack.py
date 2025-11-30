@@ -4,6 +4,8 @@ from dndassist.autoroll import rolldice
 from dndassist.character import Character
 
 from dndassist.equipment import Armor, Weapon, Shield
+from dndassist.spellcasting import Spell
+
 from dndassist.storyprint import story_print
 
 
@@ -16,6 +18,7 @@ def attack(
     defender: Character,
     advantage: int = 0,
 ):
+    """an attack with a weapon"""
     print_r(f"Defender {defender.name}, {defender.current_state['current_hp']} HP")
     dex_bonus = 0
     armor_name = defender.equipped_armor()
@@ -102,5 +105,69 @@ def attack(
     else:
         # Attaque rate
         print_r("Attack failed")
+
+    return damage
+
+
+def offensive_spell(
+    attacker: Character,
+    spell_name,
+    defender: Character,
+    advantage: int = 0,
+):
+    """an attack with a spell
+    
+    takes into ssaving throws and ranged spells"""
+    
+    spell = Spell.from_name(spell_name)
+    print_r(f"Attacker  [{attacker.name}] has casted {spell_name} on [{defender.name}] {defender.current_state['current_hp']} HP")
+    
+    attr_modifier = max(attacker.attr_mod("wisdom"),attacker.attr_mod("intelligence"))
+    print_r(f".   Attr. modifier    :{attr_modifier}")
+    print_r(f".   Proficiency bonus : {attacker.proficiency_bonus}")
+    chant_modifier = attr_modifier + attacker.proficiency_bonus
+    
+    autoroll = True
+    if "player" in  attacker.faction:
+        autoroll=False
+
+    # if ranged , test attack
+    if spell.range > 2:
+        print_r(f".  {spell_name} is a ranged spell, roll dice for accuracy")
+        roll, dice_normed = rolldice("1d20", autoroll=autoroll, advantage=advantage)
+        damage, _ = rolldice(spell.damage_dice, autoroll=autoroll)
+        if dice_normed == 0.0:
+            print_r(f".  Misfire, [{attacker.name}] missed the attack!")
+            damage = damage //2
+            print_r(f".  [{attacker.name}] takes  {damage} HP of damage")
+            attacker.get_damage(damage)
+            return 0
+        
+        if dice_normed == 1.0:
+            print_r(f".  Magic burst, damages are doubled! [{defender.name}] could not dodge ")
+            damage = damage * 2
+            return damage
+        
+        if roll + chant_modifier < 10:
+            print_r(f".  Attack missed!")
+            return 0
+
+    # saving throw
+    if dice_normed != 1.0 and spell.saving_throw is not None:
+        # if 
+        save_mod = defender.attr_mod(spell.saving_throw)
+        autoroll = True
+        if "player" in  defender.faction:
+            autoroll=False
+        print_r(f"  [{defender.name}] make a saving throw on {spell.saving_throw}.")
+        roll, dice_normed = rolldice("1d20", autoroll=autoroll, advantage=advantage)
+
+        if dice_normed == 1.0:  # lucky roll
+            print_r(f"Perfect dodge, [{defender.name}] took no damages")
+            return 0
+        else:
+            if roll+save_mod > 8 + chant_modifier:
+                print_r(f"Partial dodge. Damage reduction 50%")
+                damage = damage // 2
 
     return damage

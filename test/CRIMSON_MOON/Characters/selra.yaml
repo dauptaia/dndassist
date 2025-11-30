@@ -35,8 +35,6 @@ equipment:
 - Shadow Tome
 spells:
 - Eldritch Blast
-- Hex
-- Armor of Agathys
 - Charm Person
 equipped:
   armor: null #Dark Robes

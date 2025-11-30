@@ -34,10 +34,85 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 20:07:39.991390
+   Room village_start, time 22:18:02.251845
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
 
 
 --- __neila__'s turn (15, 7)---
+hex lana with Eldritch Blast ; damage max 10 HP
+Manual input
+
+lana took 7 hp damage
+
+ROUND 2 START
+   Room village_start, time 22:18:14.251845
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
+
+
+--- __neila__'s turn (15, 7)---
+hex lana with Eldritch Blast ; damage max 10 HP
+Manual input
+
+lana took 2 hp damage
+
+ROUND 3 START
+   Room village_start, time 22:18:26.251845
+
+
+--- __neila__'s turn (15, 7)---
+hex lana with Eldritch Blast ; damage max 10 HP
+Manual input
+
+lana took 0 hp damage
+
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
+ROUND 4 START
+   Room village_start, time 22:18:38.251845
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
+
+
+--- __neila__'s turn (15, 7)---
+hex lana with Eldritch Blast ; damage max 10 HP
+Manual input
+
+lana took 4 hp damage
+
+ROUND 5 START
+   Room village_start, time 22:18:50.251845
+
+
+--- __neila__'s turn (15, 7)---
+round finished
+Manual input
+
+
+
+
+--- __lana__'s turn (14, 7)---
 show status
 Manual input
 

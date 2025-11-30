@@ -9,6 +9,7 @@ import random
 
 from dndassist.autoroll import rolldice
 from dndassist.equipment import weapon_catg, Weapon, equipment_weight
+from dndassist.spellcasting import item_is_offensive_spell, Spell
 from dndassist.storyprint import story_print
 
 
@@ -131,6 +132,20 @@ class Character:
         sorted_ranges = sorted(found_ranges, key=lambda x: x[1], reverse=True)
         return sorted_ranges
 
+    def available_hex_ranges(self) -> List[Tuple[str, int, str]]:
+        """return all hexes ranges available, from the longest to the shortest
+        as a list of weapon_name, range, and damage_dice"""
+        found_ranges = []
+        for item in self.spells:
+            if item_is_offensive_spell(item) :
+                spell = Spell.from_name(item)
+                range_ = spell.range
+                damage_ = spell.damage_dice
+                found_ranges.append((item, range_, damage_))
+
+        sorted_ranges = sorted(found_ranges, key=lambda x: x[1], reverse=True)
+        return sorted_ranges
+    
     def equipped_armor(self) -> str:
         return self.equipped["armor"]
 
@@ -159,7 +174,7 @@ class Character:
         self.current_state["current_hp"] -= damage
 
         # Insta-kill
-        if self.current_state["current_hp"] <= self.max_hp:
+        if -self.current_state["current_hp"] > self.max_hp:
             self.current_state["conditions"].append("dead")
             story_print(f"Character __{self.name}__ is dead...", color="red")
             return True
@@ -182,7 +197,7 @@ class Character:
             success = 0
             fails = 0
             while 1:
-                fate = rolldice("1d20")
+                fate,_ = rolldice("1d20")
                 if fate == 20:
                     success = 3
                 elif fate >= 10:

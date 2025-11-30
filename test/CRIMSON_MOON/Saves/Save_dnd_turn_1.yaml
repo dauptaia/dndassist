@@ -10,11 +10,10 @@ actors:
         intelligence: 13
         strength: 12
         wisdom: 18
-      available_actions: []
       char_class: Ranger
       current_state:
         conditions: []
-        current_hp: 10
+        current_hp: 3
       description: no particular trait
       equipment:
       - Longbow
@@ -26,7 +25,6 @@ actors:
         off_hand: Dagger
       faction: player
       gender: female
-      gold: 0
       level: 3
       max_cargo: 30
       max_hp: 24
@@ -55,8 +53,8 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: talk to village_elder
-    last_outcome: '[lana] cannot give money | 3 cp to [village_elder]'
+    last_action: round finished
+    last_outcome: ''
     name: lana
     objectives:
     - Quit the village map using the path to the forest
@@ -71,61 +69,63 @@ actors:
   neila:
     aggro: null
     character:
-      alignment: Chaotic Good
+      alignment: Lawful Evil
       attributes:
-        charisma: 10
-        constitution: 11
-        dexterity: 16
-        intelligence: 13
-        strength: 12
-        wisdom: 18
-      available_actions: []
-      char_class: Ranger
+        charisma: 17
+        constitution: 12
+        dexterity: 13
+        intelligence: 14
+        strength: 8
+        wisdom: 11
+      char_class: Warlock
       current_state:
+        action: idle
+        aggro: null
         conditions: []
         current_hp: 10
+        objectives:
+        - stand watch
+        outcome: ''
       description: no particular trait
       equipment:
-      - Longbow
-      - Leather Armor
+      - Arcane Focus
       - Dagger
-      - bottle of beer
+      - Dark Robes
+      - Shadow Tome
       equipped:
-        armor: Leather Armor
-        main_hand: Longbow
+        armor: null
+        main_hand: Arcane Focus
         off_hand: Dagger
-      faction: player
-      gender: female
-      gold: 0
+      faction: cult_of_shadows
+      gender: male
       level: 3
       max_cargo: 30
-      max_hp: 24
-      max_speed: 35
+      max_hp: 22
+      max_speed: 30
       money:
-        cp: 7
+        cp: 10
       name: neila
-      notes: Prefers ranged combat.
-      proficiencies:
-      - perception
-      proficiency_bonus: 4
-      race: Elf
+      notes: Serves a shadowy patron; prefers to manipulate and curse from afar.
+      proficiencies: []
+      proficiency_bonus: 2
+      race: Human
       spells:
-      - "Hunter\u2019s Mark"
-      - Cure Wounds
-      sprite: sprite_liora.png
+      - Eldritch Blast
+      - Charm Person
+      sprite: sprite_selra.png
       weapon_mastery:
-        martial: expert
+        martial: none
         simple: proficient
       wkdir: ./
-      xp: 850
+      xp: 820
     climbed: 0
     facing: North
     height: 1.7
     interaction: null
-    last_action: talk to village_elder
-    last_outcome: '[neila] gave money | 3 cp to [village_elder]
+    last_action: hex lana with Eldritch Blast ; damage max 10 HP
+    last_outcome: '
 
-      [village_elder] gave bottle of beer to [neila]'
+      lana took 7 hp damage'
     name: neila
     objectives:
     - Quit the village map using the path to the forest
@@ -148,7 +148,6 @@ actors:
         intelligence: 8
         strength: 14
         wisdom: 10
-      available_actions: []
       char_class: Countryman
       current_state:
         conditions: []
@@ -163,7 +162,6 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
-      gold: 0
       level: 2
       max_cargo: 30
       max_hp: 10
@@ -212,7 +210,6 @@ actors:
         intelligence: 10
         strength: 10
         wisdom: 14
-      available_actions: []
       char_class: Countryman
       current_state:
         conditions: []
@@ -221,14 +218,12 @@ actors:
       equipment:
       - bottle of beer
       - map
-      - money | 3 cp
       equipped:
         armor: Leather Armor
         main_hand: Sickle
         off_hand: None
       faction: neutral
       gender: male
-      gold: 0
       level: 2
       max_cargo: 20
       max_hp: 10
@@ -278,7 +273,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-28 16:46:01.321550
+now: 2025-11-30 22:18:14.251845
 players_sorted_list:
 - lana
 - neila

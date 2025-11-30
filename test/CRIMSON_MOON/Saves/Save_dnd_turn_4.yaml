@@ -9,12 +9,12 @@ actors:
         dexterity: 16
         intelligence: 13
         strength: 12
-        wisdom: 15
-      available_actions: []
+        wisdom: 18
       char_class: Ranger
       current_state:
-        conditions: []
-        current_hp: 10
+        conditions:
+        - injured
+        current_hp: 1
       description: no particular trait
       equipment:
       - Longbow
@@ -26,14 +26,20 @@ actors:
         off_hand: Dagger
       faction: player
       gender: female
-      gold: 0
       level: 3
       max_cargo: 30
       max_hp: 24
       max_speed: 35
+      money:
+        cp: 0
+        gp: 0
+        pp: 0
+        sp: 0
       name: lana
       notes: Prefers ranged combat.
-      proficiency_bonus: 2
+      proficiencies:
+      - perception
+      proficiency_bonus: 4
       race: Elf
       spells:
       - "Hunter\u2019s Mark"
@@ -44,19 +50,18 @@ actors:
         simple: proficient
       wkdir: ./
       xp: 850
-    dialog: null
+    climbed: 0
     facing: North
+    height: 1.7
+    interaction: null
     last_action: round finished
     last_outcome: ''
     name: lana
     objectives:
     - Quit the village map using the path to the forest
-    - Find the path to the north
-    - Find the path to the south
-    - Find the path to the north
     pos:
-    - 20
-    - 38
+    - 14
+    - 7
     sprite: liora.png
     state: manual
     symbol: L
@@ -65,70 +70,213 @@ actors:
   neila:
     aggro: null
     character:
-      alignment: Chaotic Good
+      alignment: Lawful Evil
       attributes:
-        charisma: 10
-        constitution: 11
-        dexterity: 16
-        intelligence: 13
-        strength: 12
-        wisdom: 15
-      available_actions: []
-      char_class: Ranger
+        charisma: 17
+        constitution: 12
+        dexterity: 13
+        intelligence: 14
+        strength: 8
+        wisdom: 11
+      char_class: Warlock
       current_state:
+        action: idle
+        aggro: null
         conditions: []
         current_hp: 10
+        objectives:
+        - stand watch
+        outcome: ''
       description: no particular trait
       equipment:
-      - Longbow
-      - Leather Armor
+      - Arcane Focus
       - Dagger
+      - Dark Robes
+      - Shadow Tome
       equipped:
-        armor: Leather Armor
-        main_hand: Longbow
+        armor: null
+        main_hand: Arcane Focus
         off_hand: Dagger
-      faction: player
-      gender: female
-      gold: 0
+      faction: cult_of_shadows
+      gender: male
       level: 3
       max_cargo: 30
-      max_hp: 24
-      max_speed: 35
+      max_hp: 22
+      max_speed: 30
+      money:
+        cp: 10
       name: neila
-      notes: Prefers ranged combat.
+      notes: Serves a shadowy patron; prefers to manipulate and curse from afar.
+      proficiencies: []
       proficiency_bonus: 2
-      race: Elf
+      race: Human
       spells:
-      - "Hunter\u2019s Mark"
-      - Cure Wounds
-      sprite: sprite_liora.png
+      - Eldritch Blast
+      - Charm Person
+      sprite: sprite_selra.png
       weapon_mastery:
-        martial: expert
+        martial: none
         simple: proficient
       wkdir: ./
-      xp: 850
-    dialog: null
+      xp: 820
+    climbed: 0
     facing: North
-    last_action: round finished
-    last_outcome: ''
+    height: 1.7
+    interaction: null
+    last_action: hex lana with Eldritch Blast ; damage max 10 HP
+    last_outcome: '
+
+      lana took 4 hp damage'
     name: neila
     objectives:
     - Quit the village map using the path to the forest
-    - Find the path to the north
-    - Find the path to the south
-    - Find the path to the north
     pos:
-    - 19
-    - 38
+    - 15
+    - 7
     sprite: liora.png
     state: manual
     symbol: N
     xp_accumulated: 0
     xp_to_gain: 10
+  thomas:
+    aggro: null
+    character:
+      alignment: Farming
+      attributes:
+        charisma: 6
+        constitution: 12
+        dexterity: 14
+        intelligence: 8
+        strength: 14
+        wisdom: 10
+      char_class: Countryman
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: A usual hard working country man.
+      equipment:
+      - Sickle
+      - Leather Armor
+      equipped:
+        armor: Leather Armor
+        main_hand: Sickle
+        off_hand: None
+      faction: neutral
+      gender: male
+      level: 2
+      max_cargo: 30
+      max_hp: 10
+      max_speed: 10
+      money:
+        cp: 0
+        gp: 0
+        pp: 0
+        sp: 0
+      name: thomas
+      notes: Likes apples, peace and good harvests.
+      proficiencies: []
+      proficiency_bonus: 0
+      race: Human
+      spells: []
+      sprite: villager.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 100
+    climbed: 0
+    facing: North
+    height: 1.7
+    interaction: null
+    last_action: null
+    last_outcome: null
+    name: thomas
+    objectives: []
+    pos:
+    - 13
+    - 39
+    sprite: villager.png
+    state: idle
+    symbol: V
+    xp_accumulated: 0
+    xp_to_gain: 10
+  village_elder:
+    aggro: null
+    character:
+      alignment: Farming
+      attributes:
+        charisma: 14
+        constitution: 11
+        dexterity: 12
+        intelligence: 10
+        strength: 10
+        wisdom: 14
+      char_class: Countryman
+      current_state:
+        conditions: []
+        current_hp: 10
+      description: An old but energetic country man, head of the village
+      equipment:
+      - bottle of beer
+      - map
+      equipped:
+        armor: Leather Armor
+        main_hand: Sickle
+        off_hand: None
+      faction: neutral
+      gender: male
+      level: 2
+      max_cargo: 20
+      max_hp: 10
+      max_speed: 10
+      money:
+        cp: 22
+        gp: 0
+        sp: 0
+      name: village_elder
+      notes: Likes apples, peace and good harvests.
+      proficiencies: []
+      proficiency_bonus: 0
+      race: Human
+      spells: []
+      sprite: village_elder.png
+      weapon_mastery:
+        martial: null
+        simple: proficient
+      wkdir: ./
+      xp: 100
+    climbed: 0
+    facing: North
+    height: 1.7
+    interaction:
+      paths:
+      - cost: money | 3 cp
+        name: booze!
+        reward: equipment | bottle of beer
+      - cost: equipment | dagger
+        name: info on quest2
+        reward: information | life is short
+      - cost: equipment | dagger
+        name: map of the region
+        reward: equipment | map
+      smalltalk:
+      - what strangers like ya'r doin' here. No business with ya!
+    last_action: null
+    last_outcome: null
+    name: village_elder
+    objectives: []
+    pos:
+    - 13
+    - 7
+    sprite: village_elder.png
+    state: idle
+    symbol: E
+    xp_accumulated: 0
+    xp_to_gain: 10
 kills: []
-now: 2025-11-02 22:25:12.243294
+now: 2025-11-30 22:18:50.251845
 players_sorted_list:
 - lana
 - neila
-room: forest_slopes
+room: village_start
 round_counter: 4

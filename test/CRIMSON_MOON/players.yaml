@@ -17,7 +17,7 @@ players:
     - 14
     - 6
     symbol: N
-    character: liora.yaml
+    character: selra.yaml
     sprite: liora.png
     override_money:
       cp : 10
