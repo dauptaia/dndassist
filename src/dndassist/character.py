@@ -22,6 +22,8 @@ class Character:
     name: str
     race: str
     char_class: str
+    hit_dice: str = "1d8"
+    hit_dices: int = 1
     gender: str  = "neutral"
     level: int = 1
     xp: int = 0

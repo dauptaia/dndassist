@@ -13,7 +13,7 @@ actors:
       char_class: Ranger
       current_state:
         conditions: []
-        current_hp: 3
+        current_hp: 10
       description: no particular trait
       equipment:
       - Longbow
@@ -25,6 +25,8 @@ actors:
         off_hand: Dagger
       faction: player
       gender: female
+      hit_dice: 1d8
+      hit_dices: 1
       level: 3
       max_cargo: 30
       max_hp: 24
@@ -53,8 +55,8 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: round finished
-    last_outcome: ''
+    last_action: talk to village_elder
+    last_outcome: '[village_elder] None)'
     name: lana
     objectives:
     - Quit the village map using the path to the forest
@@ -98,6 +100,8 @@ actors:
         off_hand: Dagger
       faction: cult_of_shadows
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 3
       max_cargo: 30
       max_hp: 22
@@ -122,16 +126,14 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: hex lana with Eldritch Blast ; damage max 10 HP
-    last_outcome: '
-
-      lana took 7 hp damage'
+    last_action: round finished
+    last_outcome: ''
     name: neila
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 15
-    - 7
+    - 20
+    - 17
     sprite: liora.png
     state: manual
     symbol: N
@@ -162,6 +164,8 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 2
       max_cargo: 30
       max_hp: 10
@@ -224,6 +228,8 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 2
       max_cargo: 20
       max_hp: 10
@@ -273,7 +279,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-30 22:18:14.251845
+now: 2025-12-08 13:16:14.663887
 players_sorted_list:
 - lana
 - neila
