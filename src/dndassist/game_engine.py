@@ -73,7 +73,6 @@ class GameEngine:
         self.gates: Gates = Gates()
         self.players_sorted_list: List[str] = None
         self.room: RoomMap = None
-        self.kills: List[str] = None
         if reload_from_save is None:
             self.round_counter: int = 0
             self.startup()
@@ -84,7 +83,6 @@ class GameEngine:
     def startup(self):
         # load gates
         self.gates.load(self.wkdir, "gates.yaml")
-        self.kills = []
         # load players 
         with open(os.path.join(self.wkdir, "players.yaml"), "r") as fin:
             players_data = yaml.safe_load(fin)
@@ -103,7 +101,6 @@ class GameEngine:
             "round_counter" : self.round_counter,
             "now" : self.now,
             "room" : self.room.name,
-            "kills" : self.kills,
             "players_sorted_list" : self.players_sorted_list,
             "actors": {},
     #        "loots": {}
@@ -133,7 +130,6 @@ class GameEngine:
         self.gates.load(self.wkdir, "gates.yaml") #just in case
         self.round_counter = save["round_counter"]
         self.now = save["now"]
-        self.kills = save["kills"]
         self.players_sorted_list = save["players_sorted_list"]
         
         self.room = RoomMap.load(self.wkdir, save["room"] + ".yaml")
@@ -295,15 +291,17 @@ class GameEngine:
                 elif action.startswith("talk to"):
                     remaining_actions -= 100
                     npc_actor = self.room.actors[action.split()[2]]
-                    name, cost_str, reward_str = npc_actor.talk_to()
+                    name, cost_str, reward_str, xp = npc_actor.talk_to()
                     if cost_str is None:
                         outcome = f"[{npc_actor.name}] {name})"
                     else:
                         if actor.give_something(cost_str):
                             npc_actor.get_equipment(cost_str)
-                            reward = actor.get_something(reward_str)
+                            kind, reward = actor.get_something(reward_str)
+                            self.room.xp_accumulated += xp
                             outcome = f"[{actor.name}] gave {cost_str} to [{npc_actor.name}]"
-                            outcome += f"\n[{npc_actor.name}] gave {reward} to [{actor.name}]"
+                            outcome += f"\n[{npc_actor.name}] gave {kind} {reward} to [{actor.name}]"
+                            outcome += f"\nParty gained {xp}"
                         else:
                             outcome = f"[{actor.name}] cannot give {cost_str} to [{npc_actor.name}]"
                             
@@ -432,10 +430,9 @@ class GameEngine:
         
     def distribute_xp_points(self):
         """Distribute XP to players"""
-        xp_gained = 0
-        for kill in self.kills:
-            xp_gained+= self.room.actors[kill].xp_to_gain
-        xp_share = xp_gained // len(self.players_sorted_list)
+        
+        xp_share = self.room.xp_accumulated // len(self.players_sorted_list)
+        self.room.xp_accumulated = 0
         for actor in self.gates.travelers_actors():
             story_print(f"__[{actor.name}]__ has gained __{xp_share}__ XP points!" )
             actor.character.xp += xp_share
@@ -459,8 +456,7 @@ class GameEngine:
                 story_print(f"__[{actor.name}]__ ability {ability} increased ! +1" )
                 actor.character.attributes[ability]+=1            
 
-            actor.xp_accumulated += xp_share
-        self.kills = []
+            
 
         
     def end_of_round_dialog(self):
@@ -658,7 +654,7 @@ class GameEngine:
         if is_dead:
             outcome += f" and is dead"
             self.room.add_loot(defender.character.drop_loot(), defender.pos)
-            self.kills.append(defender_name)
+            self.room.xp_accumulated += defender.xp_to_gain
         return outcome
 
     def action_hex(self, actor, action)->str:
@@ -673,7 +669,7 @@ class GameEngine:
         if is_dead:
             outcome += f" and is dead"
             self.room.add_loot(defender.character.drop_loot(), defender.pos)
-            self.kills.append(defender_name)
+            self.room.xp_accumulated += defender.xp_to_gain
         return outcome
 
     def action_move_to_target(self, actor:Actor, remaining_moves:float, action:str)->Tuple[str,int]:

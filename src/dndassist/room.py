@@ -89,7 +89,6 @@ class Actor:
     facing: str = "North"
     height: float = 1.7 # height of the creature, standing
     xp_to_gain: int = 10
-    xp_accumulated: int = 0
     sprite: str = None
     last_action: str = None
     last_outcome: str = None
@@ -198,15 +197,17 @@ class Actor:
         roll, success = rolldice(dice,autoroll=auto)
         return roll, success, mod
 
-    def talk_to(self)-> Tuple[str, str, str]:
+    def talk_to(self)-> Tuple[str, str, str, int]:
         """Return option through name, cost, and reward"""
         cost = None
         reward = None
+        xp = 0
+        
         if self.interaction is None:
             name = f" has nothing to say"
         else:
-            name,cost,reward = self.interaction.try_talking()
-        return name,cost,reward
+            name,cost,reward, xp = self.interaction.try_talking()
+        return name,cost,reward, xp
                 
     def give_money(self, money_str : str)-> bool:
         """money_str must be of shape ' 10 gp' 
@@ -226,26 +227,49 @@ class Actor:
         nb, piece = money_str.strip().split()
         self.character.money[piece] += nb
     
-    def give_equipment(self, equipment : str)-> bool:
-        """Sum must be of shape ' 10 gp' """
+    def give_equipment(self, equipment_str : str)-> bool:
+        """Sum must be of shape ' dagger' or ' dagger *3' """
+        expected_nb = 1
+        if "*" in equipment_str:
+            equipment, expected_nb = equipment_str.split("*")
+            expected_nb=int(expected_nb)
+            equipment=equipment.strip()    
+        else:
+            equipment=equipment_str.strip()   
+
         new_equipment = []
-        avail = False
+        nb = 0
         for equip in self.character.equipment:
-            if equip in equipment:
-                avail = True
+            if equip == equipment:
+                nb +=1
+                if nb > expected_nb:
+                    new_equipment.append(equip) 
             else:
                new_equipment.append(equip) 
-        if not avail:
-            story_print(f"[{self.name}] does not have {equipment}")
+        
+        avail = False
+        if nb < expected_nb:
+            story_print(f"[{self.name}] does not have {equipment_str}")
         else:
+            avail = True
             self.character.equipment = new_equipment
         return avail
     
-    def get_equipment(self, equipment : str):
-        """Sum must be of shape ' 10 gp' """
-        self.character.equipment.append(equipment)
+    def get_equipment(self, equipment_str : str):
+        """Sum must be of shape ' dagger' or ' dagger *3' """
+        expected_nb = 1
+        if "*" in equipment_str:
+            equipment, expected_nb = equipment_str.split("*")
+            expected_nb=int(expected_nb)
+            equipment=equipment.strip()    
+        else:
+            equipment=equipment_str.strip()    
+        
+        for i in range(expected_nb):
+            self.character.equipment.append(equipment)
     
     def give_something(self, product_str: str):
+        """When an actor gives something"""
         kind, object_ = product_str.strip().split("|")
         kind= kind.strip()
         object_ = object_.strip()
@@ -257,6 +281,7 @@ class Actor:
             raise NotImplementedError(f"give {kind} is not possible")
         
     def get_something(self, product_str: str):
+        """When an actor get something"""
         kind, object_ = product_str.strip().split("|")
         kind= kind.strip()
         object_ = object_.strip()
@@ -268,7 +293,7 @@ class Actor:
             pass
         else:
             raise NotImplementedError(f"get {kind} is not possible")
-        return object_
+        return kind, object_
 
     def status_str(self)-> Tuple[str, str, str]:
         """return the status of the actor when necessary"""
@@ -352,9 +377,9 @@ class RoomMap:
     height: int
     elevation: np.ndarray # the ground level 
     obstacles_elev: np.ndarray # the ground level + obstacles elev
-    
     opacity: np.ndarray
     unit_m: float = 1.5
+    xp_accumulated: int = 0
     npc_ordered_list: List[str] = None
     actors: Dict[str, Actor] = field(default_factory=dict)
     loots: Dict[str, Loot] = field(default_factory=dict)
@@ -712,6 +737,8 @@ class RoomMap:
         left.append("\n\nLoots:")
         for loot in self.loots.values():
             left.append(f" {loot.name} : __{loot.symbol}__")
+        
+        left.append(f"\n\nXP accumulated : {self.xp_accumulated}")
         left = "\n".join(left)
 
         right =[f"\n Map: {self.name}\n"]

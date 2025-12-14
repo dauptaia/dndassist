@@ -34,82 +34,56 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 13:55:10.318957
-
-
---- __lana__'s turn (14, 7)---
-move to cocotte at 5m 
-Manual input
-
-lana moved toward cocotte over 6m
-
-pick up cocotte_2
-Manual input
-
-lana has picked up cocotte_2 cocotte
-
+   Room village_start, time 15:43:02.233095
 
 
 --- __neila__'s turn (15, 7)---
-pick up cocotte_5
+move to cocotte_2 at 6m 
 Manual input
 
-neila has picked up cocotte_5 cocotte
+neila moved toward cocotte_2 over 8m
 
-ROUND 2 START
-   Room village_start, time 13:55:22.318957
-
-
---- __lana__'s turn (15, 10)---
 pick up cocotte
 Manual input
 
-lana has picked up cocotte cocotte
+neila has picked up cocotte cocotte
 
 
 
---- __neila__'s turn (15, 7)---
-move to cocotte_6 at 4m 
+--- __lana__'s turn (14, 7)---
+round finished
 Manual input
 
-neila moved toward cocotte_6 over 4m
 
-pick up cocotte_6
+ROUND 2 START
+   Room village_start, time 15:43:14.233095
+
+
+--- __lana__'s turn (14, 7)---
+round finished
 Manual input
 
-neila has picked up cocotte_6 cocotte
-
-ROUND 3 START
-   Room village_start, time 13:55:34.318957
 
 
---- __lana__'s turn (15, 10)---
+
+--- __neila__'s turn (16, 11)---
 pick up cocotte_3
 Manual input
 
-lana has picked up cocotte_3 cocotte
+neila has picked up cocotte_3 cocotte
+
+ROUND 3 START
+   Room village_start, time 15:43:26.233095
 
 
-
---- __neila__'s turn (14, 9)---
-pick up cocotte_7
+--- __neila__'s turn (16, 11)---
+move to village_elder at 8m 
 Manual input
 
-neila has picked up cocotte_7 cocotte
+neila moved toward village_elder over 6m
 
-ROUND 4 START
-   Room village_start, time 13:55:46.318957
-
-
---- __neila__'s turn (14, 9)---
-pick up cocotte_4
+talk to village_elder
 Manual input
-
-neila has picked up cocotte_4 cocotte
-
-
-
---- __lana__'s turn (15, 10)---
-show status
-Manual input
-
+[neila] gave equipment | cocotte * 2 to [village_elder]
+[village_elder] gave information this quest is about blabla bla to [neila]
+Party gained 200

@@ -91,9 +91,15 @@ actors:
       - cost : money | 3 cp
         name: booze!
         reward: equipment | bottle of beer
+        xp: 1
       - cost : equipment | dagger
         name: info on quest2 
         reward : information | life is short
+      - cost : equipment | cocotte * 2
+        name: info on quest  
+        reward : information | this quest is about blabla bla
+        xp: 200
       - cost : equipment | dagger
         name: map of the region
         reward: equipment | map
+        xp: 10

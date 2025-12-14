@@ -38,9 +38,9 @@ class Interaction:
     def smalltalk(self):
         return random.choice(self.smalltalk_list)
 
-    def try_talking(self)-> Tuple[str, str, str]:
+    def try_talking(self)-> Tuple[str, str, str, int]:
         if self.paths is None:
-            return self.smalltalk(), None, None
+            return self.smalltalk(), None, None, 0
         
         list_options = ["forget it"]
         for path in self.paths:
@@ -55,7 +55,7 @@ class Interaction:
         if option == "forget it":
             return None,None,None
         idx = list_options.index(option) - 1
-        return self.paths[idx]["name"], self.paths[idx]["cost"], self.paths[idx]["reward"]
+        return self.paths[idx]["name"], self.paths[idx]["cost"], self.paths[idx]["reward"], self.paths[idx]["xp"]
     
         
             
