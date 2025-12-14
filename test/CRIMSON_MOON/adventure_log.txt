@@ -34,26 +34,82 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 13:16:02.663887
+   Room village_start, time 13:55:10.318957
 
 
 --- __lana__'s turn (14, 7)---
-talk to village_elder
+move to cocotte at 5m 
 Manual input
-[village_elder] None)
+
+lana moved toward cocotte over 6m
+
+pick up cocotte_2
+Manual input
+
+lana has picked up cocotte_2 cocotte
 
 
 
 --- __neila__'s turn (15, 7)---
-show view
+pick up cocotte_5
 Manual input
 
+neila has picked up cocotte_5 cocotte
 
-move in direction
+ROUND 2 START
+   Room village_start, time 13:55:22.318957
+
+
+--- __lana__'s turn (15, 10)---
+pick up cocotte
 Manual input
 
-neila moved SouthEast over 15m
+lana has picked up cocotte cocotte
 
-round finished
+
+
+--- __neila__'s turn (15, 7)---
+move to cocotte_6 at 4m 
+Manual input
+
+neila moved toward cocotte_6 over 4m
+
+pick up cocotte_6
+Manual input
+
+neila has picked up cocotte_6 cocotte
+
+ROUND 3 START
+   Room village_start, time 13:55:34.318957
+
+
+--- __lana__'s turn (15, 10)---
+pick up cocotte_3
+Manual input
+
+lana has picked up cocotte_3 cocotte
+
+
+
+--- __neila__'s turn (14, 9)---
+pick up cocotte_7
+Manual input
+
+neila has picked up cocotte_7 cocotte
+
+ROUND 4 START
+   Room village_start, time 13:55:46.318957
+
+
+--- __neila__'s turn (14, 9)---
+pick up cocotte_4
+Manual input
+
+neila has picked up cocotte_4 cocotte
+
+
+
+--- __lana__'s turn (15, 10)---
+show status
 Manual input
 

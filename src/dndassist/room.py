@@ -4,6 +4,7 @@ from typing import Dict, Tuple, List, Optional
 import textwrap, math, yaml, json
 import heapq
 import math
+import random
 import numpy as np
 from matplotlib.colors import to_rgb
 import textwrap
@@ -835,9 +836,9 @@ class RoomMap:
             if noe[*actor.pos] == 0:#< actor.height * 0.75:
                 visible_actors.append(actor.name)
         visible_loots=[]
-        for loot in self.loots.values():
+        for loot_key, loot in self.loots.items():
             if noe[*loot.pos] == 0:
-                visible_loots.append(loot.name)
+                visible_loots.append(loot_key)
         visible_gates=[]
         
         for gate in self.gates.values():
@@ -897,8 +898,8 @@ class RoomMap:
         self, actor_name: str
     ) -> Tuple[List[Tuple[str, int]], List[Tuple[str, int]], List[Tuple[str, int]]]:
         """
-        True LoS description using multiple rays per sector.
-        Returns a list of (visible actors distance in m)
+        Find what is visible by [actor_name]
+        return three list of names AND distance
         """
         actor = self.actors[actor_name]
         visible_actors,visible_loots,visible_gates=self.visible_actors_loots_gates(actor.pos,actor.height+actor.climbed)
@@ -1170,9 +1171,29 @@ class RoomMap:
             npc_ordered_list.append(a_name)
             a_dict["state"] = "idle"
             actors[a_name] = Actor.from_dict(a_dict, wkdir)
-        # loots = {k: Loot.from_dict(v) for k, v in data["loots"].items()}
+
+
         tiles, width, height,elevation_ctrl_pts = from_ascii_map(data["ascii_map"], theme.tiles)
 
+        loots = {}
+        for l_name, _dict in data["loots"].items():
+            repeat = _dict.get("repeat",1)
+            pos = _dict.get("pos",(width//2, height//2))
+            pos_ref = pos
+            
+            for i in range(repeat):
+                key = l_name
+                if i>1:
+                    key+="_"+str(i)
+                    pos = get_crown_pos(pos_ref,width, height, radius=1)[i-1]
+                loots[key] = Loot.from_dict({
+                    "name": l_name,
+                    "pos":pos,
+                    "symbol": _dict["symbol"],
+                    "sprite": None,
+                    "index": i
+                })
+          
         npc_ordered_list =sorted(npc_ordered_list)
 
         elevation = build_elevation_map(
@@ -1186,7 +1207,7 @@ class RoomMap:
         for x in range(width):
             for y in range(height):
                 obstacles_elev[x,y] = elevation[x,y] + tiles[x,y].obstacle_height
-                tiles[x,y].elevation = elevation[x,y] #+ tiles[x,y].obstacle_height
+                tiles[x,y].elevation = elevation[x,y]
 
         opacity = np.full((width, height),0.)
         for x in range(width):
@@ -1206,8 +1227,8 @@ class RoomMap:
             obstacles_elev= obstacles_elev,
             opacity=opacity,
             actors=actors,
-            npc_ordered_list=npc_ordered_list
-            # loots=loots,
+            npc_ordered_list=npc_ordered_list,
+            loots=loots,
         )
 
     def save(self, yaml_path: str):

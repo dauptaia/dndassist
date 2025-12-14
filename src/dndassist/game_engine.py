@@ -636,14 +636,14 @@ class GameEngine:
 
     def action_pick_up_loot(self, actor:Actor, action:str)->str:
         """Action handler to pick up loot (remove form room, give to Actor's Character)"""
-        loot = action.split("ick up")[-1].strip()
-        equipment_name = self.room.loots[loot].name
-        success = actor.character.add_item(equipment_name)
+        loot_key = action.split("ick up")[-1].strip()
+        item_name = self.room.loots[loot_key].name
+        success = actor.character.add_item(item_name)
         if success:
-            del self.room.loots[loot]
-            outcome = f"\n{actor.name} has picked up {loot} {equipment_name}"
+            del self.room.loots[loot_key]
+            outcome = f"\n{actor.name} has picked up {loot_key} {item_name}"
         else:
-            outcome = f"\n{actor.name} cannot pick up {loot} {equipment_name}, too heavy to carry."
+            outcome = f"\n{actor.name} cannot pick up {loot_key} {item_name}, too heavy to carry."
         return outcome
 
     def action_attack(self, actor, action)->str:

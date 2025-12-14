@@ -48,6 +48,17 @@ ascii_map:
   - "oooooooo   0   ooooooooooooooo"
   - "oooooooo       ooooooooooooooo"
 
+
+loots:
+  cocotte:
+    name: cocotte
+    pos:
+    - 15
+    - 10
+    repeat: 8
+    symbol: p
+    sprite: cocotte.png
+
 actors:
   thomas:
     name: thomas
