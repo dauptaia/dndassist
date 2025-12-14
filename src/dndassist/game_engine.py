@@ -13,6 +13,7 @@ from dndassist.storyprint import (
     print_color,
     print_3cols
 )
+from dndassist.level_up import check_new_level
 from dndassist.autoplay import (
     user_select_option,user_ask_coordinates
 )
@@ -436,8 +437,29 @@ class GameEngine:
             xp_gained+= self.room.actors[kill].xp_to_gain
         xp_share = xp_gained // len(self.players_sorted_list)
         for actor in self.gates.travelers_actors():
-            actor.xp_accumulated += xp_share
             story_print(f"__[{actor.name}]__ has gained __{xp_share}__ XP points!" )
+            actor.character.xp += xp_share
+            
+            # Levelling up...
+            lvl, prof, hp_increase, abilities_increase = check_new_level(
+                actor.character.xp, 
+                actor.character.xp+xp_share, 
+                actor.character.hit_dice, 
+                actor.character.attr_mod("constitution"))
+            if lvl > actor.character.level:
+                story_print(f"__[{actor.name}]__ level up ! {actor.character.level}->{lvl}" )
+                actor.character.level = lvl
+            if prof > actor.character.proficiency_bonus:
+                story_print(f"__[{actor.name}]__ proficiency_bonus increased ! {actor.character.proficiency_bonus}->{prof}" )
+                actor.character.proficiency_bonus = prof
+            if hp_increase:
+                story_print(f"__[{actor.name}]__ hit points increased ! +{hp_increase}" )
+                actor.character.max_hp += hp_increase
+            for ability in abilities_increase:
+                story_print(f"__[{actor.name}]__ ability {ability} increased ! +1" )
+                actor.character.attributes[ability]+=1            
+
+            actor.xp_accumulated += xp_share
         self.kills = []
 
         

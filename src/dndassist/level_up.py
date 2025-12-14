@@ -4,6 +4,39 @@ from typing import Tuple, List
 from dndassist.autoplay import user_select_option
 from dndassist.autoroll import max_dice, rolldice
 
+
+def check_new_level(past_xp:int, new_xp:int, hit_dice:str, const_mod:int)-> Tuple[int,int,int,List[str]]:
+    """find the bonuses to apply for a new level, by comparing past and new XP
+
+    Return:
+        - the curent level and proficiency
+        - if level up the increase in Hit Points and ability increase 
+    """
+    past_lvl,_ = get_lvl_proficiency(past_xp)
+    new_lvl, new_proficiency = get_lvl_proficiency(new_xp)
+    print("??",past_lvl,new_lvl)
+    if past_lvl == new_lvl:
+        return new_lvl, new_proficiency, 0, []
+    
+    avg = max_dice(hit_dice)+1
+    opt, _ = user_select_option(
+        f"Use average hit dice ({avg})? or roll {hit_dice}?",
+        f"",
+        ["roll dice", "use average"]
+    )
+    if opt == "use average":
+        hp_up = avg+const_mod
+    else:
+        roll,_ =rolldice(hit_dice)
+        hp_up = max(1, roll+const_mod)
+    
+    # ASI phase
+    ability_upgrades = ability_score_increase(new_lvl)
+    if "constitution" in ability_upgrades:
+        hp_up += new_lvl
+    return new_lvl, new_proficiency, hp_up, ability_upgrades
+
+
 def get_lvl_proficiency(xp:int)-> Tuple[int, int]:
     """return level and proficiency from xp_points"""
     if xp < 300:
@@ -46,31 +79,6 @@ def get_lvl_proficiency(xp:int)-> Tuple[int, int]:
         return 19, 6
     return 20, 6
 
-def check_new_level(past_xp:int, new_xp:int, hit_dice:str, const_mod:int)-> Tuple[int,int,int, List[str]]:
-    """find the bonuses to apply for a new level"""
-    past_lvl,_ = get_lvl_proficiency(past_xp)
-    new_lvl = get_lvl_proficiency(new_xp)
-    if past_lvl == new_lvl:
-        return 
-    
-    avg = max_dice(hit_dice)+1
-    opt, _ = user_select_option(
-        f"Use average hit dice ({avg})? or roll {hit_dice}?",
-        f"",
-        ["roll dice", "use average"]
-    )
-    if opt == "use average":
-        hp_up = avg+const_mod
-    else:
-        hp_up, _ = max(1, rolldice(hit_dice)+const_mod)
-    
-    # ASI phase
-    ability_upgrades = ability_score_increase(new_lvl)
-    if "constitution" in ability_upgrades:
-        hp_up += new_lvl
-    return hp_up, ability_upgrades
-
-
 def ability_score_increase(lvl:int) -> List[str]:
     """Ask what abilities to increase if level is an ASI"""
     if lvl not in [4,8,12,16,20]:
@@ -89,3 +97,5 @@ def ability_score_increase(lvl:int) -> List[str]:
         abilities
     )
     return [ab1,ab2]
+
+# print( check_new_level(2600, 2800, '1d10',2))
