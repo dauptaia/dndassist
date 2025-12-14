@@ -745,6 +745,7 @@ class GameEngine:
         return outcome, used_dist
 
     def build_attack_solutions(self, actor, all_visible_actors_):
+            
         actions_avail = []
         faction = actor.character.faction
         visible_foes = []
@@ -754,7 +755,8 @@ class GameEngine:
                 faction,
             ]:
                 visible_foes.append((other, dist))
-
+        
+            
         for other, dist in visible_foes:
             weapon, dmg = actor_attack_solutions(actor, dist)
             if weapon is not None:

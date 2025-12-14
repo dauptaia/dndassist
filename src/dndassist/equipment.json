@@ -1,712 +1,664 @@
 {
-    "Weapon": [
-        {
-            "name": "Club",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+    "Weapon": {
+        "club": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "1 sp",
             "weight": 2,
             "properties": [
-                "Light",
-                "Monk"
+                "light",
+                "monk"
             ]
         },
-        {
-            "name": "Dagger",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "dagger": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "2 gp",
             "weight": 1,
             "properties": [
-                "Finesse",
-                "Light",
-                "Thrown",
-                "Monk"
+                "finesse",
+                "light",
+                "thrown",
+                "monk"
             ]
         },
-        {
-            "name": "Greatclub",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "greatclub": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "2 sp",
             "weight": 10,
             "properties": [
-                "Two-Handed"
+                "two-handed"
             ]
         },
-        {
-            "name": "Handaxe",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "handaxe": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 gp",
             "weight": 2,
             "properties": [
-                "Light",
-                "Thrown",
-                "Monk"
+                "light",
+                "thrown",
+                "monk"
             ]
         },
-        {
-            "name": "Javelin",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "javelin": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 sp",
             "weight": 2,
             "properties": [
-                "Thrown",
-                "Monk"
+                "thrown",
+                "monk"
             ]
         },
-        {
-            "name": "Light hammer",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "light hammer": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "2 gp",
             "weight": 2,
             "properties": [
-                "Light",
-                "Thrown",
-                "Monk"
+                "light",
+                "thrown",
+                "monk"
             ]
         },
-        {
-            "name": "Mace",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "mace": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 gp",
             "weight": 4,
             "properties": [
-                "Monk"
+                "monk"
             ]
         },
-        {
-            "name": "Quarterstaff",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "quarterstaff": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "2 sp",
             "weight": 4,
             "properties": [
-                "Versatile",
-                "Monk"
+                "versatile",
+                "monk"
             ]
         },
-        {
-            "name": "Sickle",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "sickle": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "1 gp",
             "weight": 2,
             "properties": [
-                "Light",
-                "Monk"
+                "light",
+                "monk"
             ]
         },
-        {
-            "name": "Spear",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee",
+        "spear": {
+            "weapon_category": "simple",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "1 gp",
             "weight": 3,
             "properties": [
-                "Thrown",
-                "Versatile",
-                "Monk"
+                "thrown",
+                "versatile",
+                "monk"
             ]
         },
-        {
-            "name": "Crossbow, light",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged",
+        "crossbow, light": {
+            "weapon_category": "simple",
+            "weapon_range": "ranged",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 80,
             "range_long": 320,
             "cost": "25 gp",
             "weight": 5,
             "properties": [
-                "Ammunition",
-                "Loading",
-                "Two-Handed"
+                "ammunition",
+                "loading",
+                "two-handed"
             ]
         },
-        {
-            "name": "Dart",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged",
+        "dart": {
+            "weapon_category": "simple",
+            "weapon_range": "ranged",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 20,
             "range_long": 60,
             "cost": "5 cp",
             "weight": 0.25,
             "properties": [
-                "Finesse",
-                "Thrown"
+                "finesse",
+                "thrown"
             ]
         },
-        {
-            "name": "Shortbow",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged",
+        "shortbow": {
+            "weapon_category": "simple",
+            "weapon_range": "ranged",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 80,
             "range_long": 320,
             "cost": "25 gp",
             "weight": 2,
             "properties": [
-                "Ammunition",
-                "Two-Handed"
+                "ammunition",
+                "two-handed"
             ]
         },
-        {
-            "name": "Sling",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged",
+        "sling": {
+            "weapon_category": "simple",
+            "weapon_range": "ranged",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 30,
             "range_long": 120,
             "cost": "1 sp",
             "weight": 0,
             "properties": [
-                "Ammunition"
+                "ammunition"
             ]
         },
-        {
-            "name": "Battleaxe",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "battleaxe": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "10 gp",
             "weight": 4,
             "properties": [
-                "Versatile"
+                "versatile"
             ]
         },
-        {
-            "name": "Flail",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "flail": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "10 gp",
             "weight": 2,
             "properties": []
         },
-        {
-            "name": "Glaive",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "glaive": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d10",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "20 gp",
             "weight": 6,
             "properties": [
-                "Heavy",
-                "Reach",
-                "Two-Handed"
+                "heavy",
+                "reach",
+                "two-handed"
             ]
         },
-        {
-            "name": "Greataxe",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "greataxe": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d12",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "30 gp",
             "weight": 7,
             "properties": [
-                "Heavy",
-                "Two-Handed"
+                "heavy",
+                "two-handed"
             ]
         },
-        {
-            "name": "Greatsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "greatsword": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "2d6",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "50 gp",
             "weight": 6,
             "properties": [
-                "Heavy",
-                "Two-Handed"
+                "heavy",
+                "two-handed"
             ]
         },
-        {
-            "name": "Halberd",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "halberd": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d10",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "20 gp",
             "weight": 6,
             "properties": [
-                "Heavy",
-                "Reach",
-                "Two-Handed"
+                "heavy",
+                "reach",
+                "two-handed"
             ]
         },
-        {
-            "name": "Lance",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "lance": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d12",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "10 gp",
             "weight": 6,
             "properties": [
-                "Reach",
-                "Special"
+                "reach",
+                "special"
             ]
         },
-        {
-            "name": "Longsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "longsword": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "15 gp",
             "weight": 3,
             "properties": [
-                "Versatile"
+                "versatile"
             ]
         },
-        {
-            "name": "Maul",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "maul": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "2d6",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "10 gp",
             "weight": 10,
             "properties": [
-                "Heavy",
-                "Two-Handed"
+                "heavy",
+                "two-handed"
             ]
         },
-        {
-            "name": "Morningstar",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "morningstar": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "15 gp",
             "weight": 4,
             "properties": []
         },
-        {
-            "name": "Pike",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "pike": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d10",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 gp",
             "weight": 18,
             "properties": [
-                "Heavy",
-                "Reach",
-                "Two-Handed"
+                "heavy",
+                "reach",
+                "two-handed"
             ]
         },
-        {
-            "name": "Rapier",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "rapier": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "25 gp",
             "weight": 2,
             "properties": [
-                "Finesse"
+                "finesse"
             ]
         },
-        {
-            "name": "Scimitar",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "scimitar": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "25 gp",
             "weight": 3,
             "properties": [
-                "Finesse",
-                "Light"
+                "finesse",
+                "light"
             ]
         },
-        {
-            "name": "Shortsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "shortsword": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "10 gp",
             "weight": 2,
             "properties": [
-                "Finesse",
-                "Light",
-                "Monk"
+                "finesse",
+                "light",
+                "monk"
             ]
         },
-        {
-            "name": "Trident",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "trident": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 gp",
             "weight": 4,
             "properties": [
-                "Thrown",
-                "Versatile"
+                "thrown",
+                "versatile"
             ]
         },
-        {
-            "name": "War pick",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "war pick": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 5,
             "range_long": null,
             "cost": "5 gp",
             "weight": 2,
             "properties": []
         },
-        {
-            "name": "Warhammer",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "warhammer": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Bludgeoning",
+            "damage_type": "bludgeoning",
             "range_normal": 5,
             "range_long": null,
             "cost": "15 gp",
             "weight": 2,
             "properties": [
-                "Versatile"
+                "versatile"
             ]
         },
-        {
-            "name": "Whip",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee",
+        "whip": {
+            "weapon_category": "martial",
+            "weapon_range": "melee",
             "damage_dice": "1d4",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": null,
             "cost": "2 gp",
             "weight": 3,
             "properties": [
-                "Finesse",
-                "Reach"
+                "finesse",
+                "reach"
             ]
         },
-        {
-            "name": "Blowgun",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged",
+        "blowgun": {
+            "weapon_category": "martial",
+            "weapon_range": "ranged",
             "damage_dice": "1d1",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 25,
             "range_long": 100,
             "cost": "10 gp",
             "weight": 1,
             "properties": [
-                "Ammunition",
-                "Loading"
+                "ammunition",
+                "loading"
             ]
         },
-        {
-            "name": "Crossbow, hand",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged",
+        "crossbow, hand": {
+            "weapon_category": "martial",
+            "weapon_range": "ranged",
             "damage_dice": "1d6",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 30,
             "range_long": 120,
             "cost": "75 gp",
             "weight": 3,
             "properties": [
-                "Ammunition",
-                "Light",
-                "Loading"
+                "ammunition",
+                "light",
+                "loading"
             ]
         },
-        {
-            "name": "Crossbow, heavy",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged",
+        "crossbow, heavy": {
+            "weapon_category": "martial",
+            "weapon_range": "ranged",
             "damage_dice": "1d10",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 100,
             "range_long": 400,
             "cost": "50 gp",
             "weight": 18,
             "properties": [
-                "Ammunition",
-                "Light",
-                "Loading",
-                "Two-Handed"
+                "ammunition",
+                "light",
+                "loading",
+                "two-handed"
             ]
         },
-        {
-            "name": "Longbow",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged",
+        "longbow": {
+            "weapon_category": "martial",
+            "weapon_range": "ranged",
             "damage_dice": "1d8",
             "damage_bonus": 0,
-            "damage_type": "Piercing",
+            "damage_type": "piercing",
             "range_normal": 150,
             "range_long": 600,
             "cost": "50 gp",
             "weight": 2,
             "properties": [
-                "Ammunition",
-                "Heavy",
-                "Two-Handed"
+                "ammunition",
+                "heavy",
+                "two-handed"
             ]
         },
-        {
-            "name": "Net",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged",
+        "net": {
+            "weapon_category": "martial",
+            "weapon_range": "ranged",
             "damage_dice": "1d0",
             "damage_bonus": 0,
-            "damage_type": "Slashing",
+            "damage_type": "slashing",
             "range_normal": 5,
             "range_long": 15,
             "cost": "1 gp",
             "weight": 3,
             "properties": [
-                "Thrown",
-                "Special"
+                "thrown",
+                "special"
             ]
         }
-    ],
-    "Shield": [
-        {
+    },
+    "Shield": {
+        "shield": {
             "name": "Shield",
             "base": 2,
-            "cost": 10,
+            "cost": "10 gp",
             "weight": 6
         }
-    ],
-    "Armor": [
-        {
-            "name": "Padded Armor",
-            "category": "Light",
+    },
+    "Armor": {
+        "padded armor": {
+            "category": "light",
             "base": 11,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 5,
+            "cost": "5 gp",
             "weight": 8
         },
-        {
-            "name": "Leather Armor",
-            "category": "Light",
+        "leather armor": {
+            "category": "light",
             "base": 11,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 10,
+            "cost": "10 gp",
             "weight": 10
         },
-        {
-            "name": "Studded Leather Armor",
-            "category": "Light",
+        "studded leather armor": {
+            "category": "light",
             "base": 12,
             "dex_bonus": true,
             "max_bonus": null,
-            "cost": 45,
+            "cost": "45 gp",
             "weight": 13
         },
-        {
-            "name": "Hide Armor",
-            "category": "Medium",
+        "hide armor": {
+            "category": "medium",
             "base": 12,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 10,
+            "cost": "10 gp",
             "weight": 12
         },
-        {
-            "name": "Chain Shirt Armor",
-            "category": "Medium",
+        "chain shirt armor": {
+            "category": "medium",
             "base": 13,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 50,
+            "cost": "50 gp",
             "weight": 20
         },
-        {
-            "name": "Scale Mail Armor",
-            "category": "Medium",
+        "scale mail armor": {
+            "category": "medium",
             "base": 14,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 50,
+            "cost": "50 gp",
             "weight": 45
         },
-        {
-            "name": "Breastplate Armor",
-            "category": "Medium",
+        "breastplate armor": {
+            "category": "medium",
             "base": 14,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 400,
+            "cost": "400 gp",
             "weight": 20
         },
-        {
-            "name": "Half Plate Armor",
-            "category": "Medium",
+        "half plate armor": {
+            "category": "medium",
             "base": 15,
             "dex_bonus": true,
             "max_bonus": 2,
-            "cost": 750,
+            "cost": "750 gp",
             "weight": 40
         },
-        {
-            "name": "Ring Mail Armor",
-            "category": "Heavy",
+        "ring mail armor": {
+            "category": "heavy",
             "base": 14,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 30,
+            "cost": "30 gp",
             "weight": 40
         },
-        {
-            "name": "Chain Mail Armor",
-            "category": "Heavy",
+        "chain mail armor": {
+            "category": "heavy",
             "base": 16,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 75,
+            "cost": "75 gp",
             "weight": 55
         },
-        {
-            "name": "Splint Armor",
-            "category": "Heavy",
+        "splint armor": {
+            "category": "heavy",
             "base": 17,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 200,
+            "cost": "200 gp",
             "weight": 60
         },
-        {
-            "name": "Plate Armor",
-            "category": "Heavy",
+        "plate armor": {
+            "category": "heavy",
             "base": 18,
             "dex_bonus": false,
             "max_bonus": null,
-            "cost": 1500,
+            "cost": "1500 gp",
             "weight": 65
         }
-    ]
+    },
+    "Item": {}
 }

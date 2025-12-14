@@ -133,8 +133,9 @@ def offensive_spell(
 
     # if ranged , test attack
     if spell.range > 2:
-        print_r(f".  {spell_name} is a ranged spell, roll dice for accuracy")
+        print_l(f".  {spell_name} is a ranged spell, roll dice for accuracy")
         roll, dice_normed = rolldice("1d20", autoroll=autoroll, advantage=advantage)
+        print_l(f".  roll dice for damage")
         damage, _ = rolldice(spell.damage_dice, autoroll=autoroll)
         if dice_normed == 0.0:
             print_r(f".  Misfire, [{attacker.name}] missed the attack!")

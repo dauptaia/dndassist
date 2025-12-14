@@ -427,7 +427,7 @@ class RoomMap:
             return False
 
         if not _is_occupied(pos):
-            print(pos, " is free")
+            #print(pos, " is free")
             return pos
 
         for rad in range(1, max_crown + 1):

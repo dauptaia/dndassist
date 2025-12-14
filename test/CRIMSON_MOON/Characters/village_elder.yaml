@@ -7,7 +7,7 @@ xp: 100
 description: An old but energetic country man, head of the village
 alignment: Farming
 notes: Likes apples, peace and good harvests.
-faction: neutral
+faction: evil master
 sprite: village_elder.png
 max_cargo: 20
 max_hp: 10

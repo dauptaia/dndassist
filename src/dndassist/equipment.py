@@ -13,61 +13,58 @@ import os
 from importlib_resources import files
 from dndassist.storyprint import story_print
 
-EQUIPMENT_PATH = files("dndassist").joinpath(
-    "equipment.json"
-)  # os.path.join("data", "weapons.json")
-EQUIPMENT_CATG_PATH = files("dndassist").joinpath(
-    "equipment_categories.json"
-)  # os.path.join("data", "weapons.json")
 
-with open(EQUIPMENT_PATH, "r", encoding="utf-8") as f:
+EQUIP_CATG = ["Weapon","Shield","Armor","Item"]
+
+with open( files("dndassist").joinpath("equipment.json"), "r", encoding="utf-8") as f:
     EQUIPMENT_DICT = json.load(f)
+with open( files("dndassist").joinpath("equipment_custom.json"), "r", encoding="utf-8") as f:
+    data_ = json.load(f)
+    for catg in EQUIP_CATG:
+        try:
+            EQUIPMENT_DICT[catg].update(data_[catg])
+        except KeyError:
+            pass
 
-with open(EQUIPMENT_CATG_PATH, "r", encoding="utf-8") as f:
-    EQUIPMENT_CATG_DICT = json.load(f)
+WEAPONS = EQUIPMENT_DICT["Weapon"]
+SHIELDS = EQUIPMENT_DICT["Shield"]
+ARMORS = EQUIPMENT_DICT["Armor"]
+ITEMS = EQUIPMENT_DICT["Item"]
 
 
-
-def print_r(text):
+def _print_r(text):
     story_print(text, color="green", justify="right")
 
-
 def equipment_weight(equip_name):
-    weight = 0
-    for cat in ["Weapon", "Armor", "Shield"]:
-        for equip in EQUIPMENT_DICT[cat]:
-            if equip["name"] == equip_name:
-                weight = equip["weight"]
+    equip_name = equip_name.lower()
+    
+    qoi = None
+    for cat in EQUIP_CATG:
         if equip_name in EQUIPMENT_DICT[cat]:
-            weight = EQUIPMENT_DICT[cat][equip_name]
-    if weight == 0:
-        print_r(f"{equip_name} not present in equipment ddb.")
-    return weight
+            qoi = EQUIPMENT_DICT[cat][equip_name]["weight"]
+            break
+    if qoi is None:
+        _print_r(f"{equip_name} not present in equipment ddb.")
+    return qoi
 
 def equipment_cost(equip_name):
-    weight = 0
-    for cat in ["Weapon", "Armor", "Shield"]:
-        for equip in EQUIPMENT_DICT[cat]:
-            if equip["name"] == equip_name:
-                weight = equip["cost"]
+    equip_name = equip_name.lower()
+    
+    qoi = None
+    for cat in EQUIP_CATG:
         if equip_name in EQUIPMENT_DICT[cat]:
-            weight = EQUIPMENT_DICT[cat][equip_name]
-    if weight == 0:
-        print_r(f"{equip_name} not present in equipment ddb.")
-    return weight
+            qoi = EQUIPMENT_DICT[cat][equip_name]["weight"]
+            break
+    if qoi is None:
+        _print_r(f"{equip_name} not present in equipment ddb.")
+    return qoi
 
-
-def weapon_catg(weapon_name):
-    for cat in EQUIPMENT_CATG_DICT:
-        if "Simple" not in cat and "Martial" not in cat:
-            continue
-        if weapon_name in EQUIPMENT_CATG_DICT[cat]:
-            if "Simple" in cat:
-                return "simple"
-            else:
-                return "martial"
-    return None
-
+def weapon_catg(weapon_name):   
+    weapon_name = weapon_name.lower()
+    if  weapon_name not in WEAPONS:
+        return None
+    return WEAPONS[weapon_name]["weapon_category"]
+    
 
 @dataclass
 class Weapon:
@@ -86,38 +83,13 @@ class Weapon:
     # Path to your weapon definitions (adjust to your project structure)
 
     @classmethod
-    def _load_all_weapons(cls) -> Dict[str, Dict[str, Any]]:
-        """Load all weapon specs into a dict indexed by name (case-insensitive)."""
-        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Weapon"]}
-
-    @classmethod
     def from_name(cls, name: str) -> "Weapon":
         """Create a Weapon instance by name (case-insensitive lookup)."""
-
-        if not name:
-            # Bare hands fallback
-            return cls(
-                name="Unarmed strike",
-                weapon_category="Simple",
-                weapon_range="Melee",
-                damage_dice="1d1",
-                damage_bonus=1,
-                damage_type="Bludgeoning",
-                range_normal=5,
-                range_long=None,
-                properties=[],
-                cost=0,
-                weight=0,
-            )
-
-        all_weapons = cls._load_all_weapons()
-        key = name.lower()
-        if key not in all_weapons:
-            raise ValueError(f"Weapon '{name}' not found in {EQUIPMENT_PATH}")
-        return cls(**all_weapons[key])
-
-    # ------------------ GAME LOGIC ------------------
-
+        name = name.lower()
+        if name not in WEAPONS:
+            raise ValueError(f"Weapon '{name}' not found ")
+        return cls(name, **WEAPONS[name])
+    
     def attributes(self) -> List[str]:
         """Return which ability (e.g. Strength, Dexterity) is used to attack with this weapon."""
         props = [p.lower() for p in self.properties or []]
@@ -145,46 +117,39 @@ class Armor:
     cost: str
     weight: int
 
-
-    # Path to your weapon definitions (adjust to your project structure)
-
-    @classmethod
-    def _load_all_armors(cls) -> Dict[str, Dict[str, Any]]:
-        """Load all armor specs into a dict indexed by name (case-insensitive)."""
-        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Armor"]}
-
     @classmethod
     def from_name(cls, name: str) -> "Armor":
         """Create a Armor instance by name (case-insensitive lookup)."""
-
-        all_weapons = cls._load_all_armors()
-        key = name.lower()
-        if key not in all_weapons:
-            raise ValueError(f"Armor '{name}' not found in {EQUIPMENT_PATH}")
-        return cls(**all_weapons[key])
-
-
+        name = name.lower()
+        if name not in ARMORS:
+            raise ValueError(f"Armor '{name}' not found ")
+        return cls(name, **ARMORS[name])
 @dataclass
 class Shield:
     name: str
     base: int
     cost: str
     weight: int
-
-
-    # Path to your weapon definitions (adjust to your project structure)
-
-    @classmethod
-    def _load_all_shields(cls) -> Dict[str, Dict[str, Any]]:
-        """Load all shield specs into a dict indexed by name (case-insensitive)."""
-        return {entry["name"].lower(): entry for entry in EQUIPMENT_DICT["Shield"]}
+    """Used for shield or other stuff for the moment, """
 
     @classmethod
     def from_name(cls, name: str) -> "Shield":
         """Create a Shield instance by name (case-insensitive lookup)."""
+        name = name.lower()
+        if name not in SHIELDS:
+            raise ValueError(f"Shield '{name}' not found ")
+        return cls(name, **SHIELDS[name])
 
-        all_weapons = cls._load_all_shields()
-        key = name.lower()
-        if key not in all_weapons:
-            raise ValueError(f"Shield '{name}' not found in {EQUIPMENT_PATH}")
-        return cls(**all_weapons[key])
+@dataclass
+class Item:
+    name: str
+    cost: str
+    weight: int
+    """Used for Items or other stuff for the moment, """
+    @classmethod
+    def from_name(cls, name: str) -> "Item":
+        name = name.lower()
+        """Create a Item instance by name (case-sensitive lookup)."""
+        if name not in ITEMS:
+            raise ValueError(f"Item '{name}' not found ")
+        return cls(name, **ITEMS[name])
