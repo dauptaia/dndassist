@@ -22,8 +22,8 @@ class Character:
     name: str
     race: str
     char_class: str
-    hit_dice: str = "1d8"
-    hit_dices: int = 1
+    hit_dices:  List[str] = field(default_factory=list) # As many Hitdices as level
+    hit_dices_mask:  List[bool] = field(default_factory=list) # all true when starting
     gender: str  = "neutral"
     level: int = 1
     xp: int = 0
@@ -69,11 +69,7 @@ class Character:
     current_state: Dict[str, any] = field(
         default_factory=lambda: {
             "current_hp": 10,
-       #     "objectives": ["stand watch"],
             "conditions": [],
-        #    "action": "idle",
-        #    "outcome": "",
-        #    "aggro": None,
         }
     )
 
@@ -103,16 +99,8 @@ class Character:
 
     @classmethod
     def load_from_dict(cls, data:dict) -> "Character":
-        """Load a character from a dict descriptio,"""
+        """Load a character from a dict description"""
         return cls(**data)
-    
-    # def is_npc(self):
-    #     npc_bool = True
-    #     if "player" in self.faction:
-    #         npc_bool = False
-    #     if "gamemaster" in self.faction:
-    #         npc_bool =False
-    #     return npc_bool
     
     def attr_mod(self, attr) -> int:
         """Return attribute modifier"""
@@ -292,6 +280,15 @@ class Character:
             if int(v) > 0:
                 _list_str.append(f"{v} {k}") 
         situation += ", ".join(_list_str)
+
+        situation  +=f"\n\n __Hit Dices__ :"
+        for hd,hd_m in zip(self.hit_dices,self.hit_dices_mask):
+            sym = " "
+            if hd_m:
+                sym = "*"
+            situation  +=f"\n {hd} {sym}"
+         
+        add_info = ""
 
         situation  +=f"\n\n __Attributes__ :"
         for k,v in self.attributes.items():

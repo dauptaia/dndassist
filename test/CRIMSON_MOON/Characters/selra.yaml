@@ -2,6 +2,8 @@ name: Selra the Umbral Adept
 race: Human
 gender: male
 char_class: Warlock
+hit_dices: [1d8]
+hit_dices_mask: [True]
 level: 3
 xp: 820
 description: no particular trait

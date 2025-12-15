@@ -45,6 +45,7 @@ def equipment_weight(equip_name):
             break
     if qoi is None:
         _print_r(f"{equip_name} not present in equipment ddb.")
+        qoi = 0
     return qoi
 
 def equipment_cost(equip_name):
@@ -57,6 +58,7 @@ def equipment_cost(equip_name):
             break
     if qoi is None:
         _print_r(f"{equip_name} not present in equipment ddb.")
+        qoi = 0
     return qoi
 
 def weapon_catg(weapon_name):   

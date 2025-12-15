@@ -64,7 +64,7 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 class GameEngine:
     def __init__(self, wkdir: str, reload_from_save:int=None):
         print_color(banner, color="yellow")
-        time.sleep(1)
+        time.sleep(0.1)
         self.wkdir=wkdir
         self.adventure_log = []
 
@@ -94,7 +94,8 @@ class GameEngine:
             pdict["state"] = "manual"
             list_players_actors.append(Actor.from_dict(pdict, self.wkdir))
         # startup room
-        self.change_room(players_data["room"],list_players_actors,datetime.now() )
+        zero_date = datetime(1000, 10, 5, 12, 00)
+        self.change_room(players_data["room"],list_players_actors,zero_date)
     
     def save_game(self):
         save = {
@@ -197,7 +198,7 @@ class GameEngine:
 
         # 3️⃣ Execute each actor's turn in initiative order
         for actor in initiative_order:
-            time.sleep(1)
+            time.sleep(0.1)
             # skip is actor is dead or unconcious
             skip = False
             for skip_state in ["dead"]:
@@ -214,7 +215,7 @@ class GameEngine:
             remaining_moves = actor.character.max_distance()
             remaining_actions = 100
             while remaining_moves >= self.room.unit_m and remaining_actions > 0:
-                time.sleep(1)
+                time.sleep(0.1)
                 story_print(f"""
     --- __{actor.name}__'s turn ---
     pos: {actor.pos}, view height: {actor.height+actor.climbed} m
@@ -441,7 +442,7 @@ class GameEngine:
             lvl, prof, hp_increase, abilities_increase = check_new_level(
                 actor.character.xp, 
                 actor.character.xp+xp_share, 
-                actor.character.hit_dice, 
+                actor.character.hit_dices_max[0], 
                 actor.character.attr_mod("constitution"))
             if lvl > actor.character.level:
                 story_print(f"__[{actor.name}]__ level up ! {actor.character.level}->{lvl}" )
@@ -468,6 +469,8 @@ class GameEngine:
             "Change actor(s) status : idle < > manual < > auto",
             "Move actor(s) to coordinates",
             "Send player(s) to gate",
+            "Short rest",
+            "Long rest",
             "Exit game",
         ]
         continue_game = None
@@ -560,7 +563,48 @@ class GameEngine:
                 for actor_name,actor in self.room.actors.items():
                     if actor_name in self.players_sorted_list:
                         self.gates.new_traveler(actor,target_gate)
-                    
+            elif option == "Short rest" :
+                self.now += timedelta(0, 3600)
+                for actor_name,actor in self.room.actors.items():
+                    if actor_name in self.players_sorted_list:
+
+                        hit_mask = self.room.actors[actor_name].character.hit_dices_mask
+                        hit_dices =  self.room.actors[actor_name].character.hit_dices
+
+                        if sum(hit_mask) == 0:
+                            story_print(f"[{actor_name}] have no hit_dices left]")
+                        else:
+
+                            remain_hit_dices = ["no recovery"] + [v for i,v in enumerate(hit_dices) if hit_mask[i]] 
+                            hit_dice, _ = user_select_option(
+                                f"What hit dice [{actor_name}] will use? ",
+                                f"[{actor_name}] is having a short rest",
+                                remain_hit_dices
+                            )
+                            if hit_dice == "no recovery":
+                                continue
+                            idx = remain_hit_dices.index(hit_dice)-1
+                            self.room.actors[actor_name].character.hit_dices_mask[idx] = False
+                            roll, success, mod = self.room.actors[actor_name].rolldice(hit_dice, attr="constitution")
+                            story_print(f"[{actor_name}] get {roll}+{mod} (const) HP")
+                            chp = self.room.actors[actor_name].character.current_state["current_hp"] 
+                            mhp = self.room.actors[actor_name].character.max_hp
+                            self.room.actors[actor_name].character.current_state["current_hp"] = min(mhp, chp+roll+mod)
+            elif option == "Long rest" :
+                self.now += timedelta(0, 8*3600)
+                for actor_name,actor in self.room.actors.items():
+                    if actor_name in self.players_sorted_list:
+                        if self.room.actors[actor_name].character.current_state["current_hp"] < 1:
+                            continue
+                        self.room.actors[actor_name].character.current_state["current_hp"] = self.room.actors[actor_name].character.max_hp
+                        hd_m =  self.room.actors[actor_name].character.hit_dices_mask
+                        gain = max(1, (len(hd_m)-sum(hd_m))//2)
+                        for i,val in enumerate(hd_m):
+                            if val is False:
+                                self.room.actors[actor_name].character.hit_dices_mask[i] = True
+                                gain -=1
+                            if gain == 0:
+                                break
             else:
                 raise RuntimeError(f"End of turn action {option} not understood...")
         if continue_game is None:

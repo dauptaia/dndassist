@@ -298,7 +298,7 @@ class Actor:
     def status_str(self)-> Tuple[str, str, str]:
         """return the status of the actor when necessary"""
         actor_status = f"__[{self.name}]__"
-        actor_status += f"\n\n Experience accumulated {self.xp_accumulated} XP"
+        actor_status += f"\n\n Experience accumulated {self.character.xp} XP"
         actor_status += f"\n\n State {self.state}"
         actor_status += f"\n\n Climbed {self.climbed} m"
         char_stat1 ,char_stat2  = self.character.status_str()

@@ -34,19 +34,46 @@ By Antoine Dauptain, dedicated to Noé, Gaspard, Hugo.
 
 
 ROUND 1 START
-   Room village_start, time 21:42:03.458597
-
-
---- __lana__'s turn (14, 7)---
-attack village_elder with Longbow ; damage max 8 HP
-Manual input
-
-village_elder took 11 hp damage and is dead
-
+   Room village_start, time 12:00:00
 
 
 --- __neila__'s turn (15, 7)---
-hex lana with Eldritch Blast ; damage max 10 HP
+round finished
 Manual input
 
-lana took 2 hp damage
+
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
+ROUND 2 START
+   Room village_start, time 13:00:12
+
+
+--- __neila__'s turn (15, 7)---
+show status
+Manual input
+
+
+round finished
+Manual input
+
+
+
+
+--- __lana__'s turn (14, 7)---
+round finished
+Manual input
+
+
+ROUND 3 START
+   Room village_start, time 21:00:24
+
+
+--- __neila__'s turn (15, 7)---
+show status
+Manual input
+
