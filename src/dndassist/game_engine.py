@@ -67,9 +67,7 @@ class GameEngine:
         time.sleep(0.1)
         self.wkdir=wkdir
         self.adventure_log = []
-
         self.adventure_log.append(banner)
-
         self.gates: Gates = Gates()
         self.players_sorted_list: List[str] = None
         self.room: RoomMap = None
@@ -104,7 +102,7 @@ class GameEngine:
             "room" : self.room.name,
             "players_sorted_list" : self.players_sorted_list,
             "actors": {},
-    #        "loots": {}
+            "loots": {}
         }
 
         for actor_name, actor in self.room.actors.items():
@@ -178,6 +176,8 @@ class GameEngine:
 
         self.adventure_log.append(turn_mark)
 
+
+        # Build initiative of active actors in a Function
         # 1️⃣ Filter out inactive actors
         active_actors = []
         for  actor in self.room.actors.values():
@@ -222,7 +222,6 @@ class GameEngine:
     Remaining moves: __{remaining_moves}__m
 """, color="grey",justify="left")
                 actions_avail = self.build_all_actions_available_to_actor(actor)
-                #story_print("Actions available:\n"+"\n".join(actions_avail), color="grey",justify="left")
                 npc_bool = actor.state == "auto"
                 action, comment = user_select_option(
                     "What action will you do?",
@@ -290,8 +289,10 @@ class GameEngine:
                     outcome = self.action_pick_up_loot(actor, action)
 
                 elif action.startswith("talk to"):
+                    # make function
                     remaining_actions -= 100
-                    npc_actor = self.room.actors[action.split()[2]]
+                    actor_name = action.split()[2]
+                    npc_actor = self.room.actors[actor_name]
                     name, cost_str, reward_str, xp = npc_actor.talk_to()
                     if cost_str is None:
                         outcome = f"[{npc_actor.name}] {name})"
@@ -345,6 +346,7 @@ class GameEngine:
 
         return True
 
+    # move to room
     def climb_adjacent_tile(self, actor: Actor, action:str)->int:
         """What happen when climbing up, equal or down
         actor can lose HP if critical fails
@@ -493,6 +495,8 @@ class GameEngine:
                 self.load_game(self.round_counter-1)
                 
             elif option == "Change actor(s) status : idle < > manual < > auto":
+                # make function
+                # make sub function for targets
                 targets_options = ["all_actors", "all_players", "all_npcs"]
                 for actor_name in self.room.actors:
                     if actor_name in self.players_sorted_list:
@@ -522,6 +526,7 @@ class GameEngine:
                     story_print(f"[{actor_name}] state is now __{new_state}__", color="green", justify="right")
                 pass
             elif option == "Move actor(s) to coordinates":
+                # make function
                 targets_options = ["all_actors", "all_players", "all_npcs"]
                 for actor_name in self.room.actors:
                     if actor_name in self.players_sorted_list:
@@ -564,6 +569,7 @@ class GameEngine:
                     if actor_name in self.players_sorted_list:
                         self.gates.new_traveler(actor,target_gate)
             elif option == "Short rest" :
+                # make function
                 self.now += timedelta(0, 3600)
                 for actor_name,actor in self.room.actors.items():
                     if actor_name in self.players_sorted_list:
@@ -591,6 +597,7 @@ class GameEngine:
                             mhp = self.room.actors[actor_name].character.max_hp
                             self.room.actors[actor_name].character.current_state["current_hp"] = min(mhp, chp+roll+mod)
             elif option == "Long rest" :
+                #make function
                 self.now += timedelta(0, 8*3600)
                 for actor_name,actor in self.room.actors.items():
                     if actor_name in self.players_sorted_list:
@@ -610,9 +617,8 @@ class GameEngine:
         if continue_game is None:
             raise RuntimeError("GameMaster dialog ended unexpectedly...")
         return continue_game
-                
-
-        
+    
+    # Function
     def build_all_actions_available_to_actor(self, actor:Actor)-> List[str]:
         """ Create a list of possible actions for an Actor"""
 
@@ -674,6 +680,7 @@ class GameEngine:
         
         return actions_avail
 
+    # make function
     def action_pick_up_loot(self, actor:Actor, action:str)->str:
         """Action handler to pick up loot (remove form room, give to Actor's Character)"""
         loot_key = action.split("ick up")[-1].strip()
@@ -685,7 +692,8 @@ class GameEngine:
         else:
             outcome = f"\n{actor.name} cannot pick up {loot_key} {item_name}, too heavy to carry."
         return outcome
-
+    
+    # make function
     def action_attack(self, actor, action)->str:
         """Action handler for Actor attacker hitting Actor defender """
         
@@ -701,7 +709,8 @@ class GameEngine:
             self.room.xp_accumulated += defender.xp_to_gain
         return outcome
 
-    def action_hex(self, actor, action)->str:
+    # make function
+    def action_hex(self, actor:Actor, action:str)->str:
         """Action handler for Actor attacker hexing Actor defender """
         
         defender_name = action.split(" ")[1]
@@ -716,6 +725,7 @@ class GameEngine:
             self.room.xp_accumulated += defender.xp_to_gain
         return outcome
 
+    # make function
     def action_move_to_target(self, actor:Actor, remaining_moves:float, action:str)->Tuple[str,int]:
         """Action handler for Actor moving to a target (Actor, Loot or Gate)"""
         tgt = action.split(" ")[2]
@@ -724,6 +734,7 @@ class GameEngine:
         outcome = f"\n{actor.name} moved toward {tgt} over {used_dist}m"
         return outcome, used_dist
 
+    # make function
     def action_move_to_direction(self, actor:Actor, remaining_moves:float)->Tuple[str,int]:
         
 
@@ -787,7 +798,8 @@ class GameEngine:
             outcome = f"\nMOVEMENT TO {heading} IMPOSSIBLE DUE TO AN OBSTACLE!"
             used_dist = self.room.unit_m
         return outcome, used_dist
-
+    
+    # move to actor function
     def build_attack_solutions(self, actor, all_visible_actors_):
             
         actions_avail = []
@@ -815,6 +827,7 @@ class GameEngine:
         return actions_avail
 
     # ---------- INITIATIVE ----------
+    # make function
     def compute_initiative(self, active_actors: List[Actor]) -> List[Actor]:
         """Compute initiative order based on dice rolls and dexterity modifiers."""
         initiatives = []
@@ -833,7 +846,7 @@ class GameEngine:
             story_print(f".  {i}, __[{a.name}]__",color="green", justify="right")
         return ordered
 
-
+#move to actor
 def list_of_foes(actor: Actor, other_actors_: List[Actor]) -> List[Actor]:
     """return the foes of this actor"""
     out = []
@@ -842,7 +855,7 @@ def list_of_foes(actor: Actor, other_actors_: List[Actor]) -> List[Actor]:
             out.append(other)
     return out
 
-
+# move to actor
 def actor_attack_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
     """return strongest available weapon  in range"""
     max_dmg = 0
@@ -854,6 +867,7 @@ def actor_attack_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
 
     return weap, max_dmg
 
+# move to actor
 def actor_hex_solutions(actor: Actor, dist: int) -> Tuple[str, str]:
     """return strongest available hex  in range"""
     max_dmg = 0

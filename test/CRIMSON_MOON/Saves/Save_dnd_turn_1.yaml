@@ -25,9 +25,11 @@ actors:
         off_hand: Dagger
       faction: player
       gender: female
-      hit_dice: 1d8
-      hit_dices: 1
-      level: 3
+      hit_dices:
+      - 1d8
+      hit_dices_mask:
+      - true
+      level: 1
       max_cargo: 30
       max_hp: 24
       max_speed: 35
@@ -55,8 +57,8 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: talk to village_elder
-    last_outcome: '[village_elder] None)'
+    last_action: round finished
+    last_outcome: ''
     name: lana
     objectives:
     - Quit the village map using the path to the forest
@@ -66,7 +68,6 @@ actors:
     sprite: liora.png
     state: manual
     symbol: L
-    xp_accumulated: 0
     xp_to_gain: 10
   neila:
     aggro: null
@@ -100,8 +101,10 @@ actors:
         off_hand: Dagger
       faction: cult_of_shadows
       gender: male
-      hit_dice: 1d8
-      hit_dices: 1
+      hit_dices:
+      - 1d8
+      hit_dices_mask:
+      - true
       level: 3
       max_cargo: 30
       max_hp: 22
@@ -132,12 +135,11 @@ actors:
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 20
-    - 17
+    - 15
+    - 7
     sprite: liora.png
     state: manual
     symbol: N
-    xp_accumulated: 0
     xp_to_gain: 10
   thomas:
     aggro: null
@@ -164,8 +166,8 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
-      hit_dice: 1d8
-      hit_dices: 1
+      hit_dices: []
+      hit_dices_mask: []
       level: 2
       max_cargo: 30
       max_hp: 10
@@ -201,7 +203,6 @@ actors:
     sprite: villager.png
     state: idle
     symbol: V
-    xp_accumulated: 0
     xp_to_gain: 10
   village_elder:
     aggro: null
@@ -226,10 +227,10 @@ actors:
         armor: Leather Armor
         main_hand: Sickle
         off_hand: None
-      faction: neutral
+      faction: evil master
       gender: male
-      hit_dice: 1d8
-      hit_dices: 1
+      hit_dices: []
+      hit_dices_mask: []
       level: 2
       max_cargo: 20
       max_hp: 10
@@ -258,12 +259,18 @@ actors:
       - cost: money | 3 cp
         name: booze!
         reward: equipment | bottle of beer
+        xp: 1
       - cost: equipment | dagger
         name: info on quest2
         reward: information | life is short
+      - cost: equipment | cocotte * 2
+        name: info on quest
+        reward: information | this quest is about blabla bla
+        xp: 200
       - cost: equipment | dagger
         name: map of the region
         reward: equipment | map
+        xp: 10
       smalltalk:
       - what strangers like ya'r doin' here. No business with ya!
     last_action: null
@@ -276,10 +283,8 @@ actors:
     sprite: village_elder.png
     state: idle
     symbol: E
-    xp_accumulated: 0
     xp_to_gain: 10
-kills: []
-now: 2025-12-08 13:16:14.663887
+now: 1000-10-05 12:00:12
 players_sorted_list:
 - lana
 - neila

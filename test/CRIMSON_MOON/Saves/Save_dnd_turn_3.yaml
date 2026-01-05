@@ -13,18 +13,22 @@ actors:
       char_class: Ranger
       current_state:
         conditions: []
-        current_hp: 1
+        current_hp: 10
       description: no particular trait
       equipment:
       - Longbow
       - Leather Armor
       - Dagger
+      - cocotte
+      - cocotte
       equipped:
         armor: Leather Armor
         main_hand: Longbow
         off_hand: Dagger
       faction: player
       gender: female
+      hit_dice: 1d8
+      hit_dices: 1
       level: 3
       max_cargo: 30
       max_hp: 24
@@ -53,14 +57,14 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: round finished
-    last_outcome: ''
+    last_action: talk to village_elder
+    last_outcome: '[lana] cannot give equipment | poule * 2 to [village_elder]'
     name: lana
     objectives:
     - Quit the village map using the path to the forest
     pos:
-    - 14
-    - 7
+    - 13
+    - 8
     sprite: liora.png
     state: manual
     symbol: L
@@ -98,6 +102,8 @@ actors:
         off_hand: Dagger
       faction: cult_of_shadows
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 3
       max_cargo: 30
       max_hp: 22
@@ -122,10 +128,8 @@ actors:
     facing: North
     height: 1.7
     interaction: null
-    last_action: hex lana with Eldritch Blast ; damage max 10 HP
-    last_outcome: '
-
-      lana took 0 hp damage'
+    last_action: round finished
+    last_outcome: ''
     name: neila
     objectives:
     - Quit the village map using the path to the forest
@@ -162,6 +166,8 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 2
       max_cargo: 30
       max_hp: 10
@@ -224,6 +230,8 @@ actors:
         off_hand: None
       faction: neutral
       gender: male
+      hit_dice: 1d8
+      hit_dices: 1
       level: 2
       max_cargo: 20
       max_hp: 10
@@ -255,6 +263,9 @@ actors:
       - cost: equipment | dagger
         name: info on quest2
         reward: information | life is short
+      - cost: equipment | poule * 2
+        name: info on quest
+        reward: information | you got all the chickens, here is the quest....
       - cost: equipment | dagger
         name: map of the region
         reward: equipment | map
@@ -273,7 +284,7 @@ actors:
     xp_accumulated: 0
     xp_to_gain: 10
 kills: []
-now: 2025-11-30 22:18:38.251845
+now: 2025-12-14 14:08:48.131088
 players_sorted_list:
 - lana
 - neila
